@@ -1,7 +1,6 @@
 package locator
 
 import gamification.GamificationManager
-import gamification.LocatorsAnalyzer
 import gamification.UserProfile
 import ui.GUIManager
 import java.nio.file.FileSystems
@@ -15,28 +14,22 @@ class LocatorsMonitor(
     private val gamificationManager: GamificationManager,
     private val userProfile: UserProfile,
     private val guiManager: GUIManager,
-    filePaths: List<Path>
-) {
+    private val filePaths: List<Path>
+)
+
+{
     private val executor = Executors.newSingleThreadScheduledExecutor()
+    private val extractor = LocatorsExtractor()
 
     init {
         // Update monitor and GUI panel
-        val extractor = LocatorsExtractor()
-        val analyzer = LocatorsAnalyzer()
-        val initialLocators = filePaths.flatMap { extractor.parseLocators(it) }
-        val initialMetricsResults = analyzer.analyzeLocators(initialLocators)
-        guiManager.updateGUI(initialMetricsResults, userProfile, false)
+        guiManager.updateGUI(userProfile, false)
     }
 
-    fun startMonitoring(filePaths: List<Path>) {
+    fun startMonitoring() {
         val watcher = FileSystems.getDefault().newWatchService()
         filePaths.forEach { it.parent.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY) }
-        val extractor = LocatorsExtractor()
-        val analyzer = LocatorsAnalyzer()
         var previousLocators = filePaths.flatMap { extractor.parseLocators(it) }
-        var currentMetricsResults = analyzer.analyzeLocators(previousLocators)
-        var previousMetricsResults: Map<String, Int>
-
         // Every 10 seconds, if any change happens on the locators, the GUI is updated
         executor.scheduleWithFixedDelay({
             val key = watcher.poll(10, TimeUnit.SECONDS) ?: return@scheduleWithFixedDelay
@@ -51,16 +44,13 @@ class LocatorsMonitor(
                     val currentLocators = filePaths.flatMap { extractor.parseLocators(it) }
                     val modifiedLocators = currentLocators.filter { it !in previousLocators }
                     if (modifiedLocators.isNotEmpty()) {
+                        gamificationManager.updateProgresses(previousLocators, currentLocators, userProfile)
+                        guiManager.updateGUI(userProfile, true)
                         previousLocators = currentLocators
-                        previousMetricsResults = currentMetricsResults
-                        currentMetricsResults = analyzer.analyzeLocators(currentLocators)
-                        val results = analyzer.compareMetrics(previousMetricsResults, currentMetricsResults)
-                        gamificationManager.updateProgresses(userProfile, results)
-                        guiManager.updateGUI(currentMetricsResults, userProfile, true)
                     }
                 }
             }
-            guiManager.updateGUI(currentMetricsResults, userProfile, false)
+            guiManager.updateGUI(userProfile, false)
             key.reset()
         }, 0, 10, TimeUnit.SECONDS)
     }

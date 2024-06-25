@@ -1,5 +1,6 @@
 package gamification
 
+import locator.Locator
 import utils.XMLReader
 import utils.XMLWriter
 
@@ -13,157 +14,152 @@ class GamificationManager(private val path: String) {
         Title("Master Tester", 1000),
     )
 
-    private val allQuests = mutableListOf(
-        Quest("xpathAbs10","Replace 10 absolute XPath locators with relative ones", 200, 10),
-        Quest("xpathLength10", "Reduce the length of 10 XPath locators", 150, 10),
-        Quest("xpathHeight10", "Reduce the height of 10 XPath locators", 150, 10),
-        Quest("loc2css10", "Convert 10 non-CSS locators to a CSS ones", 150, 10),
-        Quest("loc2xpath10", "Convert 10 non-XPath locators to XPath ones", 150, 10),
-        Quest("loc2id10", "Convert 10 non-ID locators to ID ones", 150, 10),
-        Quest("attrRef10", "Add a reference to 10 attributes within XPath locators", 150, 10),
-        Quest("tableRef10", "Add a reference to 10 <table> tags within XPath locators", 150, 10),
-        Quest("divRef10", "Add a reference to 10 <div> tags within XPath locators", 150, 10),
-        Quest("formRef10", "Add a reference to 10 <form> tags within XPath locators", 150, 10),
-        Quest("buttonRef10", "Add a reference to 10 <button> tags within XPath locators", 150, 10),
-        Quest("linkRef10", "Add a reference to 10 <a> tags within XPath locators", 150, 10),
-        Quest("spanRef10", "Add a reference to 10 <span> tags within XPath locators", 150, 10),
-        Quest("change10", "Change 10 different locators", 100, 10),
-        Quest("changeAllMethod", "Change all locators of a test method", 300, 999),
-        Quest("changeAllTest", "Change all locators of a test class", 800, 999),
+
+    private val MAX_LENGTH: Int = 20//TODO: to reason about
+    private val MAX_HEIGHT: Int = 5
+
+
+
+    private fun cssLocatorsCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return locatorsNew.count { it.locatorType.equals("css", ignoreCase = true) } -
+                locatorsOld.count { it.locatorType.equals("css", ignoreCase = true) }
+    }
+
+    private fun xpathLocatorsCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return locatorsNew.count { it.locatorType.equals("xpath", ignoreCase = true) } -
+                locatorsOld.count { it.locatorType.equals("xpath", ignoreCase = true) }
+    }
+
+    private fun idLocatorsCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return locatorsNew.count { it.locatorType.equals("id", ignoreCase = true) } -
+                locatorsOld.count { it.locatorType.equals("id", ignoreCase = true) }
+    }
+
+    private fun nameLocatorsCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return locatorsNew.count { it.locatorType.equals("name", ignoreCase = true) } -
+                locatorsOld.count { it.locatorType.equals("name", ignoreCase = true) }
+    }
+
+    private fun classLocatorsCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return locatorsNew.count { it.locatorType.equals("class", ignoreCase = true) } -
+                locatorsOld.count { it.locatorType.equals("class", ignoreCase = true) }
+    }
+
+    private fun linkTextLocatorsCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count {
+            it.locatorType.equals("linkText", ignoreCase = true) ||
+                    it.locatorType.equals("partialLinkText", ignoreCase = true)
+        } -
+                locatorsOld.count {
+                    it.locatorType.equals("linkText", ignoreCase = true) ||
+                            it.locatorType.equals("partialLinkText", ignoreCase = true)
+                })
+    }
+
+    private fun xpathLocators(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Pair<List<Locator>, List<Locator>> {
+        val oldXpathLocators = locatorsOld.filter { it.locatorType.equals("xpath", ignoreCase = true) }
+        val newXpathLocators = locatorsNew.filter { it.locatorType.equals("xpath", ignoreCase = true) }
+        return Pair(oldXpathLocators, newXpathLocators)
+    }
+
+    private fun longXpathCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        val (xpathLocatorsOld, xpathLocatorsNew) = xpathLocators(locatorsOld, locatorsNew)
+        return (xpathLocatorsOld.count { it.locatorValue.length > MAX_LENGTH } -
+                xpathLocatorsNew.count { it.locatorValue.length > MAX_LENGTH })
+    }
+
+    private fun highXpathCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        val (xpathLocatorsOld, xpathLocatorsNew) = xpathLocators(locatorsOld, locatorsNew)
+        return (
+                xpathLocatorsOld.count {it.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size > MAX_HEIGHT }
+                        -
+                        xpathLocatorsNew.count {it.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size > MAX_HEIGHT }
+                )
+    }
+
+    private fun absoluteXpathCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsOld.count { it.locatorValue.startsWith("/html") } -
+                locatorsNew.count { it.locatorValue.startsWith("/html") })
+    }
+
+    private fun xpathAttributeCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("@") } -
+                locatorsOld.count { it.locatorValue.contains("@") })
+    }
+
+    private fun xpathTableCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("/table") } -
+                locatorsOld.count { it.locatorValue.contains("/table") })
+    }
+
+    private fun xpathDivCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("/div") } -
+                locatorsOld.count { it.locatorValue.contains("/div") })
+    }
+
+    private fun xpathSpanCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("/span") } -
+                locatorsOld.count { it.locatorValue.contains("/span") })
+    }
+
+    private fun xpathButtonCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("/button") } -
+                locatorsOld.count { it.locatorValue.contains("/button") })
+    }
+
+    private fun xpathAnchorCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("/a") } -
+                locatorsOld.count { it.locatorValue.contains("/a") })
+    }
+
+    private fun xpathFormCount(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Int {
+        return (locatorsNew.count { it.locatorValue.contains("/form") } -
+                locatorsOld.count { it.locatorValue.contains("/form") })
+    }
+
+    private fun prova(): Int{
+        return 1
+    }
+
+
+    private val dailyChecks: Map<String, (List<Locator>, List<Locator>) -> Int> = mapOf(
+        "xpathAbs" to { locsOld, locsNew -> absoluteXpathCount(locsOld, locsNew) },
+        "xpathLength" to { locsOld, locsNew -> longXpathCount(locsOld, locsNew) },
+        "xpathHeight" to { locsOld, locsNew -> highXpathCount(locsOld, locsNew) },
+        "loc2css" to { locsOld, locsNew -> cssLocatorsCount(locsOld, locsNew) },
+        "loc2xpath" to { locsOld, locsNew -> xpathLocatorsCount(locsOld, locsNew) },
+        "loc2id" to { locsOld, locsNew -> idLocatorsCount(locsOld, locsNew) },
+        "loc2class" to { locsOld, locsNew -> classLocatorsCount(locsOld, locsNew) },
+        "loc2linkText" to { locsOld, locsNew -> linkTextLocatorsCount(locsOld, locsNew) },
+        "loc2name" to { locsOld, locsNew -> nameLocatorsCount(locsOld, locsNew) },
+        "attrRef" to { locsOld, locsNew -> xpathAttributeCount(locsOld, locsNew) },
+        "tableRef" to { locsOld, locsNew -> xpathTableCount(locsOld, locsNew) },
+        "divRef" to { locsOld, locsNew -> xpathDivCount(locsOld, locsNew) },
+        "formRef" to { locsOld, locsNew -> xpathFormCount(locsOld, locsNew) },
+        "buttonRef" to { locsOld, locsNew -> xpathButtonCount(locsOld, locsNew) },
+        "linkRef" to { locsOld, locsNew -> xpathAnchorCount(locsOld, locsNew) },
+        "spanRef" to { locsOld, locsNew -> xpathSpanCount(locsOld, locsNew) },
+        "robust" to { _, _ -> prova() } //TODO: placeholder to adapt with new method depending on the daily check
     )
 
-    private val allAchievements = mutableListOf(
-        Achievement("Is this a locator?", "Just a dummy achievement", 1),
-        Achievement("Absolute XPath Destroyer", "Fix 100 absolute XPath locators", 100),
-        Achievement("Length Reducer", "Reduce the length of 100 XPath locators", 100),
-        Achievement("Height Reducer", "Reduce the height of 100 XPath locators", 100),
-        Achievement("Stillness", "Do not change any locator for 48 hours", 999),
-        Achievement("Master of Changes", "Change every locator at least once", 999),
-        Achievement("I made a mistake", "Change a locator into something worse", 999), //e.g., relative to absolute, longer xpath, id to else, higher xpath
-    )
 
-
-    private fun initAchievements(userProfile: UserProfile) {
-        for (ach in allAchievements) {
-            val achProgress = AchievementProgress(ach, 0)
-            userProfile.achievementProgresses.add(achProgress)
-        }
-    }
-
-    private fun assignQuests(userProfile: UserProfile) {
-        val quests = allQuests.shuffled().take(1)
-        userProfile.assignQuests(quests)
-    }
-
-    //TODO: this will require to 1) be used to setup new users 2) retrieve persistent data from old users
-    fun setupUserProfile(name: String): UserProfile {
-        val xmlReader = XMLReader()
-        var userProfile = xmlReader.createUserProfileFromXML(path, name)
-        if(userProfile == null) {
-            userProfile = UserProfile(
-                name = name,
-                level = 1,
-                currentXP = 0,
-                title = "Newbie Tester",
-                achievementProgresses = mutableListOf(),
-                dailyProgresses = mutableListOf(),
-                questProgresses = mutableListOf(),
-                achievements = mutableListOf()
-            )
-            DailyManager.setupDailies(userProfile)
-            assignQuests(userProfile)
-            initAchievements(userProfile)
-        }
-        return userProfile
-    }
-
-
-
-
-
-    fun updateProgresses(userProfile: UserProfile, results: Map<String, Int>) {
-        DailyManager.updateDailies(userProfile, results)
-        //updateQuests(userProfile, results)
-        //updateAchievements(userProfile, results)
-        updateTitleAndLvl(userProfile)
-        val xmlWriter = XMLWriter()
-        xmlWriter.updateXmlWithUserProfile(path, userProfile)
-    }
-
-
-
-
-
-
-
-
-
-
-    /*
-    fun updateProgresses1(userProfile: UserProfile, results: Map<String, Int>){
-
-        val numImprovedByLength = results["longXPathCount"] ?: 0
-        val numImprovedByHeight = results["highXPathCount"] ?: 0
-        val numImprovedByAbs = results["absXPathCount"] ?: 0
-
-
-        if(numImprovedByLength > 0) {
-            allDailies.find { it.name == "xpathLength" }?.let { updateDailyProgresses(userProfile, it, numImprovedByLength) }
-            //allQuests.find { it.name == "xpathLength10" }?.let { updateQuestProgresses(userProfile, it, numImprovedByLength) }
-            //allAchievements.find { it.name == "Length Reducer" }?.let { updateAchievementProgresses(userProfile, it, numImprovedByLength) }
-        }
-        if(numImprovedByHeight > 0) {
-            allDailies.find { it.name == "xpathHeight" }?.let { updateDailyProgresses(userProfile, it, numImprovedByHeight) }
-            //allQuests.find { it.name == "xpathHeight10" }?.let { updateQuestProgresses(userProfile, it, numImprovedByHeight) }
-            //allAchievements.find { it.name == "Height Reducer" }?.let { updateAchievementProgresses(userProfile, it, numImprovedByHeight) }
-        }
-        if(numImprovedByAbs > 0) {
-            allDailies.find { it.name == "xpathAbs" }?.let { updateDailyProgresses(userProfile, it, numImprovedByAbs) }
-            //allQuests.find { it.name == "xpathAbs10" }?.let { updateQuestProgresses(userProfile, it, numImprovedByAbs) }
-            //allAchievements.find { it.name == "Absolute XPath Destroyer" }?.let { updateAchievementProgresses(userProfile, it, numImprovedByAbs) }
-        }
-        //if(numImprovedByLength > 0 || numImprovedByHeight > 0 || numImprovedByAbs > 0)
-        //    allAchievements.find { it.name == "Dummy Achievement" }?.let { updateAchievementProgresses(userProfile, it, 1) }
-    }
-    */
-
-
-    /*private fun updateDailyProgresses(userProfile: UserProfile, daily: Daily, progress: Int){
-        val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
-        dailyProgress?.let {
-            dailyProgress.progress += progress
-            if (dailyProgress.progress >= daily.target) {
-                addXP(userProfile, daily.xp)
-                removeDaily(userProfile, daily)
-            }
-        }
-    }*/
-
-    private fun updateQuestProgresses(userProfile: UserProfile, quest: Quest, progress: Int){
-        val questProgress = userProfile.questProgresses.find { it.quest.name == quest.name }
-        questProgress?.let {
-            questProgress.progress += progress
-            if (questProgress.progress >= quest.target){
-                addXP(userProfile, quest.xp)
-                removeQuest(userProfile, quest)
+    private fun checkDailies(userProfile: UserProfile, locatorsOld: List<Locator>, locatorsNew: List<Locator>) {
+        val allDailies = DailyManager.getDailies()
+        val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
+        copyOfDailyProgresses.forEach { dailyProgress ->
+            allDailies.find { it.name == dailyProgress.daily.name }?.let {
+                val progress = dailyChecks[it.name]?.invoke(locatorsOld, locatorsNew)
+                if (progress!! > 0)
+                    DailyManager.updateDaily(userProfile, it, progress)
             }
         }
     }
 
-    private fun updateAchievementProgresses(userProfile: UserProfile, ach: Achievement, progress: Int){
-        val achProgress = userProfile.achievementProgresses.find { it.achievement.name == ach.name }
-        achProgress?.let {
-            achProgress.progress += progress
-            if (achProgress.progress >= ach.target){
-                addAchievement(userProfile, ach)
-            }
-        }
+
+    private fun checkAchievement(){
+
     }
 
-    private fun addXP(userProfile: UserProfile, xp: Int) {
-        userProfile.currentXP += xp
-        updateTitleAndLvl(userProfile)
-    }
 
     private fun updateTitleAndLvl(userProfile: UserProfile) {
         val newTitle = allTitles
@@ -177,12 +173,41 @@ class GamificationManager(private val path: String) {
 
 
 
-    private fun removeQuest(userProfile: UserProfile, quest: Quest){
-        userProfile.questProgresses.removeIf { it.quest.name == quest.name }
+    fun updateProgresses(locatorsOld: List<Locator>, locatorsNew: List<Locator>, userProfile: UserProfile) {
+        val xmlWriter = XMLWriter()
+        checkDailies(userProfile, locatorsOld, locatorsNew)//for each assigned daily, check
+
+        //qui devo ciclare tra achievements ancora attivi
+        //userProfile.achievementProgresses.forEach { achievementProgress -> checkAchievement(achievement) }
+        //AchievementManager.updateAchievements(userProfile, results)
+
+        updateTitleAndLvl(userProfile)
+        xmlWriter.saveUserProfileToXML(path, userProfile)
     }
 
-    private fun addAchievement(userProfile: UserProfile, ach: Achievement){
-        userProfile.achievements.add(ach)
+
+
+
+    //upload user profile data from file if they exist or create a new user profile if they do not
+    fun setupUserProfile(name: String): UserProfile {
+        val xmlReader = XMLReader()
+        val xmlWriter = XMLWriter()
+        var userProfile = xmlReader.loadUserProfileFromXML(path, name)
+        if(userProfile == null) {
+            userProfile = UserProfile(
+                name = name,
+                level = 1,
+                currentXP = 0,
+                title = "Newbie Tester",
+                achievementProgresses = mutableListOf(),
+                dailyProgresses = mutableListOf(),
+                completedAchievements = mutableListOf()
+            )
+            DailyManager.setupDailies(userProfile)
+            AchievementManager.setupAchievements(userProfile)
+            xmlWriter.addNewUserProfileToXML(path, userProfile)
+        }
+        return userProfile
     }
 
 }

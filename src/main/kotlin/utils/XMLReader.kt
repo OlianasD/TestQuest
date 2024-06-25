@@ -2,14 +2,14 @@ package utils
 
 import gamification.*
 import org.w3c.dom.Element
-import org.w3c.dom.NodeList
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
 
 class XMLReader {
 
-    fun createUserProfileFromXML(xmlFilePath: String, name: String): UserProfile? {
+
+    fun loadUserProfileFromXML(xmlFilePath: String, name: String): UserProfile? {
         val userProfileNode = findUserProfileNodeByName(xmlFilePath, name)
         if (userProfileNode != null) {
             val userProfile = UserProfile(
@@ -19,17 +19,13 @@ class XMLReader {
                 title = userProfileNode.getElementsByTagName("title").item(0).textContent,
                 achievementProgresses = mutableListOf(),
                 dailyProgresses = mutableListOf(),
-                questProgresses = mutableListOf(),
-                achievements = mutableListOf()
+                completedAchievements = mutableListOf()
             )
             loadAchievementProgresses(userProfile, userProfileNode)
             loadDailyProgresses(userProfile, userProfileNode)
-            loadQuestProgresses(userProfile, userProfileNode)
             return userProfile
         }
-        else {
-            return null
-        }
+        return null
     }
 
     private fun findUserProfileNodeByName(xmlFilePath: String, name: String): Element? {
@@ -42,23 +38,35 @@ class XMLReader {
             if (node.nodeType == org.w3c.dom.Node.ELEMENT_NODE) {
                 val element = node as Element
                 val profileName = element.getElementsByTagName("name").item(0).textContent
-                if (profileName == name) {
+                if (profileName == name)
                     return element
-                }
             }
         }
         return null
     }
 
     private fun loadAchievementProgresses(userProfile: UserProfile, userProfileNode: Element) {
-        val achievementProgressesNode = userProfileNode.getElementsByTagName("achievements").item(0) as Element
-        val achievementNodes = achievementProgressesNode.getElementsByTagName("achievement")
-        for (i in 0 until achievementNodes.length) {
-            val achievementNode = achievementNodes.item(i) as Element
+        val achievementsNode = userProfileNode.getElementsByTagName("achievements").item(0) as Element
+        //load completed achievements
+        val completedNodes = achievementsNode.getElementsByTagName("completed").item(0) as Element
+        val completedAchievementNodes = completedNodes.getElementsByTagName("achievement")
+        for (i in 0 until completedAchievementNodes.length) {
+            val achievementNode = completedAchievementNodes.item(i) as Element
             val achievementName = achievementNode.getElementsByTagName("name").item(0).textContent
             val achievementDescription = achievementNode.getElementsByTagName("description").item(0).textContent
             val achievementTarget = achievementNode.getElementsByTagName("target").item(0).textContent.toInt()
-            userProfile.achievements.add(Achievement(achievementName, achievementDescription, achievementTarget))
+            userProfile.completedAchievements.add(Achievement(achievementName, achievementDescription, achievementTarget))
+        }
+        //load ongoing achievements
+        val ongoingNodes = achievementsNode.getElementsByTagName("ongoing").item(0) as Element
+        val ongoingAchievementNodes = ongoingNodes.getElementsByTagName("achievement")
+        for (i in 0 until ongoingAchievementNodes.length) {
+            val achievementNode = ongoingAchievementNodes.item(i) as Element
+            val achievementName = achievementNode.getElementsByTagName("name").item(0).textContent
+            val achievementDescription = achievementNode.getElementsByTagName("description").item(0).textContent
+            val achievementTarget = achievementNode.getElementsByTagName("target").item(0).textContent.toInt()
+            val achievementProgress = achievementNode.getElementsByTagName("progress").item(0).textContent.toInt()
+            userProfile.achievementProgresses.add(AchievementProgress(Achievement(achievementName, achievementDescription, achievementTarget), achievementProgress))
         }
     }
 
@@ -77,23 +85,5 @@ class XMLReader {
             userProfile.dailyProgresses.add(dailyProgressObj)
         }
     }
-
-    private fun loadQuestProgresses(userProfile: UserProfile, userProfileNode: Element) {
-        val questProgressesNode = userProfileNode.getElementsByTagName("quests").item(0) as Element
-        val questNodes = questProgressesNode.getElementsByTagName("quest")
-        for (i in 0 until questNodes.length) {
-            val questNode = questNodes.item(i) as Element
-            val questName = questNode.getElementsByTagName("name").item(0).textContent
-            val questDescription = questNode.getElementsByTagName("description").item(0).textContent
-            val questXP = questNode.getElementsByTagName("xp").item(0).textContent.toInt()
-            val questTarget = questNode.getElementsByTagName("target").item(0).textContent.toInt()
-            val questProgress = questNode.getElementsByTagName("progress").item(0).textContent.toInt()
-            val quest = Quest(questName, questDescription, questXP, questTarget)
-            val questProgressObj = QuestProgress(quest, questProgress)
-            userProfile.questProgresses.add(questProgressObj)
-        }
-    }
-
-
 
 }

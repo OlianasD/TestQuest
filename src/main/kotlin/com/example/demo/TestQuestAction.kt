@@ -25,7 +25,7 @@ class TestQuestAction : AnAction() {
             val gamificationManager = GamificationManager("C:\\Users\\User\\Desktop\\users.xml")
             val userProfile = gamificationManager.setupUserProfile("John Doe")
             val monitor = LocatorsMonitor(gamificationManager, userProfile, guiManager, testFilePaths)
-            monitor.startMonitoring(testFilePaths)
+            monitor.startMonitoring()
         } else {
             Messages.showMessageDialog(
                 "Test files not found",

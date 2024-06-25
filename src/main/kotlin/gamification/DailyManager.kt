@@ -5,10 +5,9 @@ class DailyManager {
 
     companion object {
 
-        private val TARGET_DAILY: Int = 1 //TODO: to convert into a map (each daily may have specific requests)
+        private val TARGET_DAILY: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
         private val XP_DAILY: Int = 20 //TODO: to convert into a map (each daily may provide specific XP)
         private val DAILIES_PER_USER: Int = 3
-
 
         private val allDailies = mutableListOf(
             Daily("xpathAbs", "Replace $TARGET_DAILY absolute XPath locators with $TARGET_DAILY relative ones", XP_DAILY, TARGET_DAILY),
@@ -27,6 +26,7 @@ class DailyManager {
             Daily("buttonRef", "Add a reference to $TARGET_DAILY <button> tags within $TARGET_DAILY XPath locators", XP_DAILY, TARGET_DAILY),
             Daily("linkRef", "Add a reference to $TARGET_DAILY <a> tags within $TARGET_DAILY XPath locators", XP_DAILY, TARGET_DAILY),
             Daily("spanRef", "Add a reference to $TARGET_DAILY <span> tags within $TARGET_DAILY XPath locators", XP_DAILY, TARGET_DAILY),
+            Daily("robust", "Make $TARGET_DAILY locators more robust", XP_DAILY, TARGET_DAILY), //TODO: which metric?
         )
 
         fun setupDailies(userProfile: UserProfile) {
@@ -34,31 +34,24 @@ class DailyManager {
             userProfile.assignDailies(dailies)
         }
 
-        fun updateDailies(userProfile: UserProfile, results: Map<String, Int>) {
-            results.forEach { (dailyName, progress) ->
-                println("Updating daily: $dailyName with progress: $progress")
-                if(progress > 0)
-                    updateDailyProgress(userProfile, dailyName, progress)
-            }
+        fun getDailies(): MutableList<Daily> {
+            return allDailies
         }
 
-        private fun updateDailyProgress(userProfile: UserProfile, dailyName: String, progress: Int) {
-            val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == dailyName }
-            dailyProgress?.let {
-                it.progress += progress
-                if (it.progress >= it.daily.target) {
-                    addXP(userProfile, it.daily.xp)
-                    removeDaily(userProfile, it.daily)
+
+        fun updateDaily(userProfile: UserProfile, daily: Daily, progress: Int) {
+            if (progress > 0) {
+                val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
+                dailyProgress?.let { dp ->
+                    dp.progress += progress
+                    if (dp.progress >= dp.daily.target) { // if the daily has been completed, assign xp and remove it from list
+                        userProfile.currentXP += dp.daily.xp
+                        userProfile.dailyProgresses.removeIf { it.daily.name == dp.daily.name }
+                    }
                 }
             }
         }
 
-        private fun addXP(userProfile: UserProfile, xp: Int) {
-            userProfile.currentXP += xp
-        }
 
-        private fun removeDaily(userProfile: UserProfile, daily: Daily) {
-            userProfile.dailyProgresses.removeIf { it.daily.name == daily.name }
-        }
     }
 }
