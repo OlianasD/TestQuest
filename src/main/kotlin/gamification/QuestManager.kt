@@ -1,4 +1,0 @@
-package gamification
-
-class QuestManager {
-}
