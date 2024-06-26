@@ -14,6 +14,7 @@ class UserProfile(
     var name: String,
     var level: Int,
     var currentXP: Int,
+    var nextXP: Int,
     var title: String,
     val achievementProgresses: MutableList<AchievementProgress>,
     val dailyProgresses: MutableList<DailyProgress>,

@@ -16,6 +16,7 @@ class XMLReader {
                 name = userProfileNode.getElementsByTagName("name").item(0).textContent,
                 level = userProfileNode.getElementsByTagName("level").item(0).textContent.toInt(),
                 currentXP = userProfileNode.getElementsByTagName("currentXP").item(0).textContent.toInt(),
+                nextXP = userProfileNode.getElementsByTagName("nextXP").item(0).textContent.toInt(),
                 title = userProfileNode.getElementsByTagName("title").item(0).textContent,
                 achievementProgresses = mutableListOf(),
                 dailyProgresses = mutableListOf(),

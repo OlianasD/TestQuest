@@ -30,9 +30,9 @@ class LocatorsMonitor(
         val watcher = FileSystems.getDefault().newWatchService()
         filePaths.forEach { it.parent.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY) }
         var previousLocators = filePaths.flatMap { extractor.parseLocators(it) }
-        // Every 10 seconds, if any change happens on the locators, the GUI is updated
+        // Every 1 second, if any change happens on the locators, the GUI is updated
         executor.scheduleWithFixedDelay({
-            val key = watcher.poll(10, TimeUnit.SECONDS) ?: return@scheduleWithFixedDelay
+            val key = watcher.poll(1, TimeUnit.MILLISECONDS) ?: return@scheduleWithFixedDelay
             for (event in key.pollEvents()) {
                 val kind = event.kind()
                 if (kind == StandardWatchEventKinds.OVERFLOW) continue
@@ -44,15 +44,15 @@ class LocatorsMonitor(
                     val currentLocators = filePaths.flatMap { extractor.parseLocators(it) }
                     val modifiedLocators = currentLocators.filter { it !in previousLocators }
                     if (modifiedLocators.isNotEmpty()) {
-                        gamificationManager.updateProgresses(previousLocators, currentLocators, userProfile)
-                        guiManager.updateGUI(userProfile, true)
+                        val notifyChanges = gamificationManager.updateProgresses(previousLocators, currentLocators, userProfile)
+                        guiManager.updateGUI(userProfile, notifyChanges)//notifyChanges=true if any change occurred and popup must be shown
                         previousLocators = currentLocators
                     }
                 }
             }
             guiManager.updateGUI(userProfile, false)
             key.reset()
-        }, 0, 10, TimeUnit.SECONDS)
+        }, 0, 1, TimeUnit.MILLISECONDS)
     }
 
 

@@ -4,6 +4,8 @@ import com.intellij.util.ui.JBUI
 import gamification.UserProfile
 import java.awt.*
 import javax.swing.*
+import javax.swing.border.Border
+import javax.swing.border.TitledBorder
 
 class GUIManager {
 
@@ -31,74 +33,170 @@ class GUIManager {
         }.start()
     }
 
-
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
         SwingUtilities.invokeLater {
-            //main panel
+            // Main panel
             val mainPanel = JPanel(GridBagLayout())
-            mainPanel.border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
+            mainPanel.border = BorderFactory.createEmptyBorder(0, 0, 50, 50)
+            mainPanel.background = Color.LIGHT_GRAY
             val gbc = GridBagConstraints()
-            gbc.fill = GridBagConstraints.HORIZONTAL
+            gbc.fill = GridBagConstraints.BOTH
             gbc.insets = JBUI.insets(10)
 
-            //user data panel
+            // Font settings
+            val titleFont = Font("Arial", Font.BOLD, 18) // title size
+            val font = Font("Arial", Font.PLAIN, 16) // content size
+
+            // User data panel
             val userInfoPanel = JPanel()
             userInfoPanel.layout = BoxLayout(userInfoPanel, BoxLayout.Y_AXIS)
-            userInfoPanel.border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY), "User Info")
+            userInfoPanel.border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.DARK_GRAY),
+                "User Info",
+                TitledBorder.CENTER, // Center the title
+                TitledBorder.DEFAULT_POSITION,
+                titleFont,
+                Color.BLACK
+            )
+            userInfoPanel.background = Color.LIGHT_GRAY
+
+            val userInfoInnerPanel = JPanel(GridBagLayout())
+            userInfoInnerPanel.background = Color.LIGHT_GRAY
+            val gbcInner = GridBagConstraints()
+            gbcInner.insets = JBUI.insets(5)
+            gbcInner.anchor = GridBagConstraints.WEST
+
             val nameLabel = JLabel("Name: ${userProfile.name}")
+            nameLabel.font = font
+            nameLabel.foreground = Color.BLACK
+            gbcInner.gridx = 0
+            gbcInner.gridy = 0
+            gbcInner.weightx = 1.0
+            gbcInner.fill = GridBagConstraints.HORIZONTAL
+            userInfoInnerPanel.add(nameLabel, gbcInner)
+
             val titleLabel = JLabel("Title: ${userProfile.title}")
+            titleLabel.font = font
+            titleLabel.foreground = Color.BLACK
+            gbcInner.gridy = 1
+            userInfoInnerPanel.add(titleLabel, gbcInner)
+
             val levelLabel = JLabel("Level: ${userProfile.level}")
-            val xpLabel = JLabel("Current XP: ${userProfile.currentXP}")
+            levelLabel.font = font
+            levelLabel.foreground = Color.BLACK
+            gbcInner.gridy = 2
+            userInfoInnerPanel.add(levelLabel, gbcInner)
+
+            val currentXP = userProfile.currentXP
+            val nextXP = userProfile.nextXP
+            val xpLabel: JLabel
+            if (nextXP == Int.MAX_VALUE)
+                xpLabel = JLabel("Current XP: $currentXP/-")
+            else
+                xpLabel = JLabel("Current XP: $currentXP/$nextXP")
+            xpLabel.font = font
+            xpLabel.background = Color.BLACK
+            xpLabel.foreground = Color.BLACK
+            gbcInner.gridy = 3
+            userInfoInnerPanel.add(xpLabel, gbcInner)
+            val percentComplete = if (nextXP == Int.MAX_VALUE) 100 else (currentXP.toDouble() / nextXP * 100).toInt()
+            val xpProgressBar = JProgressBar(0, 100)
+            xpProgressBar.value = percentComplete
+            xpProgressBar.setStringPainted(true)
+            xpProgressBar.string = "$percentComplete%"
+            xpProgressBar.font = font.deriveFont(Font.BOLD)
+            xpProgressBar.foreground = Color.BLACK
+            xpProgressBar.background = Color.WHITE
+            xpProgressBar.preferredSize = Dimension(150, 20)
+            gbcInner.gridy = 4
+            gbcInner.gridwidth = 2
+            userInfoInnerPanel.add(xpProgressBar, gbcInner)
+
             val imageBox = JPanel()
-            imageBox.border = BorderFactory.createLineBorder(Color.LIGHT_GRAY)
-            imageBox.preferredSize = Dimension(100, 100)
-            userInfoPanel.add(nameLabel)
-            userInfoPanel.add(titleLabel)
-            userInfoPanel.add(levelLabel)
-            userInfoPanel.add(xpLabel)
-            userInfoPanel.add(imageBox)
+            imageBox.border = BorderFactory.createLineBorder(Color.DARK_GRAY)
+            imageBox.preferredSize = Dimension(150, 150)
+            imageBox.maximumSize = Dimension(150, 150)
+            imageBox.background = Color.LIGHT_GRAY
+            gbcInner.gridx = 2
+            gbcInner.gridy = 0
+            gbcInner.gridheight = 5
+            gbcInner.anchor = GridBagConstraints.NORTHEAST
+            gbcInner.fill = GridBagConstraints.NONE
+            userInfoInnerPanel.add(imageBox, gbcInner)
+
+            userInfoPanel.add(userInfoInnerPanel)
+            userInfoPanel.preferredSize = Dimension(800, 300)
             gbc.gridx = 0
             gbc.gridy = 0
             gbc.gridwidth = 2
+            gbc.weightx = 1.0
+            gbc.weighty = 0.33
             mainPanel.add(userInfoPanel, gbc)
 
-            //dailies panel
+            // Dailies panel
             val dailiesPanel = JPanel()
             dailiesPanel.layout = BoxLayout(dailiesPanel, BoxLayout.Y_AXIS)
-            dailiesPanel.border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY), "Dailies")
+            dailiesPanel.border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.DARK_GRAY),
+                "Dailies",
+                TitledBorder.CENTER, // Center the title
+                TitledBorder.DEFAULT_POSITION,
+                titleFont,
+                Color.BLACK
+            )
+            dailiesPanel.background = Color.LIGHT_GRAY
             for (dailyProgress in userProfile.dailyProgresses) {
-                dailiesPanel.add(JLabel(dailyProgress.daily.description))
+                val dailyLabel = JLabel(dailyProgress.daily.description)
+                dailyLabel.font = font
+                dailyLabel.foreground = Color.BLACK
+                dailiesPanel.add(dailyLabel)
             }
+            dailiesPanel.preferredSize = Dimension(800, 300)
             gbc.gridx = 0
             gbc.gridy = 1
             gbc.gridwidth = 1
+            gbc.weightx = 1.0
+            gbc.weighty = 0.33
             mainPanel.add(dailiesPanel, gbc)
 
-            //achievements panel
+            // Achievements panel
             val achievementsPanel = JPanel()
             achievementsPanel.layout = BoxLayout(achievementsPanel, BoxLayout.Y_AXIS)
-            achievementsPanel.border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY), "Achievements")
+            achievementsPanel.border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.DARK_GRAY),
+                "Achievements Unlocked",
+                TitledBorder.CENTER, // Center the title
+                TitledBorder.DEFAULT_POSITION,
+                titleFont,
+                Color.BLACK
+            )
+            achievementsPanel.background = Color.LIGHT_GRAY
             for (achievement in userProfile.completedAchievements) {
-                achievementsPanel.add(JLabel(achievement.name))
+                val achievementLabel = JLabel(achievement.name)
+                achievementLabel.font = font
+                achievementLabel.foreground = Color.BLACK
+                achievementsPanel.add(achievementLabel)
             }
+            achievementsPanel.preferredSize = Dimension(800, 300)
             gbc.gridx = 0
-            gbc.gridy = 3
+            gbc.gridy = 2
+            gbc.gridwidth = 1
+            gbc.weightx = 1.0
+            gbc.weighty = 0.33
             mainPanel.add(achievementsPanel, gbc)
 
-            //update GUI
+            // Update GUI
             textArea?.removeAll()
             textArea?.layout = BorderLayout()
             textArea?.add(mainPanel, BorderLayout.CENTER)
             textArea?.revalidate()
             textArea?.repaint()
 
-            //TODO: here the notification should also address achieved dailies/achievements and target only actual changes
-            //e.g., if I change a locator but this does not affect the profile, no popup should be shown
-            if(notifyChange)
+            // Send notification popup in case of changes
+            if (notifyChange)
                 showPopup("New Level: ${userProfile.level}\nNew Title: ${userProfile.title}\nNew XP: ${userProfile.currentXP}")
         }
     }
-
 
     fun showGUI() {
         val frame = JFrame("Test Quest - A quest to improve locators robustness")
@@ -107,9 +205,9 @@ class GUIManager {
         textArea = JTextArea()
         textArea!!.isEditable = false
         val scrollPane = JScrollPane(textArea)
-        scrollPane.preferredSize = Dimension(800, 600)
         frame.add(scrollPane, BorderLayout.CENTER)
-        frame.pack()
+        frame.isResizable = false
+        frame.setSize(1000, 800)  // Impostiamo una dimensione coerente con i pannelli
         frame.setLocationRelativeTo(null)
         frame.isVisible = true
     }
