@@ -1,11 +1,17 @@
 package ui
 
 import com.intellij.util.ui.JBUI
+import gamification.GamificationManager
 import gamification.UserProfile
 import java.awt.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.io.File
 import javax.swing.*
-import javax.swing.border.Border
 import javax.swing.border.TitledBorder
+import javax.swing.filechooser.FileNameExtensionFilter
 
 class GUIManager {
 
@@ -35,6 +41,7 @@ class GUIManager {
 
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
         SwingUtilities.invokeLater {
+
             // Main panel
             val mainPanel = JPanel(GridBagLayout())
             mainPanel.border = BorderFactory.createEmptyBorder(0, 0, 50, 50)
@@ -44,61 +51,83 @@ class GUIManager {
             gbc.insets = JBUI.insets(10)
 
             // Font settings
-            val titleFont = Font("Arial", Font.BOLD, 18) // title size
-            val font = Font("Arial", Font.PLAIN, 16) // content size
+            val titleFont = Font("Arial", Font.BOLD, 18)
+            val font = Font("Arial", Font.PLAIN, 16)
 
-            // User data panel
+            // User Info panel
             val userInfoPanel = JPanel()
             userInfoPanel.layout = BoxLayout(userInfoPanel, BoxLayout.Y_AXIS)
             userInfoPanel.border = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.DARK_GRAY),
                 "User Info",
-                TitledBorder.CENTER, // Center the title
+                TitledBorder.CENTER,
                 TitledBorder.DEFAULT_POSITION,
                 titleFont,
                 Color.BLACK
             )
             userInfoPanel.background = Color.LIGHT_GRAY
-
             val userInfoInnerPanel = JPanel(GridBagLayout())
             userInfoInnerPanel.background = Color.LIGHT_GRAY
             val gbcInner = GridBagConstraints()
             gbcInner.insets = JBUI.insets(5)
             gbcInner.anchor = GridBagConstraints.WEST
 
+            // Name
+            val namePanel = JPanel(FlowLayout(FlowLayout.LEFT))
+            namePanel.background = Color.LIGHT_GRAY
             val nameLabel = JLabel("Name: ${userProfile.name}")
             nameLabel.font = font
             nameLabel.foreground = Color.BLACK
+            val editNameButton = JButton("Edit")
+            editNameButton.addActionListener {
+                val newName = JOptionPane.showInputDialog(null, "Enter new name:", userProfile.name)
+                if (newName != null && newName.isNotEmpty()) {
+                    userProfile.name = newName
+                    nameLabel.text = "Name: $newName"
+                    GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    if (notifyChange) {
+                        showPopup("Name updated to $newName")
+                    }
+                }
+            }
+            namePanel.add(nameLabel)
+            namePanel.add(editNameButton)
             gbcInner.gridx = 0
             gbcInner.gridy = 0
-            gbcInner.weightx = 1.0
+            gbcInner.weightx = 0.5
             gbcInner.fill = GridBagConstraints.HORIZONTAL
-            userInfoInnerPanel.add(nameLabel, gbcInner)
+            gbcInner.insets = JBUI.insetsLeft(10)
+            userInfoInnerPanel.add(namePanel, gbcInner)
 
+            // Title
             val titleLabel = JLabel("Title: ${userProfile.title}")
             titleLabel.font = font
             titleLabel.foreground = Color.BLACK
             gbcInner.gridy = 1
+            gbcInner.insets = JBUI.insets(15)
             userInfoInnerPanel.add(titleLabel, gbcInner)
 
+            // Level
             val levelLabel = JLabel("Level: ${userProfile.level}")
             levelLabel.font = font
             levelLabel.foreground = Color.BLACK
             gbcInner.gridy = 2
             userInfoInnerPanel.add(levelLabel, gbcInner)
 
+            // XP
             val currentXP = userProfile.currentXP
             val nextXP = userProfile.nextXP
-            val xpLabel: JLabel
-            if (nextXP == Int.MAX_VALUE)
-                xpLabel = JLabel("Current XP: $currentXP/-")
+            val xpLabel = if (nextXP == Int.MAX_VALUE)
+                JLabel("Current XP: $currentXP/-")
             else
-                xpLabel = JLabel("Current XP: $currentXP/$nextXP")
+                JLabel("Current XP: $currentXP/$nextXP")
             xpLabel.font = font
             xpLabel.background = Color.BLACK
             xpLabel.foreground = Color.BLACK
             gbcInner.gridy = 3
             userInfoInnerPanel.add(xpLabel, gbcInner)
+
+            // XP Progress Bar
             val percentComplete = if (nextXP == Int.MAX_VALUE) 100 else (currentXP.toDouble() / nextXP * 100).toInt()
             val xpProgressBar = JProgressBar(0, 100)
             xpProgressBar.value = percentComplete
@@ -112,25 +141,54 @@ class GUIManager {
             gbcInner.gridwidth = 2
             userInfoInnerPanel.add(xpProgressBar, gbcInner)
 
+            // Profile picture
             val imageBox = JPanel()
             imageBox.border = BorderFactory.createLineBorder(Color.DARK_GRAY)
-            imageBox.preferredSize = Dimension(150, 150)
-            imageBox.maximumSize = Dimension(150, 150)
+            imageBox.preferredSize = Dimension(100, 100)
+            imageBox.maximumSize = Dimension(100, 100)
             imageBox.background = Color.LIGHT_GRAY
+            var imageIcon = ImageIcon(userProfile.propic)
+            var scaledIcon = ImageIcon(imageIcon.image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
+            var imageLabel = JLabel(scaledIcon)
+            imageBox.add(imageLabel)
+            val editImageButton = JButton("Edit")
+            editImageButton.addActionListener {
+                val fileChooser = JFileChooser()
+                fileChooser.fileFilter = FileNameExtensionFilter("Image files", "jpg", "png", "gif")
+                val result = fileChooser.showOpenDialog(null)
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    val selectedFile: File = fileChooser.selectedFile
+                    userProfile.propic = selectedFile.absolutePath
+                    GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    imageBox.removeAll()
+                    imageIcon = ImageIcon(selectedFile.absolutePath)
+                    scaledIcon = ImageIcon(imageIcon.image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
+                    imageLabel = JLabel(scaledIcon)
+                    imageBox.add(imageLabel)
+                    imageBox.revalidate()
+                    imageBox.repaint()
+                    if (notifyChange) {
+                        showPopup("Image updated")
+                    }
+                }
+            }
             gbcInner.gridx = 2
             gbcInner.gridy = 0
-            gbcInner.gridheight = 5
+            gbcInner.gridheight = 3
             gbcInner.anchor = GridBagConstraints.NORTHEAST
             gbcInner.fill = GridBagConstraints.NONE
+            gbcInner.insets = JBUI.insets(0, 15)
             userInfoInnerPanel.add(imageBox, gbcInner)
-
+            gbcInner.gridy = 5
+            gbcInner.gridheight = 1
+            userInfoInnerPanel.add(editImageButton, gbcInner)
             userInfoPanel.add(userInfoInnerPanel)
-            userInfoPanel.preferredSize = Dimension(800, 300)
+            userInfoPanel.preferredSize = Dimension(800, 220)
             gbc.gridx = 0
             gbc.gridy = 0
             gbc.gridwidth = 2
             gbc.weightx = 1.0
-            gbc.weighty = 0.33
+            gbc.weighty = 0.25
             mainPanel.add(userInfoPanel, gbc)
 
             // Dailies panel
@@ -139,60 +197,141 @@ class GUIManager {
             dailiesPanel.border = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.DARK_GRAY),
                 "Dailies",
-                TitledBorder.CENTER, // Center the title
+                TitledBorder.CENTER,
                 TitledBorder.DEFAULT_POSITION,
                 titleFont,
                 Color.BLACK
             )
             dailiesPanel.background = Color.LIGHT_GRAY
             for (dailyProgress in userProfile.dailyProgresses) {
+                val dailyPanel = JPanel()
+                dailyPanel.layout = BoxLayout(dailyPanel, BoxLayout.X_AXIS)
+                dailyPanel.alignmentX = Component.LEFT_ALIGNMENT
+                dailyPanel.background = Color.LIGHT_GRAY
+                // Daily Description
                 val dailyLabel = JLabel(dailyProgress.daily.description)
                 dailyLabel.font = font
                 dailyLabel.foreground = Color.BLACK
-                dailiesPanel.add(dailyLabel)
+                dailyPanel.add(dailyLabel)
+                // Tooltip for progression
+                dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
+                dailyLabel.addMouseListener(object : MouseAdapter() {
+                    override fun mouseEntered(e: MouseEvent?) {
+                        dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
+                    }
+                })
+                // Remove button
+                val removeButton = JButton("Remove")
+                removeButton.addActionListener {
+                    userProfile.dailyProgresses.remove(dailyProgress)
+                    GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    dailiesPanel.remove(dailyPanel)
+                    dailiesPanel.revalidate()
+                    dailiesPanel.repaint()
+                }
+                dailyPanel.add(removeButton)
+                // Add daily panel to dailiesPanel
+                dailiesPanel.add(dailyPanel)
             }
-            dailiesPanel.preferredSize = Dimension(800, 300)
+            dailiesPanel.preferredSize = Dimension(800, 270)
             gbc.gridx = 0
             gbc.gridy = 1
             gbc.gridwidth = 1
             gbc.weightx = 1.0
-            gbc.weighty = 0.33
+            gbc.weighty = 0.375
             mainPanel.add(dailiesPanel, gbc)
+
 
             // Achievements panel
             val achievementsPanel = JPanel()
-            achievementsPanel.layout = BoxLayout(achievementsPanel, BoxLayout.Y_AXIS)
-            achievementsPanel.border = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.DARK_GRAY),
-                "Achievements Unlocked",
-                TitledBorder.CENTER, // Center the title
-                TitledBorder.DEFAULT_POSITION,
-                titleFont,
-                Color.BLACK
-            )
+            achievementsPanel.layout = BorderLayout()
+            achievementsPanel.border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
             achievementsPanel.background = Color.LIGHT_GRAY
+            val tabbedPane = JTabbedPane()
+            // Unlocked achievements Panel
+            val unlockedAchievementsPanel = JPanel()
+            unlockedAchievementsPanel.layout = BoxLayout(unlockedAchievementsPanel, BoxLayout.Y_AXIS)
+            unlockedAchievementsPanel.background = Color.LIGHT_GRAY
+            val unlockedScrollPane = JScrollPane(unlockedAchievementsPanel)
+            tabbedPane.addTab("Unlocked", unlockedScrollPane)
+            // Ongoing achievements Panel
+            val ongoingAchievementsPanel = JPanel()
+            ongoingAchievementsPanel.layout = BoxLayout(ongoingAchievementsPanel, BoxLayout.Y_AXIS
+            )
+            ongoingAchievementsPanel.background = Color.LIGHT_GRAY
+            val ongoingScrollPane = JScrollPane(ongoingAchievementsPanel)
+            tabbedPane.addTab("Ongoing", ongoingScrollPane)
+            achievementsPanel.add(tabbedPane, BorderLayout.CENTER)
+            // Populate Unlocked achievements panel
             for (achievement in userProfile.completedAchievements) {
-                val achievementLabel = JLabel(achievement.name)
-                achievementLabel.font = font
-                achievementLabel.foreground = Color.BLACK
-                achievementsPanel.add(achievementLabel)
+                val achievementPanel = JPanel()
+                achievementPanel.layout = BoxLayout(achievementPanel, BoxLayout.X_AXIS)
+                achievementPanel.alignmentX = Component.LEFT_ALIGNMENT
+                achievementPanel.background = Color.LIGHT_GRAY
+                // Icon
+                val iconLabel = JLabel()
+                val icon = ImageIcon(achievement.icon)
+                iconLabel.icon = ImageIcon(icon.image.getScaledInstance(50, 50, Image.SCALE_SMOOTH))
+                achievementPanel.add(iconLabel)
+                achievementPanel.background = Color.LIGHT_GRAY
+                // Achievement Name
+                val nameLabel = JLabel(achievement.name)
+                nameLabel.font = font
+                nameLabel.foreground = Color.BLACK
+                achievementPanel.add(nameLabel)
+                // Tooltip for description
+                nameLabel.toolTipText = achievement.description
+                nameLabel.addMouseListener(object : MouseAdapter() {
+                    override fun mouseEntered(e: MouseEvent?) {
+                        nameLabel.toolTipText = achievement.description
+                    }
+                })
+                // Add achievement panel to unlockedAchievementsPanel
+                unlockedAchievementsPanel.add(achievementPanel)
             }
-            achievementsPanel.preferredSize = Dimension(800, 300)
+            // Populate Ongoing achievements panel
+            for (progress in userProfile.achievementProgresses) {
+                val achievement = progress.achievement
+                val progressPanel = JPanel()
+                progressPanel.layout = BoxLayout(progressPanel, BoxLayout.X_AXIS)
+                progressPanel.alignmentX = Component.LEFT_ALIGNMENT
+                progressPanel.background = Color.LIGHT_GRAY
+                // Icon
+                val iconLabel = JLabel()
+                val icon = ImageIcon(achievement.icon)
+                iconLabel.icon = ImageIcon(icon.image.getScaledInstance(50, 50, Image.SCALE_SMOOTH))
+                progressPanel.add(iconLabel)
+                progressPanel.background = Color.LIGHT_GRAY
+                // Achievement Name
+                val nameLabel = JLabel("${achievement.name} (${progress.progress} / ${achievement.target})")
+                nameLabel.font = font
+                nameLabel.foreground = Color.BLACK
+                progressPanel.add(nameLabel)
+                // Tooltip for description
+                nameLabel.toolTipText = achievement.description
+                nameLabel.addMouseListener(object : MouseAdapter() {
+                    override fun mouseEntered(e: MouseEvent?) {
+                        nameLabel.toolTipText = achievement.description
+                    }
+                })
+                // Add progress panel to ongoingAchievementsPanel
+                ongoingAchievementsPanel.add(progressPanel)
+            }
+            achievementsPanel.preferredSize = Dimension(800, 270)
             gbc.gridx = 0
             gbc.gridy = 2
             gbc.gridwidth = 1
             gbc.weightx = 1.0
-            gbc.weighty = 0.33
+            gbc.weighty = 0.375
             mainPanel.add(achievementsPanel, gbc)
 
-            // Update GUI
+            // Refresh GUI & send notification in case of changes
             textArea?.removeAll()
             textArea?.layout = BorderLayout()
             textArea?.add(mainPanel, BorderLayout.CENTER)
             textArea?.revalidate()
             textArea?.repaint()
 
-            // Send notification popup in case of changes
             if (notifyChange)
                 showPopup("New Level: ${userProfile.level}\nNew Title: ${userProfile.title}\nNew XP: ${userProfile.currentXP}")
         }
@@ -207,12 +346,9 @@ class GUIManager {
         val scrollPane = JScrollPane(textArea)
         frame.add(scrollPane, BorderLayout.CENTER)
         frame.isResizable = false
-        frame.setSize(1000, 800)  // Impostiamo una dimensione coerente con i pannelli
+        frame.setSize(1000, 800)
         frame.setLocationRelativeTo(null)
         frame.isVisible = true
     }
-
-
-
 
 }

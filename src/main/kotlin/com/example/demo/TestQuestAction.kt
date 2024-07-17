@@ -21,9 +21,9 @@ class TestQuestAction : AnAction() {
         val testFilePaths = findTestFilePaths(project)
         if (testFilePaths.isNotEmpty()) {
             guiManager.showGUI()
-            // TODO: improve multiuser and DB-based persistency or make the path external as well as username
-            val gamificationManager = GamificationManager("C:\\Users\\User\\Desktop\\users.xml")
-            val userProfile = gamificationManager.setupUserProfile("John Doe")
+            // TODO: improve multiuser and DB-based persistency
+            val gamificationManager = GamificationManager()
+            val userProfile = gamificationManager.setupUserProfile("001")
             val monitor = LocatorsMonitor(gamificationManager, userProfile, guiManager, testFilePaths)
             monitor.startMonitoring()
         } else {

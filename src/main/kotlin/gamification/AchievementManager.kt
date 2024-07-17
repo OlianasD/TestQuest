@@ -6,27 +6,31 @@ class AchievementManager {
 
     companion object {
 
+        //TODO: change icon accordingly
         private val allAchievements = mutableListOf(
-            Achievement("Is this a locator?", "Just a dummy achievement", 1),
-            Achievement("I did it!", "Build your first locator", 1),
-            Achievement("Kill them all", "Fix 100 absolute XPath locators", 100),
-            Achievement("Keep it short", "Reduce the length of 100 XPath locators", 100),
-            Achievement("The higher they are, the louder they fall", "Reduce the height of 100 XPath locators", 100),
-            Achievement("Stillness", "Do not change any locator for 48 hours", 999),
-            Achievement("Master of Changes", "Change every locator at least once", 999),
-            Achievement("I made a mistake", "Change a locator into something worse", 999), //e.g., relative to absolute, longer xpath, id to else, higher xpath
-            Achievement("Perfectionism", "Improve every locator at least once", 999), //TODO: wrt which metrics?
-            Achievement("Immortality", "Build the perfect locator", 999), //i.e., never changed
-            Achievement("An inside job", "Build a locator that fails immediately", 999),
-            Achievement("I feel so lonely", "Build a locator whose type is different from any other", 999),
-            Achievement("I can read this", "Use a locator name value which is meaningful", 999),
-            Achievement("The gift of synthesis", "Build the shortest locator", 999),
-            Achievement("The bigger the better", "Build the longest locator", 999),
-            Achievement("Strength lies in differences", "Use every locator types", 999),
-            Achievement("For we are many", "Use every locator types within the same test suite", 999),
-            Achievement("The cake is a lie", "Use a locator named 'cake'", 999),
-            Achievement("The clone war", "Use the same locator 50 times", 999),
-        )
+            Achievement("Is this a locator?", "Just a dummy achievement", 1, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png" ),
+            Achievement("I did it!", "Build your first locator", 1, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Kill them all", "Transform 100 absolute XPath locators into relative ones", 100, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Keep it short", "Reduce the length of 100 XPath locators", 100, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("The higher they are, the louder they fall", "Reduce the height of 100 XPath locators", 100, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Stillness", "Do not change any locator for 48 hours", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Master of Changes", "Change every locator at least once", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Ops... I made a mistake!", "Change a locator into something worse", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"), //e.g., relative to absolute, longer xpath, id to else, higher xpath
+            Achievement("Perfectionism", "Improve the robustness of every locator at least once", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Immortality", "Build the perfect locator", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"), //i.e., never changed
+            Achievement("An inside job", "Build a locator that fails immediately", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("I feel so lonely", "Build a locator whose type is different from any other", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("I can read this", "Use a locator name value which is meaningful", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("The gift of synthesis", "Build the shortest locator", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("The bigger the better", "Build the longest locator", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Strength lies in differences", "Use every locator types", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("For we are many", "Use every locator types within the same test suite", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("The cake is a lie", "Use a locator named 'cake'", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("The clone war", "Use the same locator 50 times", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("Expand the colony", "Add 100 new locators", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("You are not welcome anymore", "Remove 100 locators", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            Achievement("I've seen you before", "Execute a locator without breakages 100 times", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+            )
 
         fun setupAchievements(userProfile: UserProfile) {
             for (ach in allAchievements) {
@@ -36,8 +40,22 @@ class AchievementManager {
         }
 
 
+        private val achievementNameToDescriptionMap = allAchievements.associate { it.name to it.description }
+        private val achievementNameToTargetMap = allAchievements.associate { it.name to it.target }
+        private val achievementNameToIconMap = allAchievements.associate { it.name to it.icon }
 
 
+        fun getAchievementIconFromName(name: String): String {
+            return achievementNameToIconMap[name] ?: ""
+        }
+
+        fun getDescriptionFromName(name: String): String {
+            return achievementNameToDescriptionMap[name] ?: ""
+        }
+
+        fun getTargetFromName(name: String): Int {
+            return achievementNameToTargetMap[name] ?: 0
+        }
 
         private fun isThisALocator(locsOld: List<Locator>, locsNew: List<Locator>): Int {
             return 0
@@ -179,6 +197,9 @@ class AchievementManager {
                 }
             }
         }
+
+
+
 
 
 

@@ -3,9 +3,21 @@ package gamification
 import locator.Locator
 import utils.XMLReader
 import utils.XMLWriter
+import java.util.*
 
-class GamificationManager(private val path: String) {
+class GamificationManager() {
 
+    companion object {
+        var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml"
+        var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png"
+
+        //called when a daily is removed, a user profile name is changed, or a propic is changed
+        fun updateUserProfileAfterGUIChanges(userProfile: UserProfile){
+            val xmlWriter = XMLWriter()
+            xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
+        }
+
+    }
 
 
     private val allTitles = mutableListOf(
@@ -46,39 +58,50 @@ class GamificationManager(private val path: String) {
             userProfile.nextXP = Int.MAX_VALUE
     }
 
+
+
+
     fun updateProgresses(locatorsOld: List<Locator>, locatorsNew: List<Locator>, userProfile: UserProfile): Boolean {
         val xmlWriter = XMLWriter()
         val dailyUpdates = DailyManager.updateDailies(userProfile, locatorsOld, locatorsNew)//for each assigned daily, check
         val achUpdates = AchievementManager.updateAchievements(userProfile, locatorsOld, locatorsNew)
         if(dailyUpdates || achUpdates) {
             updateTitleAndLvl(userProfile)
-            xmlWriter.saveUserProfileToXML(path, userProfile)
+            xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
             return true
         }
         return false
     }
 
     //upload user profile data from file if they exist or create a new user profile if they do not
-    fun setupUserProfile(name: String): UserProfile {
+    fun setupUserProfile(ID: String): UserProfile {
         val xmlReader = XMLReader()
         val xmlWriter = XMLWriter()
-        var userProfile = xmlReader.loadUserProfileFromXML(path, name)
+        var userProfile = xmlReader.loadUserProfileFromXML(usersDataFile, ID)
         if(userProfile == null) {
             userProfile = UserProfile(
-                name = name,
+                id = ID,
+                name = "John Doe",
                 level = 1,
                 currentXP = allTitles[0].xp,
                 nextXP = allTitles[1].xp,
                 title = allTitles[0].name,
                 achievementProgresses = mutableListOf(),
                 dailyProgresses = mutableListOf(),
-                completedAchievements = mutableListOf()
+                completedAchievements = mutableListOf(),
+                propic = unknownUserPic
             )
             DailyManager.setupDailies(userProfile)
             AchievementManager.setupAchievements(userProfile)
-            xmlWriter.addNewUserProfileToXML(path, userProfile)
+            xmlWriter.addNewUserProfileToXML(usersDataFile, userProfile)
         }
         return userProfile
     }
+
+    fun generateUniqueId(): String {
+        val uuid = UUID.randomUUID()
+        return uuid.toString()
+    }
+
 
 }

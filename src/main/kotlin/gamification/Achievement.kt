@@ -1,5 +1,7 @@
 package gamification
 
-class Achievement(val name: String, val description: String, val target: Int)
+class Achievement(val name: String, val description: String, val target: Int, val icon: String)
 {
 }
+
+

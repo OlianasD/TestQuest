@@ -23,11 +23,13 @@ class XMLWriter {
         val userProfileNodes = userProfilesNode.getElementsByTagName("userProfile")
         for (i in 0 until userProfileNodes.length) {
             val node = userProfileNodes.item(i) as Element
-            val nodeName = node.getElementsByTagName("name").item(0).textContent
-            if (nodeName == userProfile.name) {
+            val nodeId = node.getElementsByTagName("id").item(0).textContent
+            if (nodeId == userProfile.id) {
+                node.getElementsByTagName("name").item(0).textContent = userProfile.name.toString()
                 node.getElementsByTagName("level").item(0).textContent = userProfile.level.toString()
                 node.getElementsByTagName("currentXP").item(0).textContent = userProfile.currentXP.toString()
                 node.getElementsByTagName("title").item(0).textContent = userProfile.title
+                node.getElementsByTagName("propic").item(0).textContent = userProfile.propic
                 val dailiesNode = node.getElementsByTagName("dailies").item(0) as Element
                 //update dailies
                 dailiesNode.textContent = ""
@@ -47,16 +49,12 @@ class XMLWriter {
                 userProfile.completedAchievements.forEach { achievement ->
                     val achievementNode = doc.createElement("achievement")
                     achievementNode.appendChild(createElementWithText(doc, "name", achievement.name))
-                    achievementNode.appendChild(createElementWithText(doc, "description", achievement.description))
-                    achievementNode.appendChild(createElementWithText(doc, "target", achievement.target.toString()))
                     completedAchievementsNode.appendChild(achievementNode)
                 }
                 //update ongoing achievements
                 userProfile.achievementProgresses.forEach { achievementProgress ->
                     val achievementNode = doc.createElement("achievement")
                     achievementNode.appendChild(createElementWithText(doc, "name", achievementProgress.achievement.name))
-                    achievementNode.appendChild(createElementWithText(doc, "description", achievementProgress.achievement.description))
-                    achievementNode.appendChild(createElementWithText(doc, "target", achievementProgress.achievement.target.toString()))
                     achievementNode.appendChild(createElementWithText(doc, "progress", achievementProgress.progress.toString()))
                     ongoingAchievementsNode.appendChild(achievementNode)
                 }
@@ -81,6 +79,7 @@ class XMLWriter {
         val userProfilesNode = doc.documentElement
         // Create userProfile element
         val userProfileNode = doc.createElement("userProfile")
+        userProfileNode.appendChild(createElementWithText(doc, "id", userProfile.id))
         userProfileNode.appendChild(createElementWithText(doc, "name", userProfile.name))
         userProfileNode.appendChild(createElementWithText(doc, "level", userProfile.level.toString()))
         userProfileNode.appendChild(createElementWithText(doc, "currentXP", userProfile.currentXP.toString()))

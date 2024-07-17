@@ -11,6 +11,7 @@ data class AchievementProgress(
 )
 
 class UserProfile(
+    var id: String,
     var name: String,
     var level: Int,
     var currentXP: Int,
@@ -18,11 +19,17 @@ class UserProfile(
     var title: String,
     val achievementProgresses: MutableList<AchievementProgress>,
     val dailyProgresses: MutableList<DailyProgress>,
-    val completedAchievements: MutableList<Achievement> //achieved achievements
+    val completedAchievements: MutableList<Achievement>, //achieved achievements
+    var propic: String
 )
 
 {
     fun assignDailies(dailies: List<Daily>) {
         dailies.forEach { d -> dailyProgresses.add(DailyProgress(d)) }    }
+
+
+
+
+
 }
 
