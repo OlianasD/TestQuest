@@ -14,10 +14,9 @@ kotlin {
   jvmToolchain(17)
 }
 
-
 intellij {
   version.set("2023.2.6")
-  plugins.set(listOf("org.jetbrains.kotlin"))  // Specifica i plugin necessari
+  plugins.set(listOf("org.jetbrains.kotlin"))
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -31,11 +30,9 @@ tasks {
   }
 }
 
+val ktorVersion = "2.3.2"
 
-
-//NEW
 dependencies {
-  //implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
   testImplementation(kotlin("test"))
   implementation(kotlin("stdlib"))
   implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
@@ -43,16 +40,12 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
   implementation("org.seleniumhq.selenium:selenium-java:4.21.0")
   implementation("com.github.javaparser:javaparser-core:3.23.1")
-  //implementation("org.simpleframework:simple-xml:2.7.1")
-  //implementation("org.w3c:dom:1.0.1")
-  //implementation("org.openjfx:javafx-controls:22.0.1")
-  //implementation("org.openjfx:javafx-fxml:22.0.1")
+  implementation("org.slf4j:slf4j-api:2.0.9")
+  implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+  implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+  implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 }
 
 tasks.test {
   useJUnitPlatform()
 }
-
-/*kotlin {
-  jvmToolchain(8)
-}*/

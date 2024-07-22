@@ -1,38 +1,16 @@
-<userProfiles>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><userProfiles>
     <userProfile>
 	    <id>001</id>
         <name>John Doe</name>
-        <level>1</level>
-        <currentXP>0</currentXP>
+        <level>2</level>
+        <currentXP>20</currentXP>
 		<nextXP>20</nextXP>
-        <title>Novice</title>
+        <title>Apprentice</title>
 		<propic>C:\\Users\\User\\Desktop\\img\\user.png</propic>
         <achievements>
-			<completed>
-				<achievement>
-					<name>Is this a locator?</name>
-				</achievement>
-			</completed>
-			<ongoing>
-				<achievement>
-					<name>I did it!</name>
-					<progress>0</progress>
-				</achievement>
-			</ongoing>
+			<completed><achievement><name>Is this a locator?</name></achievement></completed>
+			<ongoing><achievement><name>I did it!</name><progress>0</progress></achievement></ongoing>
         </achievements>
-        <dailies>
-            <daily>
-                <name>xpathAbs</name>
-                <progress>0</progress> 
-            </daily>
-			<daily>
-                <name>xpathLength</name>
-                <progress>0</progress> 
-            </daily>
-			<daily>
-                <name>xpathHeight</name>
-                <progress>0</progress> 
-            </daily>
-        </dailies>
+        <dailies><daily><name>xpathLength</name><progress>0</progress></daily><daily><name>xpathHeight</name><progress>0</progress></daily></dailies>
     </userProfile>
 </userProfiles>

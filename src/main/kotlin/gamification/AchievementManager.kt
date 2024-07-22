@@ -30,6 +30,10 @@ class AchievementManager {
             Achievement("Expand the colony", "Add 100 new locators", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
             Achievement("You are not welcome anymore", "Remove 100 locators", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
             Achievement("I've seen you before", "Execute a locator without breakages 100 times", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+
+            Achievement("What's the difference?", "Replace a locator with a same value", 999, "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"),
+
+
             )
 
         fun setupAchievements(userProfile: UserProfile) {

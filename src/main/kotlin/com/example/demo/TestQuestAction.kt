@@ -11,6 +11,8 @@ import ui.GUIManager
 import java.io.File
 import java.nio.file.Path
 
+
+
 class TestQuestAction : AnAction() {
 
     private var guiManager = GUIManager()
@@ -25,6 +27,8 @@ class TestQuestAction : AnAction() {
             val gamificationManager = GamificationManager()
             val userProfile = gamificationManager.setupUserProfile("001")
             val monitor = LocatorsMonitor(gamificationManager, userProfile, guiManager, testFilePaths)
+
+
             monitor.startMonitoring()
         } else {
             Messages.showMessageDialog(
