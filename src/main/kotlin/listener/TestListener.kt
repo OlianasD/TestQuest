@@ -4,10 +4,31 @@ import Server
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
 import com.intellij.openapi.project.Project
+import gamification.GamificationManager
+import locator.Locator
+import locator.LocatorsExtractor
+import utils.TestFilesExtractor
+
 
 class TestListener(private val project: Project) : SMTRunnerEventsListener {
+
     private lateinit var server: Server
+    private lateinit var locatorsNew: List<Locator>
+    private lateinit var locatorsOld: List<Locator>
+
+
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
+        val testFilePaths = TestFilesExtractor.findTestFilePaths(project)//test files are identified
+        //first, locators are extracted during plugin initialization (see TestQuestAction) and saved
+        //then, before each run (as we assume locators may have changed), new locators are extracted, saving old ones
+        val extractor = LocatorsExtractor()
+        if (TestQuestAction.locatorsNew.isNotEmpty()) {//the first run we have to save locators from plugin initialization
+            locatorsOld = TestQuestAction.locatorsNew
+            TestQuestAction.locatorsNew = emptyList()
+        }
+        else //after the first run, old locators will be saved considering the previous state
+            locatorsOld = locatorsNew
+        locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
         server = Server()
         server.start()
         println("Server started!")
@@ -16,6 +37,9 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
         server.stop()
         println("Server stopped!")
+        //TODO: temporary placement. might be placed after each test execution
+        GamificationManager.updateProgresses(locatorsOld, locatorsNew, GamificationManager.userProfile)
+
     }
 
     override fun onTestsCountInSuite(count: Int) {
@@ -26,6 +50,7 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
 
     override fun onTestFinished(test: SMTestProxy) {
         println("Test finished!")
+
         val eventList = Server.events
         println("Events:")
         for (event in eventList) {
@@ -35,17 +60,17 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
         if (eventList.isNotEmpty()) {
 
             if (test.isPassed) {
-                //New test passed
+                //checks for passed
 
 
             }
             else {
-
+                //check for not passed
             }
             //service.analyzeEvents(eventList)
         }
         else {
-
+            //TODO: exception
         }
     }
 
@@ -78,5 +103,22 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
 
     override fun onSuiteTreeStarted(suite: SMTestProxy?) {
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
