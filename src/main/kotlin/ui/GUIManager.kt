@@ -16,6 +16,9 @@ import javax.swing.filechooser.FileNameExtensionFilter
 class GUIManager {
 
     private var textArea: JTextArea? = null
+    private var changed: Boolean = false
+    private var dailyRemoved: Boolean = false
+
 
     private fun showPopup(message: String) {
         val pane = JPanel()
@@ -85,6 +88,7 @@ class GUIManager {
                     userProfile.name = newName
                     nameLabel.text = "Name: $newName"
                     GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    changed = true
                     if (notifyChange) {
                         showPopup("Name updated to $newName")
                     }
@@ -160,6 +164,7 @@ class GUIManager {
                     val selectedFile: File = fileChooser.selectedFile
                     userProfile.propic = selectedFile.absolutePath
                     GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    changed = true
                     imageBox.removeAll()
                     imageIcon = ImageIcon(selectedFile.absolutePath)
                     scaledIcon = ImageIcon(imageIcon.image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))

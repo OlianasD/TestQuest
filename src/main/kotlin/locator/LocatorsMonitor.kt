@@ -9,7 +9,9 @@ import java.nio.file.StandardWatchEventKinds
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.isRegularFile
+/*
 
+//TODO: OLD IMPLEMENTATION, TO REMOVE
 class LocatorsMonitor(
     private val gamificationManager: GamificationManager,
     private val userProfile: UserProfile,
@@ -45,7 +47,7 @@ class LocatorsMonitor(
                     val modifiedLocators = currentLocators.filter { it !in previousLocators }
                     if (modifiedLocators.isNotEmpty()) {
                         val notifyChanges = gamificationManager.updateProgresses(previousLocators, currentLocators, userProfile)
-                        guiManager.updateGUI(userProfile, notifyChanges)//notifyChanges=true if any change occurred and popup must be shown
+                        guiManager.updateGUI(userProfile, true)//notifyChanges=true if any change occurred and popup must be shown
                         previousLocators = currentLocators
                     }
                 }
@@ -57,3 +59,4 @@ class LocatorsMonitor(
 
 
 }
+*/

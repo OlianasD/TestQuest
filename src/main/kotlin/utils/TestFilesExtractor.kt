@@ -5,7 +5,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import java.io.File
 import java.nio.file.Path
 
-object TestsFileExtractor {
+object TestFilesExtractor {
 
     fun findTestFilePaths(project: Project): List<Path> {
         val module = ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: return emptyList()

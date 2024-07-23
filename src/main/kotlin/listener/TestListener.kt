@@ -1,6 +1,6 @@
-package com.example.demo
+package listener
 
-import Server
+import com.example.demo.TestQuestAction
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
 import com.intellij.openapi.project.Project
@@ -32,20 +32,14 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
         server = Server()
         server.start()
         println("Server started!")
+        GamificationManager.updateProgresses(locatorsOld, locatorsNew, GamificationManager.userProfile)
     }
 
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
         server.stop()
         println("Server stopped!")
-        //TODO: temporary placement. might be placed after each test execution
-        GamificationManager.updateProgresses(locatorsOld, locatorsNew, GamificationManager.userProfile)
+        //TODO: here place the general checks
 
-    }
-
-    override fun onTestsCountInSuite(count: Int) {
-    }
-
-    override fun onTestStarted(test: SMTestProxy) {
     }
 
     override fun onTestFinished(test: SMTestProxy) {
@@ -56,6 +50,9 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
         for (event in eventList) {
             println(event)
         }
+
+
+        //TODO: here place positive and negative checks
 
         if (eventList.isNotEmpty()) {
 
@@ -72,6 +69,16 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
         else {
             //TODO: exception
         }
+    }
+
+
+
+
+
+    override fun onTestsCountInSuite(count: Int) {
+    }
+
+    override fun onTestStarted(test: SMTestProxy) {
     }
 
     override fun onTestFailed(test: SMTestProxy) {

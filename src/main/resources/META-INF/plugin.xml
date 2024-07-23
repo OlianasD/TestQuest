@@ -19,7 +19,7 @@
     </actions>
 
     <projectListeners>
-        <listener class="com.example.demo.TestListener"
+        <listener class="listener.TestListener"
                   topic="com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener"/>
     </projectListeners>
 
