@@ -1,5 +1,7 @@
 package gamification
 
+import com.intellij.openapi.util.NlsSafe
+import listener.TestOutcome
 import locator.Locator
 import ui.GUIManager
 import utils.XMLReader
@@ -17,11 +19,11 @@ class GamificationManager() {
         var guiManager: GUIManager = GUIManager()
 
         private val allTitles = mutableListOf(
-            Title("Novice", 0),
-            Title("Apprentice", 20),
-            Title("Adept", 50),
-            Title("Initiate", 100),
-            Title("Acolyte", 200),
+            Title("Muggle", 0),
+            Title("Mage Familiar", 20),
+            Title("Tarnished Scholar", 50),
+            Title("Gifted Acolyte", 100),
+            Title("Mage Initiate", 200),
             Title("Journeyman", 300),
             Title("Arcanist", 400),
             Title("Sorcerer", 500),
@@ -34,8 +36,8 @@ class GamificationManager() {
             Title("Elder Magus", 1400),
             Title("Celestial Archmage", 1600),
             Title("Astral Wizard", 1800),
-            Title("Epic Conjurer", 2000),
-            Title("Mana Creator", 2500),
+            Title("Veil Conjurer", 2000),
+            Title("Mana Master", 2500),
             Title("Supreme Magus", 3000)
         )
 
@@ -46,11 +48,11 @@ class GamificationManager() {
             xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
         }
 
-        fun updateProgresses(locatorsOld: List<Locator>, locatorsNew: List<Locator>, userProfile: UserProfile) {
-            val xmlWriter = XMLWriter()
-            val dailyUpdates = DailyManager.updateDailies(userProfile, locatorsOld, locatorsNew)//for each assigned daily, check
-            val achUpdates = AchievementManager.updateAchievements(userProfile, locatorsOld, locatorsNew)
+        private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
+            val dailyUpdates = DailyManager.updateDailies(userProfile, testOutcomes)//check for each assigned daily
+            val achUpdates = false//AchievementManager.updateAchievements(userProfile, testOutcomes)
             if(dailyUpdates || achUpdates) {
+                val xmlWriter = XMLWriter()
                 updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
                 guiManager.updateGUI(GamificationManager.userProfile, true)
@@ -72,6 +74,51 @@ class GamificationManager() {
             else if (newTitle == null)
                 userProfile.nextXP = Int.MAX_VALUE
         }
+
+        fun analyzeEvents(testOutcomes: List<TestOutcome>){
+            val checks = mutableListOf<TestOutcome>() //to collect the "good" outcome of each test
+            for(testOutcome in testOutcomes){
+                if (testOutcome.locatorsOld.isNotEmpty()) {
+                    //TODO: case of no changes
+                    if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size &&
+                        testOutcome.locatorsNew.toSet() == testOutcome.locatorsOld.toSet()) {
+                        return
+                    }
+                    //TODO: case of changes over locators (edit types or values)
+                    //assumption: same locator is in the same order
+                    if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size) {
+                        if(testOutcome.isPassed) //TODO: positive checks
+                            checks.add(testOutcome)
+                        else { //TODO: negative checks
+                            if (testOutcome.stacktrace!!.contains("NoSuchElementException")) {
+                                val regex = """"selector":"(.*?)"""".toRegex()
+                                val matchResult = regex.find(testOutcome.stacktrace)
+                                if (matchResult != null) {
+                                    val brokenLocator = matchResult.groupValues[1]//TODO: to use for negative checks
+                                }
+                            }
+                        }
+                    }
+                    //TODO: case of changes over locators (add/remove): how to distinguish when order is no more?
+                    else {
+                    }
+                }
+                //TODO: case of changes due to testMethod added in new implementation: how to manage new methods?
+                else {
+                }
+                //TODO: how to manage case of changes due to testMethod removed or name changed in new implementation?
+            }
+            updateProgresses(checks, userProfile)
+        }
+
+
+
+
+
+
+
+
+
 
     }
 

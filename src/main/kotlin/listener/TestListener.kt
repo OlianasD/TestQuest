@@ -4,18 +4,28 @@ import com.example.demo.TestQuestAction
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.NlsSafe
 import gamification.GamificationManager
 import locator.Locator
 import locator.LocatorsExtractor
 import utils.TestFilesExtractor
 
 
+
+data class TestOutcome(
+    val testName: String,
+    val locatorsOld: List<Locator>,
+    val locatorsNew: List<Locator>,
+    val isPassed: Boolean,
+    val stacktrace: String?
+)
+
 class TestListener(private val project: Project) : SMTRunnerEventsListener {
 
     private lateinit var server: Server
     private lateinit var locatorsNew: List<Locator>
     private lateinit var locatorsOld: List<Locator>
-
+    val testOutcomes = mutableListOf<TestOutcome>() //to collect the outcome of each test
 
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
         val testFilePaths = TestFilesExtractor.findTestFilePaths(project)//test files are identified
@@ -32,44 +42,37 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
         server = Server()
         server.start()
         println("Server started!")
-        GamificationManager.updateProgresses(locatorsOld, locatorsNew, GamificationManager.userProfile)
     }
 
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
         server.stop()
         println("Server stopped!")
-        //TODO: here place the general checks
-
+        GamificationManager.analyzeEvents(testOutcomes)
     }
 
     override fun onTestFinished(test: SMTestProxy) {
         println("Test finished!")
-
         val eventList = Server.events
         println("Events:")
         for (event in eventList) {
             println(event)
         }
-
-
-        //TODO: here place positive and negative checks
-
         if (eventList.isNotEmpty()) {
-
-            if (test.isPassed) {
-                //checks for passed
-
-
-            }
-            else {
-                //check for not passed
-            }
-            //service.analyzeEvents(eventList)
+            //collect old/new locators + other outcomes related to executed test
+            val oldLocatorsInTest = locatorsOld.filter { it.methodName == test.name }
+            val newLocatorsInTest = locatorsNew.filter { it.methodName == test.name }
+            val testOutcome = TestOutcome(test.name, oldLocatorsInTest, newLocatorsInTest, test.isPassed, test.stacktrace)
+            testOutcomes.add(testOutcome)
         }
         else {
             //TODO: exception
         }
     }
+
+
+
+
+
 
 
 
