@@ -1,8 +1,6 @@
 package gamification
 
-import com.intellij.openapi.util.NlsSafe
 import listener.TestOutcome
-import locator.Locator
 import ui.GUIManager
 import utils.XMLReader
 import utils.XMLWriter
@@ -76,20 +74,22 @@ class GamificationManager() {
         }
 
         fun analyzeEvents(testOutcomes: List<TestOutcome>){
-            val checks = mutableListOf<TestOutcome>() //to collect the "good" outcome of each test
+            var anyChange = false
+            val positiveOldNewChecks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
             for(testOutcome in testOutcomes){
                 if (testOutcome.locatorsOld.isNotEmpty()) {
-                    //TODO: case of no changes
+                    //case of no changes
                     if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size &&
                         testOutcome.locatorsNew.toSet() == testOutcome.locatorsOld.toSet()) {
-                        return
+                        continue
                     }
-                    //TODO: case of changes over locators (edit types or values)
-                    //assumption: same locator is in the same order
-                    if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size) {
-                        if(testOutcome.isPassed) //TODO: positive checks
-                            checks.add(testOutcome)
-                        else { //TODO: negative checks
+                    anyChange = true
+                    //case of changes over locators (edit types or values)
+                    //assumption: same locator is in the same order which does not change
+                    if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size) {//TODO: positive checks --> to move?
+                        if(testOutcome.isPassed)
+                            positiveOldNewChecks.add(testOutcome)
+                        else { //TODO: negative checks --> to move?
                             if (testOutcome.stacktrace!!.contains("NoSuchElementException")) {
                                 val regex = """"selector":"(.*?)"""".toRegex()
                                 val matchResult = regex.find(testOutcome.stacktrace)
@@ -99,8 +99,13 @@ class GamificationManager() {
                             }
                         }
                     }
-                    //TODO: case of changes over locators (add/remove): how to distinguish when order is no more?
+                    //TODO: case of changes over # locators due to add/remove of locators from known test or add/remove test
+                    //how to manage addition or removal of locators from already present methods?
                     else {
+                        if(testOutcome.locatorsOld.isEmpty())//this in case of newly added test
+                            if(testOutcome.isPassed)
+                                positiveOldNewChecks.add(testOutcome)
+
                     }
                 }
                 //TODO: case of changes due to testMethod added in new implementation: how to manage new methods?
@@ -108,7 +113,8 @@ class GamificationManager() {
                 }
                 //TODO: how to manage case of changes due to testMethod removed or name changed in new implementation?
             }
-            updateProgresses(checks, userProfile)
+            if(anyChange)
+                updateProgresses(positiveOldNewChecks, userProfile)
         }
 
 

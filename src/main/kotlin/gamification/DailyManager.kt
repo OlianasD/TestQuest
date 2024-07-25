@@ -14,47 +14,33 @@ class DailyManager {
 
         private val DAILIES_PER_USER: Int = 3
 
+
+
+
+
+
+
         private val DAILY_NAMES = listOf(
             "xpathAbs",
             "xpathLength",
-            "xpathHeight",
-            "loc2css",
+            "xpathLevel",
             "loc2xpath",
             "loc2id",
-            "loc2class",
             "loc2linkText",
-            "loc2name",
-            "attrRef",
-            "tableRef",
-            "divRef",
-            "formRef",
-            "buttonRef",
-            "linkRef",
-            "spanRef",
-            "robust",
-            "stringa1",
-            "stringa2",
-            "stringa3",
-            "stringa4",
-            "stringa5",
-            "stringa6",
-            "stringa7",
-            "stringa8",
-            "stringa9",
-            "stringa10",
-            "stringa11",
-            "stringa12",
-            "stringa13",
-            "stringa14",
-            "stringa15",
-            "stringa16",
-            "stringa17",
-            "stringa18",
-            "stringa19",
-            "stringa20",
-            "stringa21",
-            "stringa22",
-            "stringa23",
+            "robustness",
+            "lengthShorten10",
+            "addAttrToXPath",
+            "remAttrFromXPath",
+            "remJSFromXPath",
+            "edit5",
+            "levelLowered5",
+            "xpathNoBreak",
+            "idNoBreak",
+            "linkTextNoBreak",
+            "repair",
+            "runtc",
+            "runts",
+            "useLoc",
             )
 
         //TODO: change icons, xp, target accordingly
@@ -82,257 +68,121 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[3],
-                "Convert $TARGET_DAILY non-CSS locators to $TARGET_DAILY CSS ones",
+                "Convert $TARGET_DAILY non-XPath locators to $TARGET_DAILY XPath ones",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[4],
-                "Convert $TARGET_DAILY non-XPath locators to $TARGET_DAILY XPath one",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[5],
                 "Convert $TARGET_DAILY non-ID locators to $TARGET_DAILY ID ones",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[6],
-                "Convert $TARGET_DAILY non-class locators to $TARGET_DAILY class ones",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[7],
+                DAILY_NAMES[5],
                 "Convert $TARGET_DAILY non-linkText locators to $TARGET_DAILY linkText ones",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
+                DAILY_NAMES[6],
+                "Improve the robustness of $TARGET_DAILY locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
+                DAILY_NAMES[7],
+                "Shorten the length of $TARGET_DAILY locators below 10 characters",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
                 DAILY_NAMES[8],
-                "Convert $TARGET_DAILY non-name locators to $TARGET_DAILY name ones",
+                "Add $TARGET_DAILY references to @id, @name, @class, @title, @alt" +
+                        "or @value attributes to XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[9],
-                "Add a reference to $TARGET_DAILY attributes within $TARGET_DAILY XPath locators",
+                "Remove $TARGET_DAILY references to @src, @href, @height, or @width " +
+                        "attributes from XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[10],
-                "Add a reference to $TARGET_DAILY <table> tags within $TARGET_DAILY XPath locators",
+                "Remove $TARGET_DAILY references to Javascript code from XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[11],
-                "Add a reference to $TARGET_DAILY <div> tags within $TARGET_DAILY XPath locators",
+                "Modify 5 different locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[12],
-                "Add a reference to $TARGET_DAILY <form> tags within $TARGET_DAILY XPath locators",
+                "Lower the level of $TARGET_DAILY locators below 5",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[13],
-                "Add a reference to $TARGET_DAILY <button> tags within $TARGET_DAILY XPath locators",
+                "Implement $TARGET_DAILY new XPath locators that do not break",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[14],
-                "Add a reference to $TARGET_DAILY <a> tags within $TARGET_DAILY XPath locators",
+                "Implement $TARGET_DAILY new ID locators that do not break",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[15],
-                "Add a reference to $TARGET_DAILY <span> tags within $TARGET_DAILY XPath locators",
+                "Implement $TARGET_DAILY new linkText locators that do not break",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[16],
-                "Improve the robustness of $TARGET_DAILY locators",
+                "Repair $TARGET_DAILY broken locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ), //TODO: which metric?
+            ),
             Daily(
                 DAILY_NAMES[17],
-                "Write $TARGET_DAILY locators shorter than 10 characters",
+                "Run $TARGET_DAILY test cases successfully",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[18],
-                "Write $TARGET_DAILY locators shorter than 5 characters",
+                "Run a test suite successfully",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
                 DAILY_NAMES[19],
-                "Add @id reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[20],
-                "Add @name reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[21],
-                "Add @class reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[22],
-                "Add @title reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[23],
-                "Add @alt reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[24],
-                "Add @value reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[25],
-                "Remove @src reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[26],
-                "Remove @href reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[27],
-                "Remove @width reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[28],
-                "Remove @onclick reference within $TARGET_DAILY Xpaths",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[29],
-                "Implement $TARGET_DAILY XPath locators that do not fail in 3 runs",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[30],
-                "Implement $TARGET_DAILY ID locators that do not fail in 3 runs",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[31],
-                "Implement $TARGET_DAILY linkText locators that do not fail in 3 runs",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[32],
-                "Implement 5 locators of any type",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[33],
-                "Implement 5 ID locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),Daily(
-                DAILY_NAMES[34],
-                "Implement 5 relative XPath locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),Daily(
-                DAILY_NAMES[35],
-                "Implement 5 linkText locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[36],
-                "Implement 5 linkText locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[37],
-                "Use the same locator 5 times",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[38],
-                "Remove 5 non ID, linkText, or XPath locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[39],
-                "Modify a locator 3 times in 24 hours",
+                "Implement the same locator more than once in a test suite",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
@@ -345,25 +195,30 @@ class DailyManager {
         private val DAILY_NAME_TO_XP = ALL_DAILIES.associate { it.name to it.xp }
 
         private val DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
-            DAILY_NAMES[0] to { testOutcomes -> absoluteXpathCount(testOutcomes) },
-            DAILY_NAMES[1] to { testOutcomes -> longXpathCount(testOutcomes) },
-            DAILY_NAMES[2] to { testOutcomes -> highXpathCount(testOutcomes) },
-            DAILY_NAMES[3] to { testOutcomes -> cssLocatorsCount(testOutcomes) },
-            DAILY_NAMES[4] to { testOutcomes -> xpathLocatorsCount(testOutcomes) },
-            DAILY_NAMES[5] to { testOutcomes -> idLocatorsCount(testOutcomes) },
-            DAILY_NAMES[6] to { testOutcomes -> classLocatorsCount(testOutcomes) },
-            DAILY_NAMES[7] to { testOutcomes -> linkTextLocatorsCount(testOutcomes) },
-            DAILY_NAMES[8] to { testOutcomes -> nameLocatorsCount(testOutcomes) },
-            DAILY_NAMES[9] to { testOutcomes -> xpathAttributeCount(testOutcomes) },
-            DAILY_NAMES[10] to { testOutcomes -> xpathTableCount(testOutcomes) },
-            DAILY_NAMES[11] to { testOutcomes -> xpathDivCount(testOutcomes) },
-            DAILY_NAMES[12] to { testOutcomes -> xpathFormCount(testOutcomes) },
-            DAILY_NAMES[13] to { testOutcomes -> xpathButtonCount(testOutcomes) },
-            DAILY_NAMES[14] to { testOutcomes -> xpathAnchorCount(testOutcomes) },
-            DAILY_NAMES[15] to { testOutcomes -> xpathSpanCount(testOutcomes) },
-            DAILY_NAMES[16] to { testOutcomes -> robustnessImprovementCount(testOutcomes) }
-            //TODO: add more
+            DAILY_NAMES[0] to { testOutcomes -> checkAbsXPathRemoved(testOutcomes) },
+            DAILY_NAMES[1] to { testOutcomes -> checkXPathLengthReduced(testOutcomes) },
+            DAILY_NAMES[2] to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
+            DAILY_NAMES[3] to { testOutcomes -> checkLocs2XPathConverted(testOutcomes) },
+            DAILY_NAMES[4] to { testOutcomes -> checkLocs2IDConverted(testOutcomes) },
+            DAILY_NAMES[5] to { testOutcomes -> checkLocs2LinkTextConverted(testOutcomes) },
+            DAILY_NAMES[6] to { testOutcomes -> checkRobustnessImprovement(testOutcomes) },
+            DAILY_NAMES[7] to { testOutcomes -> checkShortenedLength10(testOutcomes) },
+            DAILY_NAMES[8] to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
+            DAILY_NAMES[9] to { testOutcomes -> checkUnwantedAttrsInXPaths(testOutcomes) },
+            DAILY_NAMES[10] to { testOutcomes -> checkJSInXPaths(testOutcomes) },
+            DAILY_NAMES[11] to { testOutcomes -> checkChangedLocs5(testOutcomes) },
+            DAILY_NAMES[12] to { testOutcomes -> checkLoweredLevel5(testOutcomes) },
+            DAILY_NAMES[13] to { testOutcomes -> checkNewXPathNoBreak(testOutcomes) },
+            DAILY_NAMES[14] to { testOutcomes -> checkNewIDNoBreak(testOutcomes) },
+            DAILY_NAMES[15] to { testOutcomes -> checkNewLinkTextNoBreak(testOutcomes) },
+            DAILY_NAMES[16] to { testOutcomes -> checkRepair(testOutcomes) },
+            DAILY_NAMES[17] to { testOutcomes -> checkRunTC(testOutcomes) },
+            DAILY_NAMES[18] to { testOutcomes -> checkRunTS(testOutcomes) },
+            DAILY_NAMES[19] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) }
         )
+
+
+
 
 
         //dailies are assigned to user
@@ -392,118 +247,12 @@ class DailyManager {
 
 
 
-
-        /*TO UPDATE DAILIES*/
-
-        private val MAX_LENGTH: Int = 20//TODO: to reason about
-        private val MAX_LEVEL: Int = 3
-
-
-
-
-        private fun cssLocatorsCount(testOutcomes: List<TestOutcome>): Int {
-            /*return locatorsNew.count { it.locatorType.equals("css", ignoreCase = true) } -
-                    locatorsOld.count { it.locatorType.equals("css", ignoreCase = true) }*/
-            return 0
-        }
-
-        private fun xpathLocatorsCount(testOutcomes: List<TestOutcome>): Int {
-            /*return locatorsNew.count { it.locatorType.equals("xpath", ignoreCase = true) } -
-                    locatorsOld.count { it.locatorType.equals("xpath", ignoreCase = true) }*/
-            return 0
-        }
-
-        private fun idLocatorsCount(testOutcomes: List<TestOutcome>): Int {
-            /*return locatorsNew.count { it.locatorType.equals("id", ignoreCase = true) } -
-                    locatorsOld.count { it.locatorType.equals("id", ignoreCase = true) }*/
-            return 0
-        }
-
-        private fun nameLocatorsCount(testOutcomes: List<TestOutcome>): Int {
-            /*return locatorsNew.count { it.locatorType.equals("name", ignoreCase = true) } -
-                    locatorsOld.count { it.locatorType.equals("name", ignoreCase = true) }*/
-            return 0
-        }
-
-        private fun classLocatorsCount(testOutcomes: List<TestOutcome>): Int {
-            /*return locatorsNew.count { it.locatorType.equals("class", ignoreCase = true) } -
-                    locatorsOld.count { it.locatorType.equals("class", ignoreCase = true) }*/
-            return 0
-        }
-
-        private fun linkTextLocatorsCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count {
-                it.locatorType.equals("linkText", ignoreCase = true) ||
-                        it.locatorType.equals("partialLinkText", ignoreCase = true)
-            } -
-                    locatorsOld.count {
-                        it.locatorType.equals("linkText", ignoreCase = true) ||
-                                it.locatorType.equals("partialLinkText", ignoreCase = true)
-                    })*/
-            return 0
-        }
-
-        private fun xpathLocators(locatorsOld: List<Locator>, locatorsNew: List<Locator>): Pair<List<Locator>, List<Locator>> {
-            val oldXpathLocators = locatorsOld.filter { it.locatorType.equals("xpath", ignoreCase = true) }
-            val newXpathLocators = locatorsNew.filter { it.locatorType.equals("xpath", ignoreCase = true) }
-            return Pair(oldXpathLocators, newXpathLocators)
-        }
-
-        private fun xpathAttributeCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("@") } -
-                    locatorsOld.count { it.locatorValue.contains("@") })*/
-            return 0
-        }
-
-        private fun xpathTableCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("/table") } -
-                    locatorsOld.count { it.locatorValue.contains("/table") })*/
-            return 0
-        }
-
-        private fun xpathDivCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("/div") } -
-                    locatorsOld.count { it.locatorValue.contains("/div") })*/
-            return 0
-        }
-
-        private fun xpathSpanCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("/span") } -
-                    locatorsOld.count { it.locatorValue.contains("/span") })*/
-            return 0
-        }
-
-        private fun xpathButtonCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("/button") } -
-                    locatorsOld.count { it.locatorValue.contains("/button") })*/
-            return 0
-        }
-
-        private fun xpathAnchorCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("/a") } -
-                    locatorsOld.count { it.locatorValue.contains("/a") })*/
-            return 0
-        }
-
-        private fun xpathFormCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsNew.count { it.locatorValue.contains("/form") } -
-                    locatorsOld.count { it.locatorValue.contains("/form") })*/
-            return 0
-        }
-
-
-
-
-
-
-
-
-
-        private fun absoluteXpathCount(testOutcomes: List<TestOutcome>): Int {
-            /*return (locatorsOld.count { it.locatorValue.startsWith("/html") } -
-                    locatorsNew.count { it.locatorValue.startsWith("/html") })*/
+        /******* CHECKS *******/
+        private fun checkAbsXPathRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
                 count += (locatorsOld.count { it.locatorValue.startsWith("/html") } -
@@ -512,20 +261,18 @@ class DailyManager {
             return count
         }
 
-
-        private fun computeFragilityCoefficient(loc: Locator): Int{
-            return 1
-        }
-
-        private fun longXpathCount(testOutcomes: List<TestOutcome>): Int {
+        private fun checkXPathLengthReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
                 for (i in locatorsOld.indices) {
                     val oldLocator = locatorsOld[i]
                     val newLocator = locatorsNew[i]
-                    if (oldLocator.locatorType == "xpath" && newLocator.locatorType == "xpath")
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        newLocator.locatorType.equals("xpath", ignoreCase = true))
                         if (newLocator.locatorValue.length < oldLocator.locatorValue.length)
                             count++
                 }
@@ -533,51 +280,314 @@ class DailyManager {
             return count
         }
 
-        private fun robustnessImprovementCount(testOutcomes: List<TestOutcome>): Int{
+        private fun checkXPathLevelReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
                 for (i in locatorsOld.indices) {
                     val oldLocator = locatorsOld[i]
                     val newLocator = locatorsNew[i]
-                    if (computeFragilityCoefficient(oldLocator) <
-                        computeFragilityCoefficient(newLocator))
-                        count++
-                }
-            }
-            return count
-        }
-
-
-        private fun highXpathCount(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (oldLocator.locatorType == "xpath" && newLocator.locatorType == "xpath")
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        newLocator.locatorType.equals("xpath", ignoreCase = true))
                         if (newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size
-                            < oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size
-                        )
+                            < oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size)
                             count++
                 }
             }
             return count
         }
 
+        private fun checkLocs2XPathConverted(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (!oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        newLocator.locatorType.equals("xpath", ignoreCase = true))
+                        count++
+                }
+            }
+            return count
+        }
+
+        private fun checkLocs2IDConverted(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (!oldLocator.locatorType.equals("id", ignoreCase = true) &&
+                        newLocator.locatorType.equals("id", ignoreCase = true))
+                        count++
+                }
+            }
+            return count
+        }
+
+        private fun checkLocs2LinkTextConverted(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if ((!oldLocator.locatorType.equals("linkText", ignoreCase = true) &&
+                                !oldLocator.locatorType.equals("partialLinkText", ignoreCase = true)) &&
+                        (newLocator.locatorType.equals("linkText", ignoreCase = true) ||
+                                newLocator.locatorType.equals("partialLinkText", ignoreCase = true)))
+                        count++
+                }
+            }
+            return count
+        }
+
+        private fun checkRobustnessImprovement(testOutcomes: List<TestOutcome>): Int{
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (computeFragilityCoefficient(newLocator) <
+                        computeFragilityCoefficient(oldLocator))
+                        count++
+                }
+            }
+            return count
+        }
+
+        private fun computeFragilityCoefficient(loc: Locator): Int{
+            return 0//TODO:implement coefficient
+        }
+
+        private fun checkShortenedLength10(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (newLocator.locatorValue.length < 10 &&
+                        newLocator.locatorValue.length < oldLocator.locatorValue.length)
+                        count++
+                }
+            }
+            return count
+        }
+
+        private fun checkWantedAttrsInXPaths(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLocator.locatorType.equals("xpath", ignoreCase = true))
+                        count += countWantedAttributes(newLocator.locatorValue) -
+                                countWantedAttributes(oldLocator.locatorValue)                }
+            }
+            return count
+        }
+
+        private fun checkUnwantedAttrsInXPaths(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLocator.locatorType.equals("xpath", ignoreCase = true))
+                        count += countUnwantedAttributes(oldLocator.locatorValue) -
+                                countUnwantedAttributes(newLocator.locatorValue)
+                }
+            }
+            return count
+        }
+
+        private fun checkJSInXPaths(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLocator.locatorType.equals("xpath", ignoreCase = true))
+                        count += countJavaScriptReferences(oldLocator.locatorValue) -
+                                countJavaScriptReferences(newLocator.locatorValue)
+                }
+            }
+            return count
+        }
+
+        private fun countWantedAttributes(locatorValue: String): Int {
+            val wantedAttributes = listOf("@id", "@name", "@class", "@title", "@alt", "@value")
+            return wantedAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
+
+        private fun countUnwantedAttributes(locatorValue: String): Int {
+            val unwantedAttributes = listOf("@src", "@href", "@width", "@height")
+            return unwantedAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
+
+        private fun countJavaScriptReferences(locatorValue: String): Int {
+            val jsAttributes = listOf("onclick", "onload", "onmouseover", "onmouseout", "onchange",
+                "onsubmit", "onfocus", "onblur", "onkeydown", "onkeyup", "onkeypress")
+            return jsAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
 
 
+        private val lastChangedLocs: MutableList<Locator> = mutableListOf()
 
+        private fun checkChangedLocs5(testOutcomes: List<TestOutcome>): Int {
+            //TODO: bisogna salvarsi da qualche parte i locators modificati
+            return 0
+        }
 
+        private fun checkLoweredLevel5(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (i in locatorsOld.indices) {
+                    val oldLocator = locatorsOld[i]
+                    val newLocator = locatorsNew[i]
+                    if (newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size < 5 &&
+                        newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <
+                        oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size)
+                        count++
+                }
+            }
+            return count
+        }
 
+        //this is checked for newly added tests or locators
+        private fun checkNewXPathNoBreak(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (newLocator in locatorsNew) {
+                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        locatorsOld.none { it.locatorType == newLocator.locatorType && it.locatorValue == newLocator.locatorValue }) {
+                        count++
+                    }
+                }
+            }
+            return count
+        }
 
+        //this is checked for newly added tests or locators
+        private fun checkNewIDNoBreak(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (newLocator in locatorsNew) {
+                    if (newLocator.locatorType.equals("id", ignoreCase = true) &&
+                        locatorsOld.none { it.locatorType == newLocator.locatorType && it.locatorValue == newLocator.locatorValue }) {
+                        count++
+                    }
+                }
+            }
+            return count
+        }
 
+        //this is checked for newly added tests or locators
+        private fun checkNewLinkTextNoBreak(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                for (newLocator in locatorsNew) {
+                        if (newLocator.locatorType.equals("linkText", ignoreCase = true) ||
+                            newLocator.locatorType.equals("partialLinkText", ignoreCase = true) &&
+                            locatorsOld.none { it.locatorType == newLocator.locatorType &&
+                                    it.locatorValue == newLocator.locatorValue }) {
+                            count++
+                    }
+                }
+            }
+            return count
+        }
 
+        private fun checkRepair(testOutcomes: List<TestOutcome>): Int {
+            return 0 //TODO
+        }
 
+        private fun checkRunTC(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                count++
+            }
+            return count
+        }
 
+        private fun checkRunTS(testOutcomes: List<TestOutcome>): Int {
+            for(testOutcome in testOutcomes){
+                if(!testOutcome.isPassed)
+                    return 0
+            }
+            return 1
+        }
+
+        //this is checked for newly added tests or locators
+        private fun checkNewMultipleUseLoc(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                val locatorCountMap = mutableMapOf<Locator, Int>() //map to count locs occurrences
+                //count multiple uses of newly added locators
+                for (locator in locatorsNew)
+                    if (locatorsOld.none { it.locatorType == locator.locatorType && it.locatorValue == locator.locatorValue })
+                        locatorCountMap[locator] = locatorCountMap.getOrDefault(locator, 0) + 1
+                count += locatorCountMap.values.count { it > 1 }
+            }
+            return count
+        }
 
 
 
