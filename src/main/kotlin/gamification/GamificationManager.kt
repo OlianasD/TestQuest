@@ -1,6 +1,7 @@
 package gamification
 
 import listener.TestOutcome
+import locator.Locator
 import ui.GUIManager
 import utils.XMLReader
 import utils.XMLWriter
@@ -48,7 +49,7 @@ class GamificationManager() {
 
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
             val dailyUpdates = DailyManager.updateDailies(userProfile, testOutcomes)//check for each assigned daily
-            val achUpdates = false//AchievementManager.updateAchievements(userProfile, testOutcomes)
+            val achUpdates = AchievementManager.updateAchievements(userProfile, testOutcomes)
             if(dailyUpdates || achUpdates) {
                 val xmlWriter = XMLWriter()
                 updateTitleAndLvl(userProfile)
@@ -75,58 +76,63 @@ class GamificationManager() {
 
         fun analyzeEvents(testOutcomes: List<TestOutcome>){
             var anyChange = false
-            val positiveOldNewChecks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
+            val checks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
             for(testOutcome in testOutcomes){
+                //case: changes on existing test methods
+                //assumption: test methods always have locators
                 if (testOutcome.locatorsOld.isNotEmpty()) {
-                    //case of no changes
+                    //case: no changes
                     if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size &&
                         testOutcome.locatorsNew.toSet() == testOutcome.locatorsOld.toSet()) {
                         continue
                     }
                     anyChange = true
-                    //case of changes over locators (edit types or values)
+                    //case: changes by removing test method
+                    //TODO
+                    if (testOutcome.locatorsNew.isEmpty()){
+                        continue
+                    }
+                    //case: changes over existing locators (edit types or values)
                     //assumption: same locator is in the same order which does not change
-                    if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size) {//TODO: positive checks --> to move?
-                        if(testOutcome.isPassed)
-                            positiveOldNewChecks.add(testOutcome)
-                        else { //TODO: negative checks --> to move?
-                            if (testOutcome.stacktrace!!.contains("NoSuchElementException")) {
-                                val regex = """"selector":"(.*?)"""".toRegex()
-                                val matchResult = regex.find(testOutcome.stacktrace)
-                                if (matchResult != null) {
-                                    val brokenLocator = matchResult.groupValues[1]//TODO: to use for negative checks
-                                }
-                            }
-                        }
+                    else if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size)
+                        checks.add(testOutcome)
+                    //case: changes by adding locators in existing test methods
+                    //TODO
+                    else if (testOutcome.locatorsNew.size > testOutcome.locatorsOld.size){
+                        checks.add(testOutcome)
                     }
-                    //TODO: case of changes over # locators due to add/remove of locators from known test or add/remove test
-                    //how to manage addition or removal of locators from already present methods?
-                    else {
-                        if(testOutcome.locatorsOld.isEmpty())//this in case of newly added test
-                            if(testOutcome.isPassed)
-                                positiveOldNewChecks.add(testOutcome)
-
+                    //case: changes by removing locators in existing test methods
+                    //TODO
+                    else{
+                        continue
                     }
                 }
-                //TODO: case of changes due to testMethod added in new implementation: how to manage new methods?
+                //case: changes by adding test methods
+                //TODO
                 else {
+                    checks.add(testOutcome)
                 }
-                //TODO: how to manage case of changes due to testMethod removed or name changed in new implementation?
             }
             if(anyChange)
-                updateProgresses(positiveOldNewChecks, userProfile)
+                updateProgresses(checks, userProfile)
         }
 
 
 
-
-
-
-
-
+        /***** aux functions *****/
+        fun computeFragilityCoefficient(loc: Locator): Int{
+            return 0//TODO:implement coefficient
+        }
 
 
     }
+
+
+
+
+
+
+
 
 
     //upload user profile data from file if they exist or create a new user profile if they do not
