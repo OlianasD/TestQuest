@@ -189,7 +189,7 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[19],
-                "Implement the new same locator more than once in a test suite",
+                "Reuse a  locator value more than once in a test suite",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
@@ -242,7 +242,7 @@ class DailyManager {
                 DAILY_NAMES[26],
                 "Run 20 locators successfully",
                 XP_DAILY,
-                TARGET_DAILY,
+                20,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             )
         )
@@ -316,31 +316,41 @@ class DailyManager {
 
         private fun checkAbsXPathRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
+            for (testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                count += (locatorsOld.count { it.locatorValue.startsWith("/html") } -
-                        locatorsNew.count { it.locatorValue.startsWith("/html") })
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLocator.locatorValue.startsWith("/html")) {
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            !newLocator.locatorValue.startsWith("/html"))
+                            count++
+                    }
+                }
             }
             return count
         }
+
 
         private fun checkXPathLengthReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if(!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        newLocator.locatorType.equals("xpath", ignoreCase = true))
-                        if (newLocator.locatorValue.length < oldLocator.locatorValue.length)
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)
+                            && newLocator.locatorValue.length < oldLocator.locatorValue.length)
                             count++
+                    }
                 }
             }
             return count
@@ -351,16 +361,17 @@ class DailyManager {
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if(!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        newLocator.locatorType.equals("xpath", ignoreCase = true))
-                        if (newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size
-                            < oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size)
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)
+                            && (newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <
+                            oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size))
                             count++
+                    }
                 }
             }
             return count
@@ -371,14 +382,15 @@ class DailyManager {
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (!oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        newLocator.locatorType.equals("xpath", ignoreCase = true))
-                        count++
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (!oldLocator.locatorType.equals("xpath", ignoreCase = true)) {
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
+                            count++
+                    }
                 }
             }
             return count
@@ -389,14 +401,15 @@ class DailyManager {
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (!oldLocator.locatorType.equals("id", ignoreCase = true) &&
-                        newLocator.locatorType.equals("id", ignoreCase = true))
-                        count++
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (!oldLocator.locatorType.equals("id", ignoreCase = true)) {
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("id", ignoreCase = true))
+                            count++
+                    }
                 }
             }
             return count
@@ -407,54 +420,55 @@ class DailyManager {
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if ((!oldLocator.locatorType.equals("linkText", ignoreCase = true) &&
-                                !oldLocator.locatorType.equals("partialLinkText", ignoreCase = true)) &&
-                        (newLocator.locatorType.equals("linkText", ignoreCase = true) ||
-                                newLocator.locatorType.equals("partialLinkText", ignoreCase = true)))
-                        count++
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (!oldLocator.locatorType.equals("linkText", ignoreCase = true) &&
+                        !oldLocator.locatorType.equals("partialLinkText", ignoreCase = true)) {
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && (newLocator.locatorType.equals("linkText", ignoreCase = true)
+                                    || newLocator.locatorType.equals("partialLinkText", ignoreCase = true)))
+                            count++
+                    }
                 }
             }
             return count
         }
 
+        //TODO: coefficient function must be implemented
         private fun checkRobustnessImprovement(testOutcomes: List<TestOutcome>): Int{
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (GamificationManager.computeFragilityCoefficient(newLocator) <
-                        GamificationManager.computeFragilityCoefficient(oldLocator))
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                    if (newLocator != null && computeFragilityCoefficient(newLocator) <
+                        computeFragilityCoefficient(oldLocator))
                         count++
                 }
             }
             return count
         }
-
-
 
         private fun checkShortenedLength10(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (newLocator.locatorValue.length < 10 &&
-                        newLocator.locatorValue.length < oldLocator.locatorValue.length)
-                        count++
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorValue.length >= 10){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorValue.length < 10)
+                            count++
+                    }
                 }
             }
             return count
@@ -462,36 +476,39 @@ class DailyManager {
 
         private fun checkWantedAttrsInXPaths(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
+            for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        oldLocator.locatorType.equals("xpath", ignoreCase = true))
-                        count += countWantedAttributes(newLocator.locatorValue) -
-                                countWantedAttributes(oldLocator.locatorValue)                }
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
+                            count += countWantedAttributes(newLocator.locatorValue) -
+                                    countWantedAttributes(oldLocator.locatorValue)
+                    }
+                }
             }
             return count
         }
 
         private fun checkUnwantedAttrsInXPaths(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
+            for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        oldLocator.locatorType.equals("xpath", ignoreCase = true))
-                        count += countUnwantedAttributes(oldLocator.locatorValue) -
-                                countUnwantedAttributes(newLocator.locatorValue)
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
+                            count += countUnwantedAttributes(oldLocator.locatorValue) -
+                                    countUnwantedAttributes(newLocator.locatorValue)
+                    }
                 }
             }
             return count
@@ -499,44 +516,26 @@ class DailyManager {
 
         private fun checkJSInXPaths(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
+            for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        oldLocator.locatorType.equals("xpath", ignoreCase = true))
-                        count += countJavaScriptReferences(oldLocator.locatorValue) -
-                                countJavaScriptReferences(newLocator.locatorValue)
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
+                            count += countJavaScriptReferences(oldLocator.locatorValue) -
+                                    countJavaScriptReferences(newLocator.locatorValue)
+                    }
                 }
             }
             return count
         }
 
-        private fun countWantedAttributes(locatorValue: String): Int {
-            val wantedAttributes = listOf("@id", "@name", "@class", "@title", "@alt", "@value")
-            return wantedAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
-        }
-
-        private fun countUnwantedAttributes(locatorValue: String): Int {
-            val unwantedAttributes = listOf("@src", "@href", "@width", "@height")
-            return unwantedAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
-        }
-
-        private fun countJavaScriptReferences(locatorValue: String): Int {
-            val jsAttributes = listOf("onclick", "onload", "onmouseover", "onmouseout", "onchange",
-                "onsubmit", "onfocus", "onblur", "onkeydown", "onkeyup", "onkeypress")
-            return jsAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
-        }
-
-
-        private val lastChangedLocs: MutableList<Locator> = mutableListOf()
-
+        //TODO: bisogna salvarsi da qualche parte i locators modificati
         private fun checkChangedLocs5(testOutcomes: List<TestOutcome>): Int {
-            //TODO: bisogna salvarsi da qualche parte i locators modificati
             return 0
         }
 
@@ -545,15 +544,17 @@ class DailyManager {
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size != locatorsNew.size)
+                if (!testOutcome.isPassed)
                     continue
-                for (i in locatorsOld.indices) {
-                    val oldLocator = locatorsOld[i]
-                    val newLocator = locatorsNew[i]
-                    if (newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size < 5 &&
-                        newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <
-                        oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size)
-                        count++
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size >= 5){
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)
+                            && newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size < 5)
+                            count++
+                    }
                 }
             }
             return count
@@ -570,40 +571,41 @@ class DailyManager {
 
 
 
-
-
         /******* CHECKS ON NEW LOCATORS *******/
 
         private fun checkNewXPath(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        locatorsOld.none { it.locatorType == newLocator.locatorType && it.locatorValue == newLocator.locatorValue }) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                //new locator hashes only
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true)
                 }
+                count += newLocators.size
             }
             return count
         }
 
+
         private fun checkNewID(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("id", ignoreCase = true) &&
-                        locatorsOld.none { it.locatorType == newLocator.locatorType && it.locatorValue == newLocator.locatorValue }) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                //new locator hashes only
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("id", ignoreCase = true)
                 }
+                count += newLocators.size
             }
             return count
         }
@@ -611,53 +613,60 @@ class DailyManager {
         private fun checkNewLinkText(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
                 val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                        if (newLocator.locatorType.equals("linkText", ignoreCase = true) ||
-                            newLocator.locatorType.equals("partialLinkText", ignoreCase = true) &&
-                            locatorsOld.none { it.locatorType == newLocator.locatorType &&
-                                    it.locatorValue == newLocator.locatorValue }) {
-                            count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                //new locator hashes only
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            (newLocator.locatorType.equals("linkText", ignoreCase = true) ||
+                                    newLocator.locatorType.equals("partialLinkText", ignoreCase = true))
                 }
+                count += newLocators.size
             }
             return count
         }
 
+        //two cases: new locators using multiple old values, new locators using multiple new values
+        //TODO: old locators using multiple old/new values is currently not considered (why should you?)
         private fun checkNewMultipleUseLoc(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
+            val oldLocatorsHashes = mutableSetOf<Int>()
+            val newLocators = mutableListOf<Locator>()
+            //locators are considered from the whole test suite and not separated by method
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                val locatorCountMap = mutableMapOf<Locator, Int>() //map to count locs occurrences
-                //count multiple uses of newly added locators
-                for (locator in locatorsNew)
-                    if (locatorsOld.none { it.locatorType == locator.locatorType && it.locatorValue == locator.locatorValue })
-                        locatorCountMap[locator] = locatorCountMap.getOrDefault(locator, 0) + 1
-                count += locatorCountMap.values.count { it > 1 }
+                oldLocatorsHashes.addAll(testOutcome.locatorsOld.map { it.hashCode() })
+                newLocators.addAll(testOutcome.locatorsNew)
             }
-            return count
+            //new locator hashes only
+            val filteredNewLocators = newLocators.filter { newLocator ->
+                !oldLocatorsHashes.contains(newLocator.hashCode())
+            }
+            //count locator value usages
+            val locatorCountMap = mutableMapOf<String, Int>()
+            for (locator in filteredNewLocators)
+                locatorCountMap[locator.locatorValue] = locatorCountMap.getOrDefault(locator.locatorValue, 0) + 1
+            return locatorCountMap.values.count { it > 1 }
         }
 
         private fun checkNewXPathLength10(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld.toSet()
+                val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        newLocator.locatorValue.length < 10 &&
-                        newLocator !in locatorsOld) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                //new locator hashes only
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                                    newLocator.locatorValue.length < 10)
                 }
+                count += newLocators.size
             }
             return count
         }
@@ -665,35 +674,38 @@ class DailyManager {
         private fun checkNewXPathLevel5(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld.toSet()
+                val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        newLocator.locatorValue.split("/").size - 1 < 5 &&
-                        newLocator !in locatorsOld) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            newLocator.locatorValue.split("/")
+                                .filter { node -> node.isNotEmpty() }
+                                .size < 5
                 }
+                count += newLocators.size
             }
             return count
         }
 
+
         private fun checkNewRobust(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld.toSet()
+                val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        GamificationManager.computeFragilityCoefficient(newLocator) < 0.5 && //TODO: is 0.5 good enough?
-                        newLocator !in locatorsOld) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            computeFragilityCoefficient(newLocator) < 0.5 //TODO: 0.5 enough?
                 }
+                count += newLocators.size
             }
             return count
         }
@@ -702,17 +714,19 @@ class DailyManager {
             val wantedAttrs = listOf("id", "name", "class", "title", "alt", "value")
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld.toSet()
+                val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        wantedAttrs.any { attribute -> newLocator.locatorValue.contains("@$attribute", ignoreCase = true) } &&
-                        newLocator !in locatorsOld) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            wantedAttrs.any { attribute ->
+                                newLocator.locatorValue.contains("@$attribute", ignoreCase = true)
+                            }
                 }
+                count += newLocators.size
             }
             return count
         }
@@ -721,17 +735,19 @@ class DailyManager {
             val unwantedAttrs = listOf("src", "href", "height", "width")
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld.toSet()
+                val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        unwantedAttrs.none { attribute -> newLocator.locatorValue.contains("@$attribute", ignoreCase = true) } &&
-                        newLocator !in locatorsOld) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            unwantedAttrs.none { attribute ->
+                                newLocator.locatorValue.contains("@$attribute", ignoreCase = true)
+                            }
                 }
+                count += newLocators.size
             }
             return count
         }
@@ -741,26 +757,22 @@ class DailyManager {
                 "onfocus", "onblur", "onkeydown", "onkeyup", "onkeypress")
             var count = 0
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
+                if (!testOutcome.isPassed)
                     continue
-                val locatorsOld = testOutcome.locatorsOld.toSet()
+                val locatorsOld = testOutcome.locatorsOld
                 val locatorsNew = testOutcome.locatorsNew
-                for (newLocator in locatorsNew) {
-                    if (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        jsAttrs.none { attribute -> newLocator.locatorValue.contains("@$attribute", ignoreCase = true) } &&
-                        newLocator !in locatorsOld) {
-                        count++
-                    }
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            jsAttrs.none { attribute ->
+                                newLocator.locatorValue.contains("@$attribute", ignoreCase = true)
+                            }
                 }
+                count += newLocators.size
             }
             return count
         }
-
-
-
-
-
-
 
 
 
@@ -803,7 +815,26 @@ class DailyManager {
 
 
 
+        /**AUXILIARY FUNCTIONS**/
+        fun computeFragilityCoefficient(loc: Locator): Int{
+            return 0//TODO:implement coefficient
+        }
 
+        private fun countWantedAttributes(locatorValue: String): Int {
+            val wantedAttributes = listOf("@id", "@name", "@class", "@title", "@alt", "@value")
+            return wantedAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
+
+        private fun countUnwantedAttributes(locatorValue: String): Int {
+            val unwantedAttributes = listOf("@src", "@href", "@width", "@height")
+            return unwantedAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
+
+        private fun countJavaScriptReferences(locatorValue: String): Int {
+            val jsAttributes = listOf("onclick", "onload", "onmouseover", "onmouseout", "onchange",
+                "onsubmit", "onfocus", "onblur", "onkeydown", "onkeyup", "onkeypress")
+            return jsAttributes.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
 
 
 

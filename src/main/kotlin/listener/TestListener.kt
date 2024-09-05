@@ -64,8 +64,7 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
             val testOutcome = TestOutcome(test.name, oldLocatorsInTest, newLocatorsInTest, test.isPassed, test.stacktrace)
             testOutcomes.add(testOutcome)
         }
-        else {
-            //TODO: exception
+        else {//TODO: exception?
         }
     }
 

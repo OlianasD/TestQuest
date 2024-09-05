@@ -75,56 +75,13 @@ class GamificationManager() {
         }
 
         fun analyzeEvents(testOutcomes: List<TestOutcome>){
-            var anyChange = false
             val checks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
-            for(testOutcome in testOutcomes){
-                //case: changes on existing test methods
-                //assumption: test methods always have locators
-                if (testOutcome.locatorsOld.isNotEmpty()) {
-                    //case: no changes
-                    if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size &&
-                        testOutcome.locatorsNew.toSet() == testOutcome.locatorsOld.toSet()) {
-                        continue
-                    }
-                    anyChange = true
-                    //case: changes by removing test method
-                    //TODO
-                    if (testOutcome.locatorsNew.isEmpty()){
-                        continue
-                    }
-                    //case: changes over existing locators (edit types or values)
-                    //assumption: same locator is in the same order which does not change
-                    else if (testOutcome.locatorsNew.size == testOutcome.locatorsOld.size)
-                        checks.add(testOutcome)
-                    //case: changes by adding locators in existing test methods
-                    //TODO
-                    else if (testOutcome.locatorsNew.size > testOutcome.locatorsOld.size){
-                        checks.add(testOutcome)
-                    }
-                    //case: changes by removing locators in existing test methods
-                    //TODO
-                    else{
-                        continue
-                    }
-                }
-                //case: changes by adding test methods
-                //TODO
-                else {
-                    checks.add(testOutcome)
-                }
-            }
-            if(anyChange)
-                updateProgresses(checks, userProfile)
+            for(testOutcome in testOutcomes)
+                checks.add(testOutcome)
+            updateProgresses(checks, userProfile)
+            //TODO: ragionare su casi in cui locators nuovi o vecchi sono vuoti (es. a seguito di remove)
+            //e su altri casi se serve (add method, remove method, ...)
         }
-
-
-
-        /***** aux functions *****/
-        fun computeFragilityCoefficient(loc: Locator): Int{
-            return 0//TODO:implement coefficient
-        }
-
-
     }
 
 

@@ -22,15 +22,11 @@
         </achievements>
         <dailies>
             <daily>
-                <name>xpathAbs</name>
+                <name>checkNewXPathLength10</name>
                 <progress>0</progress> 
             </daily>
 			<daily>
-                <name>xpathLength</name>
-                <progress>0</progress> 
-            </daily>
-			<daily>
-                <name>xpathLevel</name>
+                <name>newLengthShorter10</name>
                 <progress>0</progress> 
             </daily>
         </dailies>

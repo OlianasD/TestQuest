@@ -13,32 +13,68 @@ data class Locator(
     val locatorValue: String,
     val line: Int,
     val methodName: String,
-    val className: String
+    val className: String,
+    val locatorName: String?,
+    val locatorPosition: Int
 )
+{
+    //hashcode for uniqueness of locators
+    override fun hashCode(): Int {
+        if (locatorName != null)
+            return 31 * locatorName.hashCode() + methodName.hashCode() + className.hashCode()//TODO: risky if many same name locators
+        else
+           return 31 * locatorPosition + methodName.hashCode() + className.hashCode()//TODO: risky if many non named locators
+    }
 
-class LocatorsExtractor() : VoidVisitorAdapter<MutableList<Locator>>() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Locator) return false
+        if (locatorName != null)
+            return locatorName == other.locatorName &&
+                    methodName == other.methodName &&
+                    className == other.className &&
+                    locatorPosition == other.locatorPosition
+        else
+            return locatorPosition == other.locatorPosition &&
+                    methodName == other.methodName &&
+                    className == other.className
+    }
+}
 
+
+
+
+
+class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
 
     private var currentClassName: String = ""
     private var currentMethodName: String = ""
+    private var locatorCounter: Int = 0  // Contatore per la posizione del locator
 
-    // Visitor to find all driver.findElement calls
+    // Visitor to find all variable assignments and driver.findElement calls
     override fun visit(mce: MethodCallExpr, locators: MutableList<Locator>) {
         super.visit(mce, locators)
+
         if (mce.nameAsString == "findElement" && mce.scope.isPresent) {
             val scope = mce.scope.get()
             if (scope.toString() == "driver") {
+                //Extract locator details
                 val argument = mce.arguments[0].toString()
                 val locator = extractLocator(argument)
                 val locatorType = locator.first
                 val locatorValue = locator.second
-                locators.add(Locator(locatorType, locatorValue, mce.begin.get().line, currentMethodName, currentClassName))
+                //Find the associated variable name if present
+                val locatorName = findVariableName(mce)
+                //Increment and track the locator position
+                locatorCounter++
+                locators.add(Locator(locatorType, locatorValue, mce.begin.get().line, currentMethodName, currentClassName, locatorName, locatorCounter))
             }
         }
     }
 
     override fun visit(md: MethodDeclaration, locators: MutableList<Locator>) {
         currentMethodName = md.nameAsString
+        locatorCounter = 0  //Reset locator position counter for each new method
         super.visit(md, locators)
     }
 
@@ -56,6 +92,7 @@ class LocatorsExtractor() : VoidVisitorAdapter<MutableList<Locator>>() {
         return locators
     }
 
+    // Helper method to extract locator type and value
     private fun extractLocator(locatorString: String): Pair<String, String> {
         val regex = """By\.(.*?)\("([^"]+)"\)""".toRegex()
         val matchResult = regex.find(locatorString)
@@ -66,5 +103,20 @@ class LocatorsExtractor() : VoidVisitorAdapter<MutableList<Locator>>() {
         } else {
             throw IllegalArgumentException("Invalid locator string: $locatorString")
         }
+    }
+
+    // Helper method to find the variable name if available
+    private fun findVariableName(mce: MethodCallExpr): String? {
+        val parentNode = mce.parentNode.orElse(null)
+        // Check if the parent is an assignment (VariableDeclarationExpr)
+        if (parentNode != null && parentNode.toString().contains("= driver.findElement")) {
+            val parentText = parentNode.toString()
+            val variableRegex = """(\w+)\s*=\s*driver\.findElement""".toRegex()
+            val matchResult = variableRegex.find(parentText)
+            if (matchResult != null) {
+                return matchResult.groupValues[1]  // Return the variable name
+            }
+        }
+        return null  // Return null if no variable assignment found
     }
 }
