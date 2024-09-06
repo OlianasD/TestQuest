@@ -9,6 +9,10 @@ import locator.LocatorsExtractor
 import ui.GUIManager
 import utils.TestFilesExtractor
 
+object PluginData {
+    var userProfileId: String = ""
+}
+
 class TestQuestAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -18,7 +22,9 @@ class TestQuestAction : AnAction() {
         if (testFilePaths.isNotEmpty()) {
             val gamificationManager = GamificationManager()
             gamificationManager.showGUI()
-            gamificationManager.setupUserProfile("001")//TODO: change it into login via GUI
+            PluginData.userProfileId = "001" //TODO: change as a login
+            gamificationManager.setupUserProfile(PluginData.userProfileId)
+            // wait for login to update
             val extractor = LocatorsExtractor()
             locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
         } else {

@@ -1,6 +1,8 @@
 package ui
 
 import com.intellij.util.ui.JBUI
+import gamification.DailyManager
+import gamification.DailyProgress
 import gamification.GamificationManager
 import gamification.UserProfile
 import java.awt.*
@@ -55,7 +57,7 @@ class GUIManager {
 
             // Font settings
             val titleFont = Font("Arial", Font.BOLD, 18)
-            val font = Font("Arial", Font.PLAIN, 16)
+            var font = Font("Arial", Font.PLAIN, 16)
 
             // User Info panel
             val userInfoPanel = JPanel()
@@ -214,28 +216,20 @@ class GUIManager {
                 dailyPanel.alignmentX = Component.LEFT_ALIGNMENT
                 dailyPanel.background = Color.LIGHT_GRAY
                 // Daily Description
-                val dailyLabel = JLabel(dailyProgress.daily.description)
-                dailyLabel.font = font
-                dailyLabel.foreground = Color.BLACK
-                dailyPanel.add(dailyLabel)
-                // Tooltip for progression
-                dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
-                dailyLabel.addMouseListener(object : MouseAdapter() {
-                    override fun mouseEntered(e: MouseEvent?) {
-                        dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
-                    }
-                })
-                // Remove button
-                val removeButton = JButton("Remove")
+                showDailyDetails(dailyPanel, dailyProgress, font) //show daily info
+                // Discard button
+                var discarded = false
+                val removeButton = JButton("Discard")
                 removeButton.addActionListener {
-                    userProfile.dailyProgresses.remove(dailyProgress)
-                    GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
-                    dailiesPanel.remove(dailyPanel)
+                    val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
+                    dailyPanel.remove(removeButton)//remove discard button as only 1 discard is allowed
+                    showDailyDetails(dailyPanel, newDailyProgress, font)//update panel with newly assigned daily info
+                    discarded = true //TODO: use a file to memorize that the discard occurred for that daily
                     dailiesPanel.revalidate()
                     dailiesPanel.repaint()
                 }
-                dailyPanel.add(removeButton)
-                // Add daily panel to dailiesPanel
+                if(!discarded)
+                    dailyPanel.add(removeButton)
                 dailiesPanel.add(dailyPanel)
             }
             dailiesPanel.preferredSize = Dimension(800, 270)
@@ -245,7 +239,6 @@ class GUIManager {
             gbc.weightx = 1.0
             gbc.weighty = 0.375
             mainPanel.add(dailiesPanel, gbc)
-
 
             // Achievements panel
             val achievementsPanel = JPanel()
@@ -355,5 +348,31 @@ class GUIManager {
         frame.setLocationRelativeTo(null)
         frame.isVisible = true
     }
+
+
+    private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font){
+        val existingLabel = dailyPanel.components.find { it is JLabel } as? JLabel
+        existingLabel?.let {
+            dailyPanel.remove(it)
+        }
+        val dailyLabel = JLabel(dailyProgress.daily.description)
+        dailyLabel.font = font
+        dailyLabel.foreground = Color.BLACK
+        dailyPanel.add(dailyLabel)
+        // Tooltip for progression
+        dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
+        dailyLabel.addMouseListener(object : MouseAdapter() {
+            override fun mouseEntered(e: MouseEvent?) {
+                dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
+            }
+        })
+    }
+
+
+
+
+
+
+
 
 }

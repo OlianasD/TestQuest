@@ -2,6 +2,15 @@ package gamification
 
 import listener.TestOutcome
 import locator.Locator
+import org.w3c.dom.Element
+import ui.GUIManager
+import java.io.File
+import java.io.StringWriter
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 class DailyManager {
 
@@ -292,6 +301,18 @@ class DailyManager {
             userProfile.assignDailies(dailies)
         }
 
+        fun reassignDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
+            val availableDailies = ALL_DAILIES.filter { d ->
+                userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
+            }
+            val newDaily = availableDailies.shuffled().first()
+            val newDailyProgress = DailyProgress(newDaily, progress = 0)
+            userProfile.dailyProgresses.add(newDailyProgress) //add new daily
+            userProfile.dailyProgresses.removeIf { it.daily == daily } //remove discarded daily
+            GamificationManager.updateUserProfileAfterGUIChanges(userProfile) //update user profile
+            return newDailyProgress
+        }
+
         fun getIconFromName(name: String): String {
             return DAILY_NAME_TO_ICON[name] ?: ""
         }
@@ -307,6 +328,51 @@ class DailyManager {
         fun getXPFromName(name: String): Int {
             return DAILY_NAME_TO_XP[name] ?: 0
         }
+
+        fun updateDailies(userProfile: UserProfile, testOutcomes: List<TestOutcome>): Boolean {
+            var anyUpdate = false
+            val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
+            copyOfDailyProgresses.forEach { dp ->
+                ALL_DAILIES.find { it.name == dp.daily.name }?.let {
+                    val progress = DAILY_CHECKS[it.name]?.invoke(testOutcomes)
+                    if (progress!! > 0) {
+                        update(userProfile, it, progress)
+                        anyUpdate = true
+                    }
+                }
+            }
+            return anyUpdate //this to keep track of any changes and update the GUI
+        }
+
+        private fun update(userProfile: UserProfile, daily: Daily, progress: Int) {
+            val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
+            dailyProgress?.let { dp ->
+                dp.progress += progress
+                if (dp.progress >= dp.daily.target) { // if the daily has been completed, assign xp and remove it from list
+                    userProfile.currentXP += dp.daily.xp
+                    userProfile.dailyProgresses.removeIf { it.daily.name == dp.daily.name }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -853,36 +919,6 @@ class DailyManager {
 
 
 
-
-
-
-
-
-        fun updateDailies(userProfile: UserProfile, testOutcomes: List<TestOutcome>): Boolean {
-            var anyUpdate = false
-            val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
-            copyOfDailyProgresses.forEach { dp ->
-                ALL_DAILIES.find { it.name == dp.daily.name }?.let {
-                    val progress = DAILY_CHECKS[it.name]?.invoke(testOutcomes)
-                    if (progress!! > 0) {
-                        update(userProfile, it, progress)
-                        anyUpdate = true
-                    }
-                }
-            }
-            return anyUpdate //this to keep track of any changes and update the GUI
-        }
-
-        private fun update(userProfile: UserProfile, daily: Daily, progress: Int) {
-            val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
-            dailyProgress?.let { dp ->
-                dp.progress += progress
-                if (dp.progress >= dp.daily.target) { // if the daily has been completed, assign xp and remove it from list
-                    userProfile.currentXP += dp.daily.xp
-                    userProfile.dailyProgresses.removeIf { it.daily.name == dp.daily.name }
-                }
-            }
-        }
 
 
     }

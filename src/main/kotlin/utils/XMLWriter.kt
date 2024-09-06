@@ -37,6 +37,7 @@ class XMLWriter {
                     val dailyNode = doc.createElement("daily")
                     dailyNode.appendChild(createElementWithText(doc, "name", dailyProgress.daily.name))
                     dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
+                    dailyNode.appendChild(createElementWithText(doc, "timestamp", System.currentTimeMillis().toString()))//timestamp needed for expiration in 24h
                     dailiesNode.appendChild(dailyNode)
                 }
                 //update achievements
@@ -115,6 +116,7 @@ class XMLWriter {
             dailyNode.appendChild(createElementWithText(doc, "xp", dailyProgress.daily.xp.toString()))
             dailyNode.appendChild(createElementWithText(doc, "target", dailyProgress.daily.target.toString()))
             dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
+            dailyNode.appendChild(createElementWithText(doc, "timestamp", System.currentTimeMillis().toString()))//timestamp needed for expiration in 24h
             dailiesNode.appendChild(dailyNode)
         }
         userProfileNode.appendChild(dailiesNode)

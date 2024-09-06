@@ -6,21 +6,23 @@ import ui.GUIManager
 import utils.XMLReader
 import utils.XMLWriter
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class GamificationManager() {
 
 
 
     companion object {
-        var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml"
-        var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png"
+        var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml" //TODO: path
+        var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
         lateinit var userProfile: UserProfile //the current user
         var guiManager: GUIManager = GUIManager()
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),
-            Title("Mage Familiar", 20),
-            Title("Tarnished Scholar", 50),
+            Title("Mage Homunculus", 10),
+            Title("Tarnished Scholar", 500),
             Title("Gifted Acolyte", 100),
             Title("Mage Initiate", 200),
             Title("Journeyman", 300),
@@ -127,6 +129,8 @@ class GamificationManager() {
     fun showGUI() {
         guiManager.showGUI()
     }
+
+
 
 
 }
