@@ -86,8 +86,10 @@ class XMLReader {
             val dailyTarget = DailyManager.getTargetFromName(dailyName)
             val dailyIcon = DailyManager.getIconFromName(dailyName)
             val dailyProgress = dailyNode.getElementsByTagName("progress").item(0).textContent.toInt()
+            val dailyTimestamp = dailyNode.getElementsByTagName("timestamp").item(0).textContent.toLong()
+            val dailyDiscarded = dailyNode.getElementsByTagName("discarded").item(0).textContent.toBoolean()
             val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon)
-            val dailyProgressObj = DailyProgress(daily, dailyProgress)
+            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyTimestamp, dailyDiscarded)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }
     }

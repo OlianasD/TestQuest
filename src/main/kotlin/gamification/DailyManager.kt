@@ -1,16 +1,9 @@
 package gamification
 
+import com.example.demo.PluginData
 import listener.TestOutcome
 import locator.Locator
-import org.w3c.dom.Element
 import ui.GUIManager
-import java.io.File
-import java.io.StringWriter
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 
 class DailyManager {
 
@@ -301,15 +294,33 @@ class DailyManager {
             userProfile.assignDailies(dailies)
         }
 
-        fun reassignDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
+        fun reassignDailiesFromExpire(userProfile: UserProfile){
+            userProfile.dailyProgresses.clear()
+            setupDailies(userProfile)//TODO: is it ok reassigning just expired daily?
+            GUIManager.updateGUI(userProfile, notifyChange = false)
+            GamificationManager.updateUserProfile(userProfile)
+        }
+
+        fun reassignDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress? {
+            //find all dailies but the one that is going to be discarded
             val availableDailies = ALL_DAILIES.filter { d ->
                 userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
             }
+            //timestamp of discarded daily is retrieved
+            val discardedDailyProgress = userProfile.dailyProgresses.find { it.daily == daily } ?: return null
+            val discardedTimestamp = discardedDailyProgress.timestamp
+            //new daily is selected
+            //with discarded set to true (only 1 discard within 24h is possible) and timestamp set to oldTimestamp
             val newDaily = availableDailies.shuffled().first()
-            val newDailyProgress = DailyProgress(newDaily, progress = 0)
+            val newDailyProgress = DailyProgress(
+                newDaily,
+                progress = 0,
+                timestamp = discardedTimestamp,
+                discarded = true
+            )
             userProfile.dailyProgresses.add(newDailyProgress) //add new daily
             userProfile.dailyProgresses.removeIf { it.daily == daily } //remove discarded daily
-            GamificationManager.updateUserProfileAfterGUIChanges(userProfile) //update user profile
+            GamificationManager.updateUserProfile(userProfile) //update user profile
             return newDailyProgress
         }
 
@@ -345,6 +356,10 @@ class DailyManager {
         }
 
         private fun update(userProfile: UserProfile, daily: Daily, progress: Int) {
+            //TODO: o qui faccio un check tra mio userProfile e quello che trovo in XML e registro solo progress
+            //senza sovrascrivere dailies
+            //oppure verifico se x caso non abbia fatto, oltre a update XML, quello relativo a userProfile --> in realtà non è lo stesso userProfile
+            //dovrei modificare quello che ho
             val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
             dailyProgress?.let { dp ->
                 dp.progress += progress

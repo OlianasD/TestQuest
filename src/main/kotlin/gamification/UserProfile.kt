@@ -2,7 +2,9 @@ package gamification
 
 data class DailyProgress(
     val daily: Daily,
-    var progress: Int = 0
+    var progress: Int = 0,
+    var timestamp: Long = System.currentTimeMillis(),
+    val discarded: Boolean = false
 )
 
 data class AchievementProgress(

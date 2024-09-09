@@ -8,14 +8,13 @@ import gamification.UserProfile
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.io.File
 import javax.swing.*
 import javax.swing.border.TitledBorder
 import javax.swing.filechooser.FileNameExtensionFilter
 
-class GUIManager {
+object GUIManager {
+//class GUIManager {
 
     private var textArea: JTextArea? = null
     private var changed: Boolean = false
@@ -46,7 +45,6 @@ class GUIManager {
 
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
         SwingUtilities.invokeLater {
-
             // Main panel
             val mainPanel = JPanel(GridBagLayout())
             mainPanel.border = BorderFactory.createEmptyBorder(0, 0, 50, 50)
@@ -89,7 +87,7 @@ class GUIManager {
                 if (newName != null && newName.isNotEmpty()) {
                     userProfile.name = newName
                     nameLabel.text = "Name: $newName"
-                    GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    GamificationManager.updateUserProfile(userProfile)
                     changed = true
                     if (notifyChange) {
                         showPopup("Name updated to $newName")
@@ -165,7 +163,7 @@ class GUIManager {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     val selectedFile: File = fileChooser.selectedFile
                     userProfile.propic = selectedFile.absolutePath
-                    GamificationManager.updateUserProfileAfterGUIChanges(userProfile)
+                    GamificationManager.updateUserProfile(userProfile)
                     changed = true
                     imageBox.removeAll()
                     imageIcon = ImageIcon(selectedFile.absolutePath)
@@ -218,18 +216,24 @@ class GUIManager {
                 // Daily Description
                 showDailyDetails(dailyPanel, dailyProgress, font) //show daily info
                 // Discard button
-                var discarded = false
-                val removeButton = JButton("Discard")
-                removeButton.addActionListener {
-                    val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
-                    dailyPanel.remove(removeButton)//remove discard button as only 1 discard is allowed
-                    showDailyDetails(dailyPanel, newDailyProgress, font)//update panel with newly assigned daily info
-                    discarded = true //TODO: use a file to memorize that the discard occurred for that daily
-                    dailiesPanel.revalidate()
-                    dailiesPanel.repaint()
-                }
-                if(!discarded)
+                val discarded = dailyProgress.discarded
+                if(!discarded) {
+                    val removeButton = JButton("Discard")
+                    removeButton.addActionListener {
+                        val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
+                        dailyPanel.remove(removeButton)//remove discard button as only 1 discard is allowed
+                        if (newDailyProgress != null) {
+                            showDailyDetails(
+                                dailyPanel,
+                                newDailyProgress,
+                                font
+                            )
+                        }//update panel with newly assigned daily info
+                        dailiesPanel.revalidate()
+                        dailiesPanel.repaint()
+                    }
                     dailyPanel.add(removeButton)
+                }
                 dailiesPanel.add(dailyPanel)
             }
             dailiesPanel.preferredSize = Dimension(800, 270)

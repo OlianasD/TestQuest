@@ -399,8 +399,8 @@ class AchievementManager {
                         return 1
                     }
                     // check if locatorNew has worse fragility coefficient
-                    if (GamificationManager.computeFragilityCoefficient(oldLocator) <
-                        GamificationManager.computeFragilityCoefficient(newLocator)) {
+                    if (computeFragilityCoefficient(oldLocator) <
+                        computeFragilityCoefficient(newLocator)) {
                         return 1
                     }
                     // check if the test breaks because of that locator
@@ -648,6 +648,10 @@ class AchievementManager {
 
 
 
+
+        fun computeFragilityCoefficient(loc: Locator): Int{
+            return 0//TODO:implement coefficient
+        }
 
 
 

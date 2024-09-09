@@ -1,13 +1,11 @@
 package gamification
 
+import com.example.demo.PluginData
 import listener.TestOutcome
-import locator.Locator
 import ui.GUIManager
 import utils.XMLReader
 import utils.XMLWriter
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 class GamificationManager() {
 
@@ -17,12 +15,11 @@ class GamificationManager() {
         var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml" //TODO: path
         var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
         lateinit var userProfile: UserProfile //the current user
-        var guiManager: GUIManager = GUIManager()
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),
             Title("Mage Homunculus", 10),
-            Title("Tarnished Scholar", 500),
+            Title("Tarnished Scholar", 50),
             Title("Gifted Acolyte", 100),
             Title("Mage Initiate", 200),
             Title("Journeyman", 300),
@@ -43,8 +40,8 @@ class GamificationManager() {
         )
 
 
-        //called when a daily is removed, a user profile name is changed, or a propic is changed
-        fun updateUserProfileAfterGUIChanges(userProfile: UserProfile){
+        //called when a daily expires or is discarded, a user profile name is changed, or a propic is changed
+        fun updateUserProfile(userProfile: UserProfile){
             val xmlWriter = XMLWriter()
             xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
         }
@@ -56,9 +53,9 @@ class GamificationManager() {
                 val xmlWriter = XMLWriter()
                 updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
-                guiManager.updateGUI(GamificationManager.userProfile, true)
+                GUIManager.updateGUI(userProfile, true)
             }
-            guiManager.updateGUI(GamificationManager.userProfile, false)
+            GUIManager.updateGUI(userProfile, false)
         }
 
         private fun updateTitleAndLvl(userProfile: UserProfile) {
@@ -118,7 +115,7 @@ class GamificationManager() {
         }
         else
             userProfile = tempUserProfile
-        guiManager.updateGUI(userProfile, false)
+        GUIManager.updateGUI(userProfile, false)
     }
 
     fun generateUniqueId(): String {
@@ -127,7 +124,7 @@ class GamificationManager() {
     }
 
     fun showGUI() {
-        guiManager.showGUI()
+        GUIManager.showGUI()
     }
 
 
