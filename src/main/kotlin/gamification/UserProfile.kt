@@ -4,7 +4,8 @@ data class DailyProgress(
     val daily: Daily,
     var progress: Int = 0,
     var timestamp: Long = System.currentTimeMillis(),
-    val discarded: Boolean = false
+    val discarded: Boolean = false,
+    var modifiedLocs: List<String> = emptyList() //used to store unique locators changed (used for some dailies/achs only)
 )
 
 data class AchievementProgress(

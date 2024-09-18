@@ -11,32 +11,37 @@ class GamificationManager() {
 
 
 
+    enum class DailyAssignmentMode {
+        random, greedy
+    }
+
     companion object {
         var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml" //TODO: path
         var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
         lateinit var userProfile: UserProfile //the current user
+        var mode: DailyAssignmentMode = DailyAssignmentMode.random //this flag is initially set to random and can be changed via GUI
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),
-            Title("Mage Homunculus", 10),
-            Title("Tarnished Scholar", 50),
-            Title("Gifted Acolyte", 100),
-            Title("Mage Initiate", 200),
-            Title("Journeyman", 300),
-            Title("Arcanist", 400),
-            Title("Sorcerer", 500),
-            Title("Magister", 600),
-            Title("Magus", 700),
-            Title("Master of Arcane Arts", 800),
-            Title("Archmage", 900),
-            Title("Grand Sorcerer", 1000),
-            Title("High Arcanist", 1200),
-            Title("Elder Magus", 1400),
-            Title("Celestial Archmage", 1600),
-            Title("Astral Wizard", 1800),
-            Title("Veil Conjurer", 2000),
-            Title("Mana Master", 2500),
-            Title("Supreme Magus", 3000)
+            Title("Mage Homunculus", 150),
+            Title("Tarnished Scholar", 400),
+            Title("Gifted Acolyte", 800),
+            Title("Mage Initiate", 1600),
+            Title("Journeyman", 3000),
+            Title("Arcanist", 5000),
+            Title("Sorcerer", 8000),
+            Title("Magister", 12000),
+            Title("Magus", 20000),
+            Title("Master of Arcane Arts", 30000),
+            Title("Archmage", 45000),
+            Title("Grand Sorcerer", 65000),
+            Title("High Arcanist", 100000),
+            Title("Elder Magus", 150000),
+            Title("Celestial Archmage", 220000),
+            Title("Astral Wizard", 300000),
+            Title("Veil Conjurer", 400000),
+            Title("Mana Master", 550000),
+            Title("Supreme Magus", 1000000)
         )
 
 

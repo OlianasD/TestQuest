@@ -88,8 +88,22 @@ class XMLReader {
             val dailyProgress = dailyNode.getElementsByTagName("progress").item(0).textContent.toInt()
             val dailyTimestamp = dailyNode.getElementsByTagName("timestamp").item(0).textContent.toLong()
             val dailyDiscarded = dailyNode.getElementsByTagName("discarded").item(0).textContent.toBoolean()
+
+
+            val modifiedLocs = mutableListOf<String>()
+            if(dailyName.equals("edit5")) {
+                val modifiedLocsNode = dailyNode.getElementsByTagName("modified-locs")
+                if (modifiedLocsNode.length > 0) {
+                    val locNodes = (modifiedLocsNode.item(0) as Element).getElementsByTagName("loc")
+                    for (j in 0 until locNodes.length) {
+                        val loc = locNodes.item(j).textContent
+                        modifiedLocs.add(loc)
+                    }
+                }
+            }
+
             val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon)
-            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyTimestamp, dailyDiscarded)
+            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyTimestamp, dailyDiscarded, modifiedLocs)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }
     }

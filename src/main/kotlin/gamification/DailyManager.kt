@@ -10,11 +10,11 @@ class DailyManager {
 
     companion object {
 
-        private val TARGET_DAILY: Int = 1 //TODO: to convert into a map (each daily may have specific requests)
+        private val TARGET_DAILY: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
 
-        private val XP_DAILY: Int = 20 //TODO: to convert into a map (each daily may provide specific XP)
+        private val XP_DAILY: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
 
-        private val DAILIES_PER_USER: Int = 3
+        private val DAILIES_PER_USER: Int = 5
 
 
 
@@ -112,7 +112,7 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[8],
-                "Add $TARGET_DAILY references to @id, @name, @class, @title, @alt" +
+                "Add $TARGET_DAILY references to @id, @name, @class, @title, @alt " +
                         "or @value attributes to existing XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
@@ -137,7 +137,7 @@ class DailyManager {
                 DAILY_NAMES[11],
                 "Modify 5 different existing locators",
                 XP_DAILY,
-                TARGET_DAILY,
+                5,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
@@ -191,7 +191,7 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[19],
-                "Reuse a  locator value more than once in a test suite",
+                "Implement the same locator value more than once in a test suite",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
@@ -246,7 +246,31 @@ class DailyManager {
                 XP_DAILY,
                 20,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            )
+            ),
+
+
+
+
+
+
+            /*Daily(
+                DAILY_NAMES[27],
+                "Edit the same locator value more than once in a test suite",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
+                DAILY_NAMES[28],
+                "Remove $TARGET_DAILY broken locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),*/
+
+
+
+
         )
 
         private val DAILY_NAME_TO_DESCRIPTION = ALL_DAILIES.associate { it.name to it.description }
@@ -290,13 +314,17 @@ class DailyManager {
 
         //dailies are assigned to user
         fun setupDailies(userProfile: UserProfile) {
-            val dailies = ALL_DAILIES.shuffled().take(DAILIES_PER_USER)
+            val dailies: List<Daily>
+            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
+                dailies = ALL_DAILIES.shuffled().take(DAILIES_PER_USER)
+            else
+                dailies = emptyList() //TODO: implement greedy assignment (i.e., assign daily based on actual need
             userProfile.assignDailies(dailies)
         }
 
         fun reassignDailiesFromExpire(userProfile: UserProfile){
             userProfile.dailyProgresses.clear()
-            setupDailies(userProfile)//TODO: is it ok reassigning just expired daily?
+            setupDailies(userProfile)//note that even the same expired dailies could be reassigned
             GUIManager.updateGUI(userProfile, notifyChange = false)
             GamificationManager.updateUserProfile(userProfile)
         }
@@ -311,7 +339,11 @@ class DailyManager {
             val discardedTimestamp = discardedDailyProgress.timestamp
             //new daily is selected
             //with discarded set to true (only 1 discard within 24h is possible) and timestamp set to oldTimestamp
-            val newDaily = availableDailies.shuffled().first()
+            val newDaily: Daily
+            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
+                newDaily = availableDailies.shuffled().first()
+            else
+                newDaily = availableDailies.last() //TODO: implement greedy assignment (i.e., assign daily based on actual need
             val newDailyProgress = DailyProgress(
                 newDaily,
                 progress = 0,
@@ -356,10 +388,7 @@ class DailyManager {
         }
 
         private fun update(userProfile: UserProfile, daily: Daily, progress: Int) {
-            //TODO: o qui faccio un check tra mio userProfile e quello che trovo in XML e registro solo progress
-            //senza sovrascrivere dailies
-            //oppure verifico se x caso non abbia fatto, oltre a update XML, quello relativo a userProfile --> in realtà non è lo stesso userProfile
-            //dovrei modificare quello che ho
+            //TODO: check user profile wrt xml
             val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
             dailyProgress?.let { dp ->
                 dp.progress += progress
@@ -615,10 +644,26 @@ class DailyManager {
             return count
         }
 
-        //TODO: bisogna salvarsi da qualche parte i locators modificati
         private fun checkChangedLocs5(testOutcomes: List<TestOutcome>): Int {
-            return 0
+            val dailyProgress = GamificationManager.userProfile.dailyProgresses
+                .find { it.daily.name == "edit5" }
+            val existingModifiedLocs = dailyProgress!!.modifiedLocs.toMutableSet()
+            val oldSize = existingModifiedLocs.size
+            for (testOutcome in testOutcomes)
+                if (testOutcome.isPassed) {
+                    //it checks if locators have changed values and are different from those that were already changed
+                    val locatorsOldMap = testOutcome.locatorsOld.associateBy { it.locatorName }
+                    testOutcome.locatorsNew.forEach { locatorNew ->
+                        val locatorOld = locatorsOldMap[locatorNew.locatorName]
+                        if (locatorOld != null && locatorNew.locatorValue != locatorOld.locatorValue)
+                            existingModifiedLocs.add(locatorNew.locatorName.toString())
+                    }
+                }
+            dailyProgress.modifiedLocs = existingModifiedLocs.toList()
+            return existingModifiedLocs.size - oldSize //it returns the number of newly changed locs
         }
+
+
 
         private fun checkLoweredLevel5(testOutcomes: List<TestOutcome>): Int {
             var count = 0
@@ -641,8 +686,28 @@ class DailyManager {
             return count
         }
 
+        //TODO: check
         private fun checkRepair(testOutcomes: List<TestOutcome>): Int {
-            return 0 //TODO
+            /*val repairedLocators = mutableSetOf<String>()
+            for (testOutcome in testOutcomes) {
+                if (testOutcome.isPassed) {
+                    val newLocators = testOutcome.locatorsNew.associateBy { it.locatorName }
+                    // Iterate over old locators to find the ones that were broken
+                    val brokenLocators = testOutcome.locatorsOld.filter { oldLocator ->
+                        oldLocator.locatorValue in testOutcome.stacktrace // Check if it was broken and mentioned in the stack trace
+                    }
+
+                    // Check if these locators are now fixed
+                    for (brokenLocator in brokenLocators) {
+                        val newLocator = newLocators[brokenLocator.locatorName]
+                        if (newLocator != null && newLocator.locatorValue != brokenLocator.locatorValue) {
+                            repairedLocators.add(brokenLocator.locatorValue)
+                        }
+                    }
+                }
+            }
+            return repairedLocators.size*/
+            return 0
         }
 
 
@@ -710,8 +775,7 @@ class DailyManager {
             return count
         }
 
-        //two cases: new locators using multiple old values, new locators using multiple new values
-        //TODO: old locators using multiple old/new values is currently not considered (why should you?)
+        //two cases: new locators using multiple old values or new locators using multiple new values
         private fun checkNewMultipleUseLoc(testOutcomes: List<TestOutcome>): Int {
             val oldLocatorsHashes = mutableSetOf<Int>()
             val newLocators = mutableListOf<Locator>()

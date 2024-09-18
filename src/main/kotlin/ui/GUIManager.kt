@@ -327,6 +327,35 @@ object GUIManager {
             gbc.weighty = 0.375
             mainPanel.add(achievementsPanel, gbc)
 
+
+
+
+            // Smart Daily Assignment panel
+            val smartDailyPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
+            smartDailyPanel.background = Color.LIGHT_GRAY
+            val smartDailyCheckBox = JCheckBox("Smart daily assignment")
+            smartDailyCheckBox.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.greedy
+            smartDailyCheckBox.addActionListener {
+                if (smartDailyCheckBox.isSelected)
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.greedy
+                else
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.random
+                GamificationManager.updateUserProfile(userProfile)
+            }
+            smartDailyPanel.add(smartDailyCheckBox)
+            gbc.gridx = 1
+            gbc.gridy = 3
+            gbc.gridwidth = 1
+            gbc.weightx = 0.0
+            gbc.weighty = 0.0
+            gbc.anchor = GridBagConstraints.SOUTHEAST
+            mainPanel.add(smartDailyPanel, gbc)
+
+
+
+
+
+
             // Refresh GUI & send notification in case of changes
             textArea?.removeAll()
             textArea?.layout = BorderLayout()

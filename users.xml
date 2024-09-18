@@ -34,7 +34,21 @@
 				<discarded>false</discarded>
             </daily>
 			<daily>
-                <name>xpathLevel</name>
+                <name>edit5</name>
+                <progress>0</progress> 
+				<timestamp>1725871779564</timestamp>
+				<discarded>false</discarded>
+				<modified-locs></modified-locs>
+            </daily>
+			
+			<daily>
+                <name>newLengthShorter10</name>
+                <progress>0</progress> 
+				<timestamp>1725871779564</timestamp>
+				<discarded>false</discarded>
+            </daily>
+			<daily>
+                <name>robustness</name>
                 <progress>0</progress> 
 				<timestamp>1725871779564</timestamp>
 				<discarded>false</discarded>
