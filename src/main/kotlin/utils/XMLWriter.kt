@@ -94,7 +94,9 @@ class XMLWriter {
         userProfileNode.appendChild(createElementWithText(doc, "name", userProfile.name))
         userProfileNode.appendChild(createElementWithText(doc, "level", userProfile.level.toString()))
         userProfileNode.appendChild(createElementWithText(doc, "currentXP", userProfile.currentXP.toString()))
+        userProfileNode.appendChild(createElementWithText(doc, "nextXP", userProfile.nextXP.toString()))
         userProfileNode.appendChild(createElementWithText(doc, "title", userProfile.title))
+        userProfileNode.appendChild(createElementWithText(doc, "propic", userProfile.propic))
         // Create achievements element
         val achievementsNode = doc.createElement("achievements")
         val completedNode = doc.createElement("completed")
@@ -122,12 +124,9 @@ class XMLWriter {
         userProfile.dailyProgresses.forEach { dailyProgress ->
             val dailyNode = doc.createElement("daily")
             dailyNode.appendChild(createElementWithText(doc, "name", dailyProgress.daily.name))
-            dailyNode.appendChild(createElementWithText(doc, "description", dailyProgress.daily.description))
-            dailyNode.appendChild(createElementWithText(doc, "xp", dailyProgress.daily.xp.toString()))
-            dailyNode.appendChild(createElementWithText(doc, "target", dailyProgress.daily.target.toString()))
             dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
-            dailyNode.appendChild(createElementWithText(doc, "target", dailyProgress.discarded.toString()))
             dailyNode.appendChild(createElementWithText(doc, "timestamp", System.currentTimeMillis().toString()))//timestamp needed for expiration in 24h
+            dailyNode.appendChild(createElementWithText(doc, "discarded", dailyProgress.discarded.toString()))
             if (dailyProgress.daily.name == "edit5") { //TODO: test on new user getting assigned this daily
                 val modifiedLocsNode = doc.createElement("modified-locs")
                 dailyProgress.modifiedLocs.forEach { loc ->

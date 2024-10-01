@@ -14,6 +14,7 @@ class PeriodicTaskProjectService {
 
     private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     private var waitTime: Long = 1
+    private var dailyTS: Long = -1
 
     init {
         scheduleNextRun()
@@ -35,6 +36,8 @@ class PeriodicTaskProjectService {
     private fun removeExpiredDailiesFromXML() {
         //val pluginPath = File(this::class.java.protectionDomain.codeSource.location.toURI()).parentFile
         //val xmlFile = File(pluginPath, "users.xml")//todo: it seems it cannot find the path
+
+
         val xmlFile = File("C:\\Users\\User\\Desktop\\demo\\users.xml")
         if (!xmlFile.exists()) {
             println("File not found: ${xmlFile.absolutePath}")
@@ -47,10 +50,11 @@ class PeriodicTaskProjectService {
         //compute currentTime and dailyTime
         if (tempUserProfile?.dailyProgresses == null)
             return
-        val dailyTimestamp = tempUserProfile.dailyProgresses.firstOrNull()?.timestamp //TODO: test when no dailies left
+        if(dailyTS.toInt() == -1)
+            dailyTS = tempUserProfile.dailyProgresses.firstOrNull()?.timestamp!! //TODO: test when no dailies left
         val currentTime = System.currentTimeMillis()
         val twentyFourHoursInMillis = 24 * 60 * 60 * 1000
-        val diffTime = currentTime - dailyTimestamp!!
+        val diffTime = currentTime - dailyTS
         //if dailies are expired, remove them and assign new ones, then updates the GUI
         if (diffTime > twentyFourHoursInMillis) {
             DailyManager.reassignDailiesFromExpire(tempUserProfile)

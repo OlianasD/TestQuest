@@ -49,7 +49,7 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
 
     private var currentClassName: String = ""
     private var currentMethodName: String = ""
-    private var locatorCounter: Int = 0  // Contatore per la posizione del locator
+    private var locatorCounter: Int = 0 // it counts the locator position within a method
 
     // Visitor to find all variable assignments and driver.findElement calls
     override fun visit(mce: MethodCallExpr, locators: MutableList<Locator>) {
@@ -74,7 +74,7 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
 
     override fun visit(md: MethodDeclaration, locators: MutableList<Locator>) {
         currentMethodName = md.nameAsString
-        locatorCounter = 0  //Reset locator position counter for each new method
+        locatorCounter = 0 //Reset locator position counter for each new method
         super.visit(md, locators)
     }
 
@@ -94,7 +94,14 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
 
     // Helper method to extract locator type and value
     private fun extractLocator(locatorString: String): Pair<String, String> {
-        val regex = """By\.(.*?)\("([^"]+)"\)""".toRegex()
+        if (locatorString.contains("By.linkText(")) {
+            val variableName = locatorString.substringAfter("By.linkText(").substringBefore(")").trim()
+            if (variableName.isNotEmpty()) {
+                return Pair("linkText", variableName)
+            }
+        }
+        //val regex = """By\.(.*?)\("([^"]+)"\)""".toRegex()
+        val regex = """By\.(\w+)\(\s*["'](.+?)["']\s*\)""".toRegex()
         val matchResult = regex.find(locatorString)
         if (matchResult != null && matchResult.groupValues.size == 3) {
             val locatorType = matchResult.groupValues[1]
@@ -104,6 +111,46 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
             throw IllegalArgumentException("Invalid locator string: $locatorString")
         }
     }
+
+    // Helper method to extract locator type and value
+    /*private fun extractLocator1(locatorString: String): Pair<String, String> {
+        val regex = """By\.(\w+)\(\s*(?:"([^"]+)"|(\w+)|(".*?"))(\s*\+\s*(".*?"))?\s*\)""".toRegex()
+        val matchResult = regex.find(locatorString)
+        if (matchResult != null) {
+            val locatorType = matchResult.groupValues[1]
+            val locatorValue = StringBuilder()
+            if (matchResult.groupValues[2].isNotEmpty()) {
+                locatorValue.append(matchResult.groupValues[2])
+            } else if (matchResult.groupValues[3].isNotEmpty()) {
+                locatorValue.append(matchResult.groupValues[3])
+            }
+            matchResult.groupValues[5]?.let {
+                locatorValue.append(it.trim())
+            }
+            return Pair(locatorType, locatorValue.toString())
+        }
+        //TODO: check whether there are locator values stored in variables
+        if (locatorString.contains("By.linkText(")) {
+            val variableName = locatorString.substringAfter("By.linkText(").substringBefore(")").trim()
+            if (variableName.isNotEmpty()) {
+                return Pair("linkText", variableName)
+            }
+        }
+        throw IllegalArgumentException("Invalid locator string: $locatorString")
+    }*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Helper method to find the variable name if available
     private fun findVariableName(mce: MethodCallExpr): String? {

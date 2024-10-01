@@ -2,6 +2,7 @@ package com.example.demo
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages
 import gamification.GamificationManager
 import gamification.UserProfile
@@ -9,6 +10,7 @@ import locator.Locator
 import locator.LocatorsExtractor
 import ui.GUIManager
 import utils.TestFilesExtractor
+import java.io.File
 
 object PluginData {
     var userProfileId: String = ""
