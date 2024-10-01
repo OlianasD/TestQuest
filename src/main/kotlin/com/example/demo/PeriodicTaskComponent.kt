@@ -36,8 +36,6 @@ class PeriodicTaskProjectService {
     private fun removeExpiredDailiesFromXML() {
         //val pluginPath = File(this::class.java.protectionDomain.codeSource.location.toURI()).parentFile
         //val xmlFile = File(pluginPath, "users.xml")//todo: it seems it cannot find the path
-
-
         val xmlFile = File("C:\\Users\\User\\Desktop\\demo\\users.xml")
         if (!xmlFile.exists()) {
             println("File not found: ${xmlFile.absolutePath}")
@@ -47,18 +45,17 @@ class PeriodicTaskProjectService {
         val xmlReader = XMLReader()
         val tempUserProfile =
             xmlReader.loadUserProfileFromXML(GamificationManager.usersDataFile, PluginData.userProfileId) //TODO: test multiple users
-        //compute currentTime and dailyTime
-        if (tempUserProfile?.dailyProgresses == null)
+        if(tempUserProfile==null)
             return
-        if(dailyTS.toInt() == -1)
-            dailyTS = tempUserProfile.dailyProgresses.firstOrNull()?.timestamp!! //TODO: test when no dailies left
+        //compute currentTime and dailyTime
+        dailyTS = tempUserProfile.timestamp //daily time is taken from user profile as it is general data shared for all dailies
         val currentTime = System.currentTimeMillis()
         val twentyFourHoursInMillis = 24 * 60 * 60 * 1000
         val diffTime = currentTime - dailyTS
         //if dailies are expired, remove them and assign new ones, then updates the GUI
         if (diffTime > twentyFourHoursInMillis) {
             DailyManager.reassignDailiesFromExpire(tempUserProfile)
-            GamificationManager.userProfile = tempUserProfile //TODO: check this, must be used not to interfere with daily completion
+            GamificationManager.userProfile = tempUserProfile
             waitTime = twentyFourHoursInMillis.toLong() //set next time to check TODO: test when dailies expire
         } else {
             waitTime = twentyFourHoursInMillis - diffTime //set next time to check TODO: test when dailies expire

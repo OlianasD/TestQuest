@@ -317,13 +317,16 @@ class DailyManager {
             val dailies: List<Daily>
             if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
                 dailies = ALL_DAILIES.shuffled().take(DAILIES_PER_USER)
+            else if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.targeted)
+                dailies = emptyList() //TODO: implement targeted assignment (i.e., assign daily based on observed issues)
             else
-                dailies = emptyList() //TODO: implement greedy assignment (i.e., assign daily based on actual need
+                dailies = emptyList() //TODO: implement inclusive assignment (i.e., assign daily based on uncovered functionalities)
             userProfile.assignDailies(dailies)
         }
 
         fun reassignDailiesFromExpire(userProfile: UserProfile){
             userProfile.dailyProgresses.clear()
+            userProfile.timestamp = System.currentTimeMillis()
             setupDailies(userProfile)//note that even the same expired dailies could be reassigned
             GUIManager.updateGUI(userProfile, notifyChange = false)
             GamificationManager.updateUserProfile(userProfile)
@@ -335,19 +338,20 @@ class DailyManager {
                 userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
             }
             //timestamp of discarded daily is retrieved
-            val discardedDailyProgress = userProfile.dailyProgresses.find { it.daily == daily } ?: return null
-            val discardedTimestamp = discardedDailyProgress.timestamp
+            //val discardedDailyProgress = userProfile.dailyProgresses.find { it.daily == daily } ?: return null
+            //val discardedTimestamp = userProfile.timestamp
             //new daily is selected
             //with discarded set to true (only 1 discard within 24h is possible) and timestamp set to oldTimestamp
             val newDaily: Daily
             if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
                 newDaily = availableDailies.shuffled().first()
+            else if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.targeted)
+                newDaily = availableDailies.last() //TODO: implement targeted assignment (i.e., assign daily based on observed issues)
             else
-                newDaily = availableDailies.last() //TODO: implement greedy assignment (i.e., assign daily based on actual need
+                newDaily = availableDailies.last()//TODO: implement inclusive assignment (i.e., assign daily based on uncovered functionalities)
             val newDailyProgress = DailyProgress(
                 newDaily,
                 progress = 0,
-                timestamp = discardedTimestamp,
                 discarded = true
             )
             userProfile.dailyProgresses.add(newDailyProgress) //add new daily

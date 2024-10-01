@@ -330,26 +330,50 @@ object GUIManager {
 
 
 
-            // Smart Daily Assignment panel
-            val smartDailyPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
-            smartDailyPanel.background = Color.LIGHT_GRAY
-            val smartDailyCheckBox = JCheckBox("Smart daily assignment")
-            smartDailyCheckBox.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.greedy
-            smartDailyCheckBox.addActionListener {
-                if (smartDailyCheckBox.isSelected)
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.greedy
-                else
+            // Daily Assignment panel
+            val dailyAssignmentModePanel = JPanel(FlowLayout(FlowLayout.RIGHT))
+            dailyAssignmentModePanel.background = Color.LIGHT_GRAY
+            val randomMode = JRadioButton("Random")
+            randomMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.random
+            randomMode.addActionListener {
+                if (randomMode.isSelected)
                     GamificationManager.mode = GamificationManager.DailyAssignmentMode.random
-                GamificationManager.updateUserProfile(userProfile)
             }
-            smartDailyPanel.add(smartDailyCheckBox)
+            val targetedMode = JRadioButton("Targeted")
+            targetedMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.targeted
+            targetedMode.addActionListener {
+                if (targetedMode.isSelected)
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.targeted
+            }
+            val inclusiveMode = JRadioButton("Inclusive")
+            inclusiveMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.inclusive
+            inclusiveMode.addActionListener {
+                if (inclusiveMode.isSelected)
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.inclusive
+            }
+            val modeGroup = ButtonGroup()
+            modeGroup.add(randomMode)
+            modeGroup.add(targetedMode)
+            modeGroup.add(inclusiveMode)
+            val modeSelectionPanel = JPanel(FlowLayout(FlowLayout.LEFT))
+            modeSelectionPanel.add(randomMode)
+            modeSelectionPanel.add(targetedMode)
+            modeSelectionPanel.add(inclusiveMode)
+            val titledBorder = BorderFactory.createTitledBorder("Daily Assignment Mode")
+            titledBorder.titleJustification = TitledBorder.CENTER
+            modeSelectionPanel.border = titledBorder
+            dailyAssignmentModePanel.add(modeSelectionPanel)
+            GamificationManager.updateUserProfile(userProfile)//TODO: store user profile with chosen moden
             gbc.gridx = 1
             gbc.gridy = 3
             gbc.gridwidth = 1
             gbc.weightx = 0.0
             gbc.weighty = 0.0
             gbc.anchor = GridBagConstraints.SOUTHEAST
-            mainPanel.add(smartDailyPanel, gbc)
+            mainPanel.add(dailyAssignmentModePanel, gbc)
+
+
+
 
 
 

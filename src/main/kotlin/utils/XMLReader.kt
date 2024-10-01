@@ -76,8 +76,12 @@ class XMLReader {
     }
 
     private fun loadDailyProgresses(userProfile: UserProfile, userProfileNode: Element) {
-        val dailyProgressesNode = userProfileNode.getElementsByTagName("dailies").item(0) as Element
-        val dailyNodes = dailyProgressesNode.getElementsByTagName("daily")
+        val dailiesNode = userProfileNode.getElementsByTagName("dailies").item(0) as Element
+        //daily expiration time is updated
+        val timestamp = dailiesNode.attributes.getNamedItem("timestamp").nodeValue!!.toLong()
+        userProfile.timestamp = timestamp
+        //load each daily info
+        val dailyNodes = dailiesNode.getElementsByTagName("daily")
         for (i in 0 until dailyNodes.length) {
             val dailyNode = dailyNodes.item(i) as Element
             val dailyName = dailyNode.getElementsByTagName("name").item(0).textContent
@@ -86,10 +90,7 @@ class XMLReader {
             val dailyTarget = DailyManager.getTargetFromName(dailyName)
             val dailyIcon = DailyManager.getIconFromName(dailyName)
             val dailyProgress = dailyNode.getElementsByTagName("progress").item(0).textContent.toInt()
-            val dailyTimestamp = dailyNode.getElementsByTagName("timestamp").item(0).textContent.toLong()
             val dailyDiscarded = dailyNode.getElementsByTagName("discarded").item(0).textContent.toBoolean()
-
-
             val modifiedLocs = mutableListOf<String>()
             if(dailyName.equals("edit5")) {
                 val modifiedLocsNode = dailyNode.getElementsByTagName("modified-locs")
@@ -101,9 +102,8 @@ class XMLReader {
                     }
                 }
             }
-
             val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon)
-            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyTimestamp, dailyDiscarded, modifiedLocs)
+            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyDiscarded, modifiedLocs)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }
     }

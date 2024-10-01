@@ -25,20 +25,21 @@ class XMLWriter {
             val node = userProfileNodes.item(i) as Element
             val nodeId = node.getElementsByTagName("id").item(0).textContent
             if (nodeId == userProfile.id) {
-                node.getElementsByTagName("name").item(0).textContent = userProfile.name.toString()
+                node.getElementsByTagName("name").item(0).textContent = userProfile.name
                 node.getElementsByTagName("level").item(0).textContent = userProfile.level.toString()
                 node.getElementsByTagName("currentXP").item(0).textContent = userProfile.currentXP.toString()
                 node.getElementsByTagName("title").item(0).textContent = userProfile.title
                 node.getElementsByTagName("propic").item(0).textContent = userProfile.propic
                 val dailiesNode = node.getElementsByTagName("dailies").item(0) as Element
+                //daily expiration time is saved
+                dailiesNode.setAttribute("timestamp", userProfile.timestamp.toString())
                 //update dailies
                 dailiesNode.textContent = ""
                 userProfile.dailyProgresses.forEach { dailyProgress ->
                     val dailyNode = doc.createElement("daily")
                     dailyNode.appendChild(createElementWithText(doc, "name", dailyProgress.daily.name))
                     dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
-                    dailyNode.appendChild(createElementWithText(doc, "timestamp", dailyProgress.timestamp.toString()))//timestamp needed for expiration in 24h
-                    dailyNode.appendChild(createElementWithText(doc, "discarded", dailyProgress.discarded.toString()))//timestamp needed for expiration in 24h
+                    dailyNode.appendChild(createElementWithText(doc, "discarded", dailyProgress.discarded.toString()))
                     if (dailyProgress.daily.name == "edit5") {
                         val modifiedLocsNode = doc.createElement("modified-locs")
                         dailyProgress.modifiedLocs.forEach { loc ->
@@ -121,11 +122,11 @@ class XMLWriter {
         userProfileNode.appendChild(achievementsNode)
         // Create dailies element
         val dailiesNode = doc.createElement("dailies")
+        dailiesNode.setAttribute("timestamp", System.currentTimeMillis().toString())//timestamp needed for expiration in 24h
         userProfile.dailyProgresses.forEach { dailyProgress ->
             val dailyNode = doc.createElement("daily")
             dailyNode.appendChild(createElementWithText(doc, "name", dailyProgress.daily.name))
             dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
-            dailyNode.appendChild(createElementWithText(doc, "timestamp", System.currentTimeMillis().toString()))//timestamp needed for expiration in 24h
             dailyNode.appendChild(createElementWithText(doc, "discarded", dailyProgress.discarded.toString()))
             if (dailyProgress.daily.name == "edit5") { //TODO: test on new user getting assigned this daily
                 val modifiedLocsNode = doc.createElement("modified-locs")

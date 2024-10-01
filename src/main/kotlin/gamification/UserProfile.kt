@@ -3,7 +3,6 @@ package gamification
 data class DailyProgress(
     val daily: Daily,
     var progress: Int = 0,
-    var timestamp: Long = System.currentTimeMillis(),
     val discarded: Boolean = false,
     var modifiedLocs: List<String> = emptyList() //used to store unique locators changed (used for some dailies/achs only)
 )
@@ -22,8 +21,9 @@ class UserProfile(
     var title: String,
     val achievementProgresses: MutableList<AchievementProgress>,
     val dailyProgresses: MutableList<DailyProgress>,
-    val completedAchievements: MutableList<Achievement>, //achieved achievements
-    var propic: String
+    val completedAchievements: MutableList<Achievement>,
+    var propic: String,
+    var timestamp: Long = System.currentTimeMillis()//to keep track of expiring dailies
 )
 
 {

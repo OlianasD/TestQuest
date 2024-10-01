@@ -1,6 +1,5 @@
 package gamification
 
-import com.example.demo.PluginData
 import listener.TestOutcome
 import ui.GUIManager
 import utils.XMLReader
@@ -10,9 +9,11 @@ import java.util.*
 class GamificationManager() {
 
 
-
+    // random = random daily assignment
+    // targeted = daily assignment based on problems and bad practices observed by analysing test artifacts
+    // inclusive = daily assignment to cover functionalities not covered by test artifacts, given the DOM
     enum class DailyAssignmentMode {
-        random, greedy
+        random, targeted, inclusive
     }
 
     companion object {
