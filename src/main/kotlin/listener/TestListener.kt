@@ -3,14 +3,13 @@ package listener
 import com.example.demo.TestQuestAction
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.NlsSafe
 import gamification.GamificationManager
 import locator.Locator
 import locator.LocatorsExtractor
+import locator.LocatorsFragilityCalculator
+import ui.GUIManager
 import utils.TestFilesExtractor
-import java.util.concurrent.CancellationException
 
 
 data class TestOutcome(
@@ -24,9 +23,9 @@ data class TestOutcome(
 class TestListener(private val project: Project) : SMTRunnerEventsListener {
 
     private lateinit var server: Server
-    private lateinit var locatorsNew: List<Locator>
-    private lateinit var locatorsOld: List<Locator>
-    val testOutcomes = mutableListOf<TestOutcome>() //to collect the outcome of each test
+    //private lateinit var locatorsNew: List<Locator>
+    //private lateinit var locatorsOld: List<Locator>
+    private val testOutcomes = mutableListOf<TestOutcome>() //to collect the outcome of each test
 
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
         try {
@@ -35,11 +34,14 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
             //then, before each run (as we assume locators may have changed), new locators are extracted, saving old ones
             val extractor = LocatorsExtractor()
             if (TestQuestAction.locatorsNew.isNotEmpty()) {//the first run we have to save locators from plugin initialization
-                locatorsOld = TestQuestAction.locatorsNew
+                //locatorsOld = TestQuestAction.locatorsNew
+                TestQuestAction.locatorsOld = TestQuestAction.locatorsNew
                 TestQuestAction.locatorsNew = emptyList()
             } else //after the first run, old locators will be saved considering the previous state
-                locatorsOld = locatorsNew
-            locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
+            //locatorsOld = locatorsNew
+                TestQuestAction.locatorsOld = TestQuestAction.locatorsNew
+            //locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
+            TestQuestAction.locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
             server = Server()
             server.start()
             println("Server started!")
@@ -51,6 +53,11 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
         try {
             server.stop()
             println("Server stopped!")
+            //estimate overall fragility and show it on GUI
+            val locEstimator = LocatorsFragilityCalculator()
+            val estimation = locEstimator.calculateOverallFragility(TestQuestAction.locatorsNew)
+            GUIManager.showOverallLocsFragilityScore(estimation)
+            //check how events affected tasks
             GamificationManager.analyzeEvents(testOutcomes)
         }
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
@@ -65,8 +72,10 @@ class TestListener(private val project: Project) : SMTRunnerEventsListener {
                 println(event)
             }
             //collect old/new locators + other outcomes related to executed test
-            val oldLocatorsInTest = locatorsOld.filter { it.methodName == test.name }
-            val newLocatorsInTest = locatorsNew.filter { it.methodName == test.name }
+            //val oldLocatorsInTest = locatorsOld.filter { it.methodName == test.name }
+            val oldLocatorsInTest = TestQuestAction.locatorsOld.filter { it.methodName == test.name }
+            //val newLocatorsInTest = locatorsNew.filter { it.methodName == test.name }
+            val newLocatorsInTest = TestQuestAction.locatorsNew.filter { it.methodName == test.name }
             val testOutcome =
                 TestOutcome(test.name, oldLocatorsInTest, newLocatorsInTest, test.isPassed, test.stacktrace)
             testOutcomes.add(testOutcome)

@@ -17,11 +17,13 @@ kotlin {
 intellij {
   version.set("2023.2.6")
   plugins.set(listOf("org.jetbrains.kotlin"))
+  //plugins.set(listOf("java", "org.jetbrains.kotlin", "com.intellij.java", "com.intellij.ui"))
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
   kotlinOptions.jvmTarget = "17"
 }
+
 
 tasks {
   patchPluginXml {

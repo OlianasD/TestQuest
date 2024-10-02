@@ -48,7 +48,7 @@ class PeriodicTaskProjectService {
         if(tempUserProfile==null)
             return
         //compute currentTime and dailyTime
-        dailyTS = tempUserProfile.timestamp //daily time is taken from user profile as it is general data shared for all dailies
+        dailyTS = tempUserProfile.timestamp //expire daily time is retrieved
         val currentTime = System.currentTimeMillis()
         val twentyFourHoursInMillis = 24 * 60 * 60 * 1000
         val diffTime = currentTime - dailyTS

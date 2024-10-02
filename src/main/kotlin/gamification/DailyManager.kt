@@ -326,22 +326,18 @@ class DailyManager {
 
         fun reassignDailiesFromExpire(userProfile: UserProfile){
             userProfile.dailyProgresses.clear()
-            userProfile.timestamp = System.currentTimeMillis()
+            userProfile.timestamp = System.currentTimeMillis()//this to assign a new expiration time for new dailies
             setupDailies(userProfile)//note that even the same expired dailies could be reassigned
             GUIManager.updateGUI(userProfile, notifyChange = false)
             GamificationManager.updateUserProfile(userProfile)
         }
 
-        fun reassignDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress? {
+        fun reassignDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
             //find all dailies but the one that is going to be discarded
             val availableDailies = ALL_DAILIES.filter { d ->
                 userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
             }
-            //timestamp of discarded daily is retrieved
-            //val discardedDailyProgress = userProfile.dailyProgresses.find { it.daily == daily } ?: return null
-            //val discardedTimestamp = userProfile.timestamp
-            //new daily is selected
-            //with discarded set to true (only 1 discard within 24h is possible) and timestamp set to oldTimestamp
+            //new daily is selected with discarded set to true (only 1 discard within 24h is possible)
             val newDaily: Daily
             if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
                 newDaily = availableDailies.shuffled().first()

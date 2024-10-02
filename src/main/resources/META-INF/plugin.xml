@@ -8,7 +8,8 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Definisci qui le tue estensioni -->
+        <editorFactoryListener
+                implementation="listener.locator.LocatorEditorListener"/>
     </extensions>
 
     <actions>
