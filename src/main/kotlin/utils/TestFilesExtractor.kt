@@ -1,6 +1,6 @@
 package utils
 
-import com.example.demo.PluginData
+import testquest.PluginData
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages

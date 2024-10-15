@@ -1,6 +1,9 @@
 package ui
 
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.JBColor
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.ui.JBUI
 import gamification.DailyManager
 import gamification.DailyProgress
@@ -15,13 +18,11 @@ import javax.swing.border.TitledBorder
 import javax.swing.filechooser.FileNameExtensionFilter
 
 object GUIManager {
-//class GUIManager {
 
     private var textArea: JTextArea? = null
     private var changed: Boolean = false
-    private var dailyRemoved: Boolean = false
 
-
+    //to show immediate user progressions via popup
     private fun showPopup(message: String) {
         val pane = JPanel()
         pane.layout = BorderLayout()
@@ -44,6 +45,7 @@ object GUIManager {
         }.start()
     }
 
+    //to update the gui based on user progression
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
         SwingUtilities.invokeLater {
             // Main panel
@@ -336,10 +338,7 @@ object GUIManager {
             )
             mainPanel.add(achievementsPanel, gbc)
 
-
-
-
-            // Daily Assignment Mode panel
+            //daily Assignment Mode panel
             val dailyAssignmentModePanel = JPanel(FlowLayout(FlowLayout.RIGHT))
             dailyAssignmentModePanel.background = JBColor.LIGHT_GRAY
             val randomMode = JRadioButton("Random")
@@ -381,14 +380,6 @@ object GUIManager {
             gbc.anchor = GridBagConstraints.SOUTHEAST
             mainPanel.add(dailyAssignmentModePanel, gbc)
 
-
-
-
-
-
-
-
-
             // Refresh GUI & send notification in case of changes
             textArea?.removeAll()
             textArea?.layout = BorderLayout()
@@ -401,6 +392,7 @@ object GUIManager {
         }
     }
 
+    //main panel
     fun showGUI() {
         val frame = JFrame("Test Quest - A quest to improve locators robustness")
         frame.defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
@@ -435,43 +427,70 @@ object GUIManager {
     }
 
 
-
-
-
-
-
-
-
-
-
+    //to shows the global locators fragility score in a window
     fun showOverallLocsFragilityScore(score: Double) {
+
+        // Set color of estimation from green to red
         val roundedEst = String.format("%.2f", (score * 100))
         val message = "Fragility Score = $roundedEst%"
-        // Set color of estimation from green to red
         val red = (255 * score).toInt()
         val green = (255 * (1 - score)).toInt()
         val color = String.format("#%02x%02x00", red, green)
-        // Main fragility score label
+
+        // Main label
         val label = JLabel("<html><div style='padding: 8px; font-size:14px; color:$color;'>$message</div></html>")
         label.horizontalAlignment = SwingConstants.CENTER
-        // Additional descriptive label
-        val note = JLabel("<html><div style='padding: 5px; font-size:11px; color:#000000;'>"
-                + "The fragility score indicates the likelihood of locators breaking due to software changes. Lower scores are better.</div></html>")
+
+        // Description label
+        val note = JLabel("<html><div style='padding: 5px; font-size:11px; color:#FFFFFF;'>"
+                + "The fragility score indicates the likelihood of locators breaking due to software changes. " +
+                "Lower scores are better.</div></html>")
         note.horizontalAlignment = SwingConstants.CENTER
-        // Panel setup
-        val pane = JPanel()
-        pane.layout = BorderLayout()
-        pane.add(label, BorderLayout.CENTER)
-        pane.add(note, BorderLayout.SOUTH)
-        // Dialog setup
-        val dialog = JDialog()
-        dialog.title = "Locators Fragility Score"
-        dialog.contentPane.add(pane)
-        dialog.isModal = true
-        dialog.setSize(350, 180)
-        dialog.setLocationRelativeTo(null)
-        dialog.isVisible = true
+
+        // Border
+        val window = JWindow()
+        val panel = JPanel(BorderLayout())
+        panel.border = BorderFactory.createLineBorder(Color(255, 215, 0), 3)
+        panel.add(label, BorderLayout.CENTER)
+        panel.add(note, BorderLayout.SOUTH)
+        window.add(panel)
+
+        // Panel size and position
+        window.setSize(350, 120)
+        val screenSize = Toolkit.getDefaultToolkit().screenSize
+        val x = 10 // Posizione orizzontale a sinistra
+        val y = (screenSize.height - window.height) / 2 // Calcola la posizione verticale per centrare
+        window.setLocation(x, y)
+
+        // Panel not focused
+        window.isAlwaysOnTop = true
+        window.isVisible = true
+
+        // Panel close in 5 seconds
+        Timer(5000) {
+            window.dispose()
+        }.start()
     }
+
+
+
+    fun showBalloon(event: MouseEvent, name: String, score: Double): Balloon {
+        val tooltipText = "Fragility Score for $name: ${String.format("%.2f", score)}"
+
+        // create new balloon
+        val balloon = JBPopupFactory.getInstance()
+            .createBalloonBuilder(com.intellij.ui.components.JBLabel(tooltipText))
+            .setFillColor(JBColor(Color(255, 255, 255), Color(60, 63, 65)))
+            .setHideOnClickOutside(true)
+            .setHideOnKeyOutside(true)
+            .setFadeoutTime(3000)
+            .createBalloon()
+
+        // place balloon close to mouse position
+        balloon.show(RelativePoint(event.component, Point(event.x, event.y)), Balloon.Position.above)
+        return balloon
+    }
+
 
 
 

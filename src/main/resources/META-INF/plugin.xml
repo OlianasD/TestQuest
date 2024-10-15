@@ -15,19 +15,19 @@
     <actions>
         <group id="Gamify.EvaluateTestsAction" text="Gamify">
             <add-to-group group-id="MainMenu" anchor="last" />
-            <action class="com.example.demo.TestQuestAction" id="Demo.Action.TestQuestAction" text="Test Quest"/>
+            <action class="testquest.TestQuestAction" id="Demo.Action.TestQuestAction" text="Test Quest"/>
         </group>
     </actions>
 
     <projectListeners>
-        <listener class="listener.TestListener"
+        <listener class="listener.test.TestListener"
                   topic="com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener"/>
     </projectListeners>
 
 
     <project-components>
         <component>
-            <implementation-class>com.example.demo.PeriodicTaskProjectService</implementation-class>
+            <implementation-class>listener.daily.DailyExpirationService</implementation-class>
         </component>
     </project-components>
 

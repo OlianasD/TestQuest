@@ -1,62 +1,44 @@
-import com.example.demo.TestQuestAction
+import testquest.TestQuestAction
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.event.EditorMouseEvent
-import com.intellij.openapi.editor.event.EditorMouseMotionListener
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.ui.awt.RelativePoint
+import com.intellij.openapi.ui.popup.Balloon
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionListener
+import javax.swing.Timer
+import ui.GUIManager
 
 class LocatorTooltipListener(
     private val editor: Editor,
-    private val locatorScores: Map<String, Double>
-) : EditorMouseMotionListener, MouseMotionListener {
+    private var locatorScores: Map<String, Double>
+) : MouseMotionListener {
 
-    override fun mouseMoved(event: EditorMouseEvent) {
-        val caret = editor.caretModel.currentCaret
-        val currentLine = caret.logicalPosition.line
-        val locatorName = getLocatorNameFromLine(currentLine)
+    private var hoverTimer: Timer? = null
+    private var currentBalloon: Balloon? = null
+
+    override fun mouseMoved(e: MouseEvent) {
+        //close any actual balloon if present
+        hoverTimer?.stop()
+        currentBalloon?.hide()
+
+        //retrieve mouse position to hook balloon with
+        val mousePoint = e.point
+        val logicalPosition = editor.xyToLogicalPosition(mousePoint)
+        val currentLine = logicalPosition.line + 1
+
+        //if mouse position is a locator, show the score and balloon
+        val locatorName = TestQuestAction.locatorsNewStatic.find { it.line == currentLine }?.locatorName
         if (locatorName != null && locatorScores.containsKey(locatorName)) {
             val score = locatorScores[locatorName]!!
-            showTooltip(event.mouseEvent, score)
-        } else {
-            // Optionally show a tooltip when there's no locator score.
-            showTooltip(event.mouseEvent, 666.0) // or consider not showing anything
+            hoverTimer = Timer(500) {
+                GUIManager.showBalloon(e, locatorName, score)
+            }
+            hoverTimer?.start()
         }
-    }
-
-    private fun showTooltip(event: MouseEvent, score: Double) {
-        val tooltipText = "Fragility Score: ${String.format("%.2f", score)}"
-        val popup = JBPopupFactory.getInstance().createMessage(tooltipText)
-        val point = RelativePoint(event)
-        popup.showInScreenCoordinates(event.component, point.screenPoint)
     }
 
     override fun mouseDragged(e: MouseEvent?) {
-        TODO("Not yet implemented")
     }
 
-    override fun mouseMoved(e: MouseEvent) {
-        //val caret = editor.caretModel.currentCaret
-        //val currentLine = caret.logicalPosition.line
-        //val locatorName = getLocatorNameFromLine(currentLine)
-
-
-        val mousePoint = e.point
-        val logicalPosition = editor.xyToLogicalPosition(mousePoint)
-        val currentLine = logicalPosition.line
-        val locatorName = getLocatorNameFromLine(currentLine)
-
-        if (locatorName != null && locatorScores.containsKey(locatorName)) {
-            val score = locatorScores[locatorName]!!
-            showTooltip(e, score)
-        }
+    fun updateLocatorScores(newScores: Map<String, Double>) {
+        locatorScores = newScores
     }
-
-
-    private fun getLocatorNameFromLine(line: Int): String? {
-        return TestQuestAction.locatorsNew.find { it.line == line }?.locatorName
-    }
-
-
 }

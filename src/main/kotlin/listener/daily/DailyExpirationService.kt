@@ -1,5 +1,6 @@
-package com.example.demo
+package listener.daily
 
+import testquest.PluginData
 import com.intellij.openapi.components.Service
 import gamification.DailyManager
 import gamification.GamificationManager
@@ -10,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 @Service(Service.Level.PROJECT)
-class PeriodicTaskProjectService {
+class DailyExpirationService {
 
     private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     private var waitTime: Long = 1

@@ -1,6 +1,6 @@
 package gamification
 
-import listener.TestOutcome
+import listener.test.TestOutcome
 import ui.GUIManager
 import utils.XMLReader
 import utils.XMLWriter

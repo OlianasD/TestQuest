@@ -1,4 +1,4 @@
-package listener
+package listener.test
 
 enum class EventType {
     NAVIGATION,

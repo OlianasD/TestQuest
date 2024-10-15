@@ -1,6 +1,6 @@
 package gamification
 
-import listener.TestOutcome
+import listener.test.TestOutcome
 import locator.Locator
 import java.io.File
 

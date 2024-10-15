@@ -1,7 +1,6 @@
 package gamification
 
-import com.example.demo.PluginData
-import listener.TestOutcome
+import listener.test.TestOutcome
 import locator.Locator
 import ui.GUIManager
 
