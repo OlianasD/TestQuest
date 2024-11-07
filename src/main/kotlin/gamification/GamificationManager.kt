@@ -61,7 +61,8 @@ class GamificationManager() {
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
                 GUIManager.updateGUI(userProfile, true)
             }
-            GUIManager.updateGUI(userProfile, false)
+            else
+                GUIManager.updateGUI(userProfile, false)
         }
 
         private fun updateTitleAndLvl(userProfile: UserProfile) {

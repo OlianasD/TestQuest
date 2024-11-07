@@ -1,56 +1,75 @@
 package ui
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.Gray
 import com.intellij.ui.JBColor
 import com.intellij.ui.awt.RelativePoint
+import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import gamification.DailyManager
 import gamification.DailyProgress
 import gamification.GamificationManager
 import gamification.UserProfile
+import locator.Locator
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 import javax.swing.*
+import javax.swing.Timer
 import javax.swing.border.TitledBorder
 import javax.swing.filechooser.FileNameExtensionFilter
+import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.table.DefaultTableModel
+import javax.swing.table.TableCellRenderer
 
 object GUIManager {
 
     private var textArea: JTextArea? = null
-    private var changed: Boolean = false
+    //private var changed: Boolean = false
 
     //to show immediate user progressions via popup
     private fun showPopup(message: String) {
-        val pane = JPanel()
-        pane.layout = BorderLayout()
-        val label = JLabel("<html><div style='padding: 10px;'>$message</div></html>")
-        label.horizontalAlignment = SwingConstants.CENTER
+        val pane = JPanel().apply {
+            layout = BorderLayout()
+            background = Color(0, 0, 0, 180)
+        }
+        val label = JLabel("<html><div style='padding: 10px; color: white; font-size: 16px;'>$message</div></html>").apply {
+            horizontalAlignment = SwingConstants.CENTER
+        }
         pane.add(label, BorderLayout.CENTER)
-        val dialog = JDialog()
-        dialog.title = "Profile Update"
-        dialog.contentPane.add(pane)
-        dialog.isModal = false
-        dialog.setSize(300, 150)
-        val screenSize = Toolkit.getDefaultToolkit().screenSize
-        val x = screenSize.width - dialog.width
-        val y = screenSize.height - dialog.height
-        dialog.setLocation(x - 20, y - 20)
-        dialog.add(pane, BorderLayout.PAGE_END)
-        dialog.isVisible = true
+        val dialog = JDialog().apply {
+            title = ""
+            isUndecorated = true
+            isModal = false
+            contentPane.add(pane)
+            setSize(300, 100)
+            val screenSize = Toolkit.getDefaultToolkit().screenSize
+            setLocation(screenSize.width - width - 20, screenSize.height - height - 100)  // Più in alto sull'asse Y
+            isVisible = true
+        }
         Timer(5000) {
             dialog.dispose()
         }.start()
     }
+
 
     //to update the gui based on user progression
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
         SwingUtilities.invokeLater {
             // Main panel
             val mainPanel = JPanel(GridBagLayout())
-            mainPanel.border = BorderFactory.createEmptyBorder(0, 0, 50, 50)
+            //mainPanel.border = BorderFactory.createEmptyBorder(0, 0, 50, 50)
             mainPanel.background = JBColor.LIGHT_GRAY
             val gbc = GridBagConstraints()
             gbc.fill = GridBagConstraints.BOTH
@@ -91,10 +110,10 @@ object GUIManager {
                     userProfile.name = newName
                     nameLabel.text = "Name: $newName"
                     GamificationManager.updateUserProfile(userProfile)
-                    changed = true
-                    if (notifyChange) {
-                        showPopup("Name updated to $newName")
-                    }
+                    //changed = true
+                    //if (notifyChange) {
+                    showPopup("Name updated to $newName")
+                    //}
                 }
             }
             namePanel.add(nameLabel)
@@ -167,7 +186,7 @@ object GUIManager {
                     val selectedFile: File = fileChooser.selectedFile
                     userProfile.propic = selectedFile.absolutePath
                     GamificationManager.updateUserProfile(userProfile)
-                    changed = true
+                    //changed = true
                     imageBox.removeAll()
                     imageIcon = ImageIcon(selectedFile.absolutePath)
                     scaledIcon = ImageIcon(imageIcon.image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
@@ -175,9 +194,9 @@ object GUIManager {
                     imageBox.add(imageLabel)
                     imageBox.revalidate()
                     imageBox.repaint()
-                    if (notifyChange) {
-                        showPopup("Image updated")
-                    }
+                    //if (notifyChange) {
+                    showPopup("Image updated")
+                    //}
                 }
             }
             gbcInner.gridx = 2
@@ -191,7 +210,8 @@ object GUIManager {
             gbcInner.gridheight = 2
             userInfoInnerPanel.add(editImageButton, gbcInner)
             userInfoPanel.add(userInfoInnerPanel)
-            userInfoPanel.preferredSize = Dimension(800, 220)
+            //userInfoPanel.preferredSize = Dimension(400, 220)
+            //userInfoInnerPanel.preferredSize = Dimension(800, 270)
             gbc.gridx = 0
             gbc.gridy = 0
             gbc.gridwidth = 2
@@ -211,6 +231,8 @@ object GUIManager {
                 JBColor.BLACK
             )
             dailiesPanel.background = JBColor.LIGHT_GRAY
+            //dailiesPanel.preferredSize = Dimension(400, 270)
+
             for (dailyProgress in userProfile.dailyProgresses) {
                 val dailyPanel = JPanel()
                 dailyPanel.layout = BoxLayout(dailyPanel, BoxLayout.X_AXIS)
@@ -225,13 +247,11 @@ object GUIManager {
                     removeButton.addActionListener {
                         val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
                         dailyPanel.remove(removeButton)//remove discard button as only 1 discard is allowed
-                        if (newDailyProgress != null) {
-                            showDailyDetails(
-                                dailyPanel,
-                                newDailyProgress,
-                                font
-                            )
-                        }//update panel with newly assigned daily info
+                        showDailyDetails(
+                            dailyPanel,
+                            newDailyProgress,
+                            font
+                        )//update panel with newly assigned daily info
                         dailiesPanel.revalidate()
                         dailiesPanel.repaint()
                     }
@@ -239,7 +259,6 @@ object GUIManager {
                 }
                 dailiesPanel.add(dailyPanel)
             }
-            dailiesPanel.preferredSize = Dimension(800, 270)
             gbc.gridx = 0
             gbc.gridy = 1
             gbc.gridwidth = 1
@@ -322,7 +341,7 @@ object GUIManager {
                 // Add progress panel to ongoingAchievementsPanel
                 ongoingAchievementsPanel.add(progressPanel)
             }
-            achievementsPanel.preferredSize = Dimension(800, 270)
+            //achievementsPanel.preferredSize = Dimension(400, 270)
             gbc.gridx = 0
             gbc.gridy = 2
             gbc.gridwidth = 1
@@ -371,7 +390,7 @@ object GUIManager {
             titledBorder.titleJustification = TitledBorder.CENTER
             modeSelectionPanel.border = titledBorder
             dailyAssignmentModePanel.add(modeSelectionPanel)
-            GamificationManager.updateUserProfile(userProfile)//TODO: store user profile with chosen moden
+            GamificationManager.updateUserProfile(userProfile)//TODO: store user profile with chosen mode
             gbc.gridx = 1
             gbc.gridy = 3
             gbc.gridwidth = 1
@@ -387,9 +406,13 @@ object GUIManager {
             textArea?.revalidate()
             textArea?.repaint()
 
+            mainPanel.revalidate()
+            mainPanel.repaint()
+
             if (notifyChange)
                 showPopup("New Level: ${userProfile.level}\nNew Title: ${userProfile.title}\nNew XP: ${userProfile.currentXP}")
         }
+
     }
 
     //main panel
@@ -458,8 +481,8 @@ object GUIManager {
         // Panel size and position
         window.setSize(350, 120)
         val screenSize = Toolkit.getDefaultToolkit().screenSize
-        val x = 10 // Posizione orizzontale a sinistra
-        val y = (screenSize.height - window.height) / 2 // Calcola la posizione verticale per centrare
+        val x = 10
+        val y = (screenSize.height - window.height) / 2
         window.setLocation(x, y)
 
         // Panel not focused
@@ -474,13 +497,13 @@ object GUIManager {
 
 
 
-    fun showBalloon(event: MouseEvent, name: String, score: Double): Balloon {
+    fun showBalloon(event: MouseEvent, name: String?, score: Double): Balloon {
         val tooltipText = "Fragility Score for $name: ${String.format("%.2f", score)}"
 
         // create new balloon
         val balloon = JBPopupFactory.getInstance()
             .createBalloonBuilder(com.intellij.ui.components.JBLabel(tooltipText))
-            .setFillColor(JBColor(Color(255, 255, 255), Color(60, 63, 65)))
+            .setFillColor(JBColor(Gray._255, Color(60, 63, 65)))
             .setHideOnClickOutside(true)
             .setHideOnKeyOutside(true)
             .setFadeoutTime(3000)
@@ -495,7 +518,85 @@ object GUIManager {
 
 
 
+    /*SECTION MANAGING LOCATORS SCORE VISUALIZATION*/
 
+    private var locScoresframe: JFrame? = null
+
+    fun showLocatorScores(project: Project, locatorScores: Map<Locator, Double>) {
+        locScoresframe?.dispose()//to close any already open window
+        locScoresframe = JFrame("Locator Details Panel").apply {
+            defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+            setSize(800, 400)
+            setLocationRelativeTo(null)
+        }
+        //create the table describing locators
+        val sortedLocators = locatorScores.entries.sortedBy { it.value }
+        val columnNames = arrayOf("Score", "Line", "Locator Name", "Locator Type", "Locator Value", "Method Name", "Class Name")
+        val tableModel = DefaultTableModel(columnNames, 0)
+        for ((locator, score) in sortedLocators) {
+            val df = DecimalFormat("#.##", DecimalFormatSymbols(Locale.US))
+            df.roundingMode = RoundingMode.CEILING
+            val rowData = arrayOf(
+                df.format(score),
+                "<html><a href=''>${locator.line}</a></html>",
+                locator.locatorName,
+                locator.locatorType,
+                locator.locatorValue,
+                locator.methodName,
+                locator.className
+            )
+            tableModel.addRow(rowData)
+        }
+        //define score colors
+        val table = JBTable(tableModel)
+        table.columnModel.getColumn(0).cellRenderer =
+            TableCellRenderer { tab, value, isSelected, hasFocus, row, column ->
+                val component = DefaultTableCellRenderer().getTableCellRendererComponent(
+                    tab, value, isSelected, hasFocus, row, column
+                )
+                val score = (value?.toString()?.toDoubleOrNull()) ?: 0.0
+                val color = getScoreColor(score)
+                (component as JLabel).foreground = color
+                component
+            }
+        //setup click event on locator line
+        table.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                val row = table.rowAtPoint(e.point)
+                val col = table.columnAtPoint(e.point)
+                if (col == 1) {
+                    val locator = sortedLocators[row].key
+                    openFileAtLine(project, locator.filePath, locator.line)
+                }
+            }
+        })
+        locScoresframe!!.add(JScrollPane(table), BorderLayout.CENTER)
+        val closeButton = JButton("Close").apply {
+            addActionListener { locScoresframe!!.dispose() }
+        }
+        locScoresframe!!.add(closeButton, BorderLayout.SOUTH)
+        locScoresframe!!.isVisible = true
+    }
+
+    private fun getScoreColor(score: Double): Color {
+        val red = (score * 255).toInt()
+        val green = ((1 - score) * 255).toInt()
+        return JBColor(Color(red.coerceIn(0, 255), green.coerceIn(0, 255), 0),
+            Color(red.coerceIn(0, 255), green.coerceIn(0, 255), 0))
+    }
+
+    //TODO: refactor to move it away
+    fun openFileAtLine(project: Project, filePath: String, line: Int) {
+        val virtualFile: VirtualFile? = LocalFileSystem.getInstance().findFileByPath(filePath)
+        if (virtualFile != null) {
+            ApplicationManager.getApplication().invokeLater {
+                val editor = FileEditorManager.getInstance(project).openTextEditor(
+                    com.intellij.openapi.fileEditor.OpenFileDescriptor(project, virtualFile, line - 1, 0), true
+                )
+                editor?.caretModel?.moveToOffset(editor.document.getLineStartOffset(line - 1))
+            }
+        }
+    }
 
 
 

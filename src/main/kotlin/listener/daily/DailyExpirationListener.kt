@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 @Service(Service.Level.PROJECT)
-class DailyExpirationService {
+class DailyExpirationListener {
 
     private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     private var waitTime: Long = 1

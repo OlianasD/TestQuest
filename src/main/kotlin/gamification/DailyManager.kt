@@ -2,24 +2,16 @@ package gamification
 
 import listener.test.TestOutcome
 import locator.Locator
+import locator.LocatorsFragilityCalculator
 import ui.GUIManager
 
 class DailyManager {
 
-
     companion object {
 
-        private val TARGET_DAILY: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
-
-        private val XP_DAILY: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
-
-        private val DAILIES_PER_USER: Int = 5
-
-
-
-
-
-
+        const val TARGET_DAILY: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
+        const val XP_DAILY: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
+        private const val DAILIES_PER_USER: Int = 5
 
         private val DAILY_NAMES = listOf(
             "xpathAbs",
@@ -176,48 +168,34 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[17],
-                "Run $TARGET_DAILY test cases successfully",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[18],
-                "Run a test suite successfully",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[19],
                 "Implement the same locator value more than once in a test suite",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[20],
+                DAILY_NAMES[18],
                 "Implement $TARGET_DAILY new XPath locators with length below 10 characters",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[21],
+                DAILY_NAMES[19],
                 "Implement $TARGET_DAILY new XPath locators with level below 5 tags",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[22],
+                DAILY_NAMES[20],
                 "Implement $TARGET_DAILY new robust locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[23],
+                DAILY_NAMES[21],
                 "Implement $TARGET_DAILY new XPath locators with references to @id, @name, @class, @title, @alt" +
                         "or @value attributes",
                 XP_DAILY,
@@ -225,7 +203,7 @@ class DailyManager {
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[24],
+                DAILY_NAMES[22],
                 "Implement $TARGET_DAILY new XPath locators with no references to @src, @href, @height, or @width" +
                         "attributes",
                 XP_DAILY,
@@ -233,22 +211,19 @@ class DailyManager {
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[25],
+                DAILY_NAMES[23],
                 "Implement $TARGET_DAILY new XPath locators with no references to Javascript code",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
-                DAILY_NAMES[26],
+                DAILY_NAMES[24],
                 "Run 20 locators successfully",
                 XP_DAILY,
                 20,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
-
-
-
 
 
 
@@ -266,8 +241,6 @@ class DailyManager {
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),*/
-
-
 
 
         )
@@ -295,16 +268,14 @@ class DailyManager {
             DAILY_NAMES[14] to { testOutcomes -> checkNewID(testOutcomes) },
             DAILY_NAMES[15] to { testOutcomes -> checkNewLinkText(testOutcomes) },
             DAILY_NAMES[16] to { testOutcomes -> checkRepair(testOutcomes) },
-            DAILY_NAMES[17] to { testOutcomes -> checkRunTC(testOutcomes) },
-            DAILY_NAMES[18] to { testOutcomes -> checkRunTS(testOutcomes) },
-            DAILY_NAMES[19] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
-            DAILY_NAMES[20] to { testOutcomes -> checkNewXPathLength10(testOutcomes) },
-            DAILY_NAMES[21] to { testOutcomes -> checkNewXPathLevel5(testOutcomes) },
-            DAILY_NAMES[22] to { testOutcomes -> checkNewRobust(testOutcomes) },
-            DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
-            DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
-            DAILY_NAMES[25] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
-            DAILY_NAMES[26] to { testOutcomes -> checkRunLoc20(testOutcomes) },
+            DAILY_NAMES[17] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
+            DAILY_NAMES[18] to { testOutcomes -> checkNewXPathLength10(testOutcomes) },
+            DAILY_NAMES[19] to { testOutcomes -> checkNewXPathLevel5(testOutcomes) },
+            DAILY_NAMES[20] to { testOutcomes -> checkNewRobust(testOutcomes) },
+            DAILY_NAMES[21] to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
+            DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
+            DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
+            DAILY_NAMES[24] to { testOutcomes -> checkRunLoc20(testOutcomes) },
         )
 
 
@@ -545,7 +516,6 @@ class DailyManager {
             return count
         }
 
-        //TODO: coefficient function must be implemented
         private fun checkRobustnessImprovement(testOutcomes: List<TestOutcome>): Int{
             var count = 0
             for(testOutcome in testOutcomes) {
@@ -847,7 +817,7 @@ class DailyManager {
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
                             newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            computeFragilityCoefficient(newLocator) < 0.5 //TODO: 0.5 enough?
+                            computeFragilityCoefficient(newLocator) < 0.5 //TODO: is 0.5 enough?
                 }
                 count += newLocators.size
             }
@@ -919,27 +889,6 @@ class DailyManager {
         }
 
 
-
-        /******* RUN CHECKS *******/
-
-        private fun checkRunTC(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            for(testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
-                    continue
-                count++
-            }
-            return count
-        }
-
-        private fun checkRunTS(testOutcomes: List<TestOutcome>): Int {
-            for(testOutcome in testOutcomes){
-                if(!testOutcome.isPassed)
-                    return 0
-            }
-            return 1
-        }
-
         private fun checkRunLoc20(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
@@ -960,8 +909,9 @@ class DailyManager {
 
 
         /**AUXILIARY FUNCTIONS**/
-        fun computeFragilityCoefficient(loc: Locator): Int{
-            return 0//TODO:implement coefficient
+        fun computeFragilityCoefficient(loc: Locator): Double{
+            val calc = LocatorsFragilityCalculator()
+            return calc.calculateFragility(loc)
         }
 
         private fun countWantedAttributes(locatorValue: String): Int {

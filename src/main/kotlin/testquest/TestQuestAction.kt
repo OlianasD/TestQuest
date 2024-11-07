@@ -1,6 +1,6 @@
 package testquest
 
-import LocatorEditorListener
+import listener.locator.LocatorScoreListener
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
@@ -27,7 +27,7 @@ class TestQuestAction : AnAction() {
             //setup gamification profile
             val gamificationManager = GamificationManager()
             gamificationManager.showGUI()
-            PluginData.userProfileId = "001" //TODO: change as a login
+            PluginData.userProfileId = "002" //TODO: change as a login
             gamificationManager.setupUserProfile(PluginData.userProfileId)
 
             //extract locators
@@ -38,7 +38,7 @@ class TestQuestAction : AnAction() {
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
             val estimation = locEstimator.calculateOverallFragility(locatorsNewStatic)
-            LocatorEditorListener.registerListener(project)
+            LocatorScoreListener.registerListener(project)
             GUIManager.showOverallLocsFragilityScore(estimation)
         }
         else {

@@ -1,6 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><userProfiles>
     <userProfile>
         <id>001</id>
+        <name>John Doe1</name>
+        <level>1</level>
+        <currentXP>0</currentXP>
+        <nextXP>20</nextXP>
+        <title>Novice</title>
+        <propic>C:\\Users\\User\\Desktop\\img\\user.png</propic>
+        <achievements>
+            <completed>
+                <achievement>
+                    <name>Is this a locator?</name>
+                </achievement>
+            </completed>
+            <ongoing>
+                <achievement>
+                    <name>I did it!</name>
+                    <progress>0</progress>
+                </achievement>
+            </ongoing>
+        </achievements>
+        <dailies timestamp="1829150333171">
+            <daily>
+                <name>xpathAbs</name>
+                <progress>0</progress>
+                <discarded>false</discarded>
+            </daily>
+            <daily>
+                <name>robustness</name>
+                <progress>0</progress>
+                <discarded>false</discarded>
+            </daily>
+            <daily>
+                <name>repair</name>
+                <progress>0</progress>
+                <discarded>true</discarded>
+            </daily>
+            <daily>
+                <name>lengthShorten10</name>
+                <progress>0</progress>
+                <discarded>true</discarded>
+            </daily>
+            <daily>
+                <name>xpathLevel</name>
+                <progress>0</progress>
+                <discarded>true</discarded>
+            </daily>
+        </dailies>
+    </userProfile>
+    <userProfile>
+        <id>002</id>
         <name>John Doe</name>
         <level>1</level>
         <currentXP>0</currentXP>
@@ -11,6 +60,6 @@
             <completed/>
             <ongoing><achievement><name>Is this a locator?</name><progress>0</progress></achievement><achievement><name>I did it!</name><progress>0</progress></achievement><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Keep it short</name><progress>0</progress></achievement><achievement><name>The higher they are, the louder they fall</name><progress>0</progress></achievement><achievement><name>Stillness</name><progress>0</progress></achievement><achievement><name>Master of Changes</name><progress>0</progress></achievement><achievement><name>Ops... I made a mistake!</name><progress>0</progress></achievement><achievement><name>Perfectionism</name><progress>0</progress></achievement><achievement><name>Immortality</name><progress>0</progress></achievement><achievement><name>An inside job</name><progress>0</progress></achievement><achievement><name>I feel so lonely</name><progress>0</progress></achievement><achievement><name>I can read this</name><progress>0</progress></achievement><achievement><name>The gift of synthesis</name><progress>0</progress></achievement><achievement><name>The bigger the better</name><progress>0</progress></achievement><achievement><name>Strength lies in differences</name><progress>0</progress></achievement><achievement><name>The cake is a lie</name><progress>0</progress></achievement><achievement><name>The clone war</name><progress>0</progress></achievement><achievement><name>Expand the colony</name><progress>0</progress></achievement><achievement><name>You are not welcome anymore</name><progress>0</progress></achievement><achievement><name>What's the difference?</name><progress>0</progress></achievement><achievement><name>Is this a test?</name><progress>0</progress></achievement><achievement><name>I joined the Test Marathon</name><progress>0</progress></achievement><achievement><name>The Beginner's Luck</name><progress>0</progress></achievement><achievement><name>There's no luck anymore</name><progress>0</progress></achievement><achievement><name>First aid</name><progress>0</progress></achievement><achievement><name>ER Medical Drama</name><progress>0</progress></achievement><achievement><name>I didn't touch it!</name><progress>0</progress></achievement><achievement><name>My dog ate it</name><progress>0</progress></achievement><achievement><name>Flawless Victory</name><progress>0</progress></achievement><achievement><name>Locatorwarts School of Robustness and Testing</name><progress>0</progress></achievement><achievement><name>I am a bit confused</name><progress>0</progress></achievement><achievement><name>What am I doing?</name><progress>0</progress></achievement></ongoing>
         </achievements>
-        <dailies timestamp="1728979869907"><daily><name>remJSFromXPath</name><progress>0</progress><discarded>false</discarded></daily><daily><name>robustness</name><progress>0</progress><discarded>false</discarded></daily><daily><name>runtc</name><progress>0</progress><discarded>false</discarded></daily><daily><name>newXPath</name><progress>0</progress><discarded>false</discarded></daily><daily><name>xpathLength</name><progress>0</progress><discarded>false</discarded></daily></dailies>
+        <dailies timestamp="1730968403218"><daily><name>remAttrFromXPath</name><progress>0</progress><discarded>false</discarded></daily><daily><name>addAttrToXPath</name><progress>0</progress><discarded>false</discarded></daily><daily><name>repair</name><progress>0</progress><discarded>true</discarded></daily><daily><name>edit5</name><progress>0</progress><discarded>true</discarded><modified-locs/></daily><daily><name>xpathAbs</name><progress>0</progress><discarded>true</discarded></daily></dailies>
     </userProfile>
 </userProfiles>

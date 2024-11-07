@@ -1,6 +1,7 @@
 import testquest.TestQuestAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.popup.Balloon
+import locator.Locator
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionListener
 import javax.swing.Timer
@@ -8,7 +9,7 @@ import ui.GUIManager
 
 class LocatorTooltipListener(
     private val editor: Editor,
-    private var locatorScores: Map<String, Double>
+    private var locatorScores: Map<Locator, Double>
 ) : MouseMotionListener {
 
     private var hoverTimer: Timer? = null
@@ -25,11 +26,11 @@ class LocatorTooltipListener(
         val currentLine = logicalPosition.line + 1
 
         //if mouse position is a locator, show the score and balloon
-        val locatorName = TestQuestAction.locatorsNewStatic.find { it.line == currentLine }?.locatorName
-        if (locatorName != null && locatorScores.containsKey(locatorName)) {
-            val score = locatorScores[locatorName]!!
+        val locator = TestQuestAction.locatorsNewStatic.find { it.line == currentLine }
+        if (locatorScores.containsKey(locator)) {
+            val score = locatorScores[locator]!!
             hoverTimer = Timer(500) {
-                GUIManager.showBalloon(e, locatorName, score)
+                GUIManager.showBalloon(e, locator!!.locatorName, score)
             }
             hoverTimer?.start()
         }
@@ -38,7 +39,7 @@ class LocatorTooltipListener(
     override fun mouseDragged(e: MouseEvent?) {
     }
 
-    fun updateLocatorScores(newScores: Map<String, Double>) {
+    fun updateLocatorScores(newScores: Map<Locator, Double>) {
         locatorScores = newScores
     }
 }

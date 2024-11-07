@@ -1,0 +1,107 @@
+package gamification
+
+import listener.test.TestOutcome
+
+class TestStructureDailyManager {
+
+    companion object {
+
+
+        private val DAILY_NAMES = listOf(
+            "runtc",
+            "runts",
+            "addAssert2Test",
+            "shortenTestWorkFlow",//test workflow must be simple
+            "makeTestWorkFlowIndependent", //test workflow must be independent from any other test
+            "adaptTestName2Format",//test name must have 3 sections: what is being tested, circumnstances, exp result
+            "meaningfulMethodName",//TODO: this may need external resources
+            "shortenMethodName",
+            "shortenVarName",
+            "meaningfulVarName",//TODO: this may need external resources
+            "addSetup",
+            "addTearDown",
+            "removeGlobVar",
+            "removeExpSleep",
+            "setDriverForEachTest"
+        )
+
+
+
+        //TODO: change icons, xp, target accordingly
+        private val ALL_DAILIES = mutableListOf(
+            Daily(
+                DAILY_NAMES[0],
+                "Run ${DailyManager.TARGET_DAILY} test cases successfully",
+                DailyManager.XP_DAILY,
+                DailyManager.TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
+                DAILY_NAMES[1],
+                "Run a test suite successfully",
+                DailyManager.XP_DAILY,
+                DailyManager.TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
+                DAILY_NAMES[3],
+                "Add an assert to a test case",
+                DailyManager.XP_DAILY,
+                DailyManager.TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            //TODO: this checks if test has not too many interactions/locs and too many assertions
+            Daily(
+                DAILY_NAMES[3],
+                "Refactor a long test into two tests",
+                DailyManager.XP_DAILY,
+                DailyManager.TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+
+
+        )
+
+
+
+
+        private val DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
+            DAILY_NAMES[0] to { testOutcomes -> checkRunTC(testOutcomes) },
+            DAILY_NAMES[1] to { testOutcomes -> checkRunTS(testOutcomes) },
+        )
+
+
+        private fun checkRunTC(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                count++
+            }
+            return count
+        }
+
+        private fun checkRunTS(testOutcomes: List<TestOutcome>): Int {
+            for(testOutcome in testOutcomes){
+                if(!testOutcome.isPassed)
+                    return 0
+            }
+            return 1
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+}

@@ -9,7 +9,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <editorFactoryListener
-                implementation="listener.locator.LocatorEditorListener"/>
+                implementation="listener.locator.LocatorScoreListener"/>
     </extensions>
 
     <actions>
@@ -20,14 +20,13 @@
     </actions>
 
     <projectListeners>
-        <listener class="listener.test.TestListener"
+        <listener class="listener.test.TestExecutionListener"
                   topic="com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener"/>
     </projectListeners>
 
-
     <project-components>
         <component>
-            <implementation-class>listener.daily.DailyExpirationService</implementation-class>
+            <implementation-class>listener.daily.DailyExpirationListener</implementation-class>
         </component>
     </project-components>
 

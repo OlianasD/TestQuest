@@ -1,3 +1,7 @@
+
+package listener.locator
+
+import LocatorTooltipListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
@@ -7,19 +11,29 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
+import locator.Locator
 import locator.LocatorsExtractor
 import locator.LocatorsFragilityCalculator
 import testquest.TestQuestAction
 import ui.GUIManager
 import utils.TestFilesExtractor
 
-object LocatorEditorListener : EditorFactoryListener, Disposable {
+
+class LocatorScoreListener private constructor() : EditorFactoryListener, Disposable {
+
+    companion object {
+        private val instance = LocatorScoreListener()
+
+        fun registerListener(project: Project) {
+            instance.registerListenerInternal(project)
+        }
+    }
 
     private val tooltipListeners = mutableMapOf<Editor, LocatorTooltipListener>()
     private lateinit var proj: Project
     private var isRegistered = false
 
-    fun registerListener(project: Project) {
+    fun registerListenerInternal(project: Project) {
         proj = project
         //this to save only test-related listeners
         if (!isRegistered) {
@@ -62,19 +76,16 @@ object LocatorEditorListener : EditorFactoryListener, Disposable {
         return filePath.endsWith(".java") || filePath.endsWith(".kt")
     }
 
-    private fun loadLocatorScores(): Map<String, Double> {
-        val locatorScores = mutableMapOf<String, Double>()
-        for (locator in TestQuestAction.locatorsNewStatic) {
-            val locatorName = locator.locatorName
-            if (locatorName != null) {
-                val locFragilityCalc = LocatorsFragilityCalculator()
-                val score = locFragilityCalc.calculateFragility(locator)
-                locatorScores[locatorName] = score
-            }
-        }
+    private fun loadLocatorScores(): Map<Locator, Double> {
         val locEstimator = LocatorsFragilityCalculator()
+        val locatorScores = mutableMapOf<Locator, Double>()
+        for (locator in TestQuestAction.locatorsNewStatic) {
+            val score = locEstimator.calculateFragility(locator)
+            locatorScores[locator] = score
+        }
         val estimation = locEstimator.calculateOverallFragility(TestQuestAction.locatorsNewStatic)
         GUIManager.showOverallLocsFragilityScore(estimation)
+        GUIManager.showLocatorScores(proj, locatorScores)
         return locatorScores
     }
 

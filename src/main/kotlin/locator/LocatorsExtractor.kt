@@ -15,7 +15,8 @@ data class Locator(
     val methodName: String,
     val className: String,
     val locatorName: String?,
-    val locatorPosition: Int
+    val locatorPosition: Int,
+    val filePath: String
 )
 {
     //hashcode for uniqueness of locators
@@ -50,6 +51,8 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
     private var currentClassName: String = ""
     private var currentMethodName: String = ""
     private var locatorCounter: Int = 0 // it counts the locator position within a method
+    private var filePath: String = ""  //the path to the current test file
+
 
     // Visitor to find all variable assignments and driver.findElement calls
     override fun visit(mce: MethodCallExpr, locators: MutableList<Locator>) {
@@ -67,7 +70,8 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
                 val locatorName = findVariableName(mce)
                 //Increment and track the locator position
                 locatorCounter++
-                locators.add(Locator(locatorType, locatorValue, mce.begin.get().line, currentMethodName, currentClassName, locatorName, locatorCounter))
+                locators.add(Locator(locatorType, locatorValue, mce.begin.get().line, currentMethodName,
+                    currentClassName, locatorName, locatorCounter, filePath))
             }
         }
     }
@@ -85,11 +89,13 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
 
     // Function to parse Java file and extract locators
     fun parseLocators(filePath: Path): List<Locator> {
+        this.filePath = filePath.toString() //to keep track of current file
         val parser = JavaParser()
         val cu: CompilationUnit? = parser.parse(filePath).result.orElse(null)
         val locators = mutableListOf<Locator>()
         visit(cu, locators)
-        return locators
+        //return locators
+        return locators.map { it.copy(filePath = filePath.toString()) }
     }
 
     // Helper method to extract locator type and value

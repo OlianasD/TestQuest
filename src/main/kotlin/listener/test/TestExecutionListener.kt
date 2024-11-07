@@ -15,7 +15,7 @@ data class TestOutcome(
     val stacktrace: String?
 )
 
-class TestListener(private val project: Project) : SMTRunnerEventsListener {
+class TestExecutionListener(private val project: Project) : SMTRunnerEventsListener {
 
     private lateinit var server: Server
     private val testOutcomes = mutableListOf<TestOutcome>() //to collect the outcome of each test
