@@ -12,6 +12,7 @@ class DailyManager {
         const val TARGET_DAILY: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
         const val XP_DAILY: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
         private const val DAILIES_PER_USER: Int = 5
+        private const val ROBUST_THRESHOLD = 0.5 //threshold used to determine whether a locator is robust
 
         private val DAILY_NAMES = listOf(
             "xpathAbs",
@@ -19,7 +20,7 @@ class DailyManager {
             "xpathLevel",
             "loc2xpath",
             "loc2id",
-            "loc2linkText",
+            "runLocs20",
             "robustness",
             "lengthShorten10",
             "addAttrToXPath",
@@ -27,20 +28,18 @@ class DailyManager {
             "remJSFromXPath",
             "edit5",
             "levelLowered5",
+            "repair",
+            "reducePredicates",
             "newXPath",
             "newID",
-            "newLinkText",
-            "repair",
-            "runtc",
-            "runts",
-            "useLoc",
+            "newSameLoc",
             "newLengthShorter10",
             "newLevelLower5",
             "newRobust",
             "newWantedAttr",
             "newUnwantedAttr",
             "newJS",
-            "runLocs20"
+            "newLowPredicates"
             )
 
         //TODO: change icons, xp, target accordingly
@@ -82,9 +81,9 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[5],
-                "Convert $TARGET_DAILY existing non-linkText locators to $TARGET_DAILY linkText ones",
+                "Run 20 locators successfully",
                 XP_DAILY,
-                TARGET_DAILY,
+                20,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
@@ -140,35 +139,35 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[13],
-                "Implement $TARGET_DAILY new XPath locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[14],
-                "Implement $TARGET_DAILY new ID locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[15],
-                "Implement $TARGET_DAILY new linkText locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-            Daily(
-                DAILY_NAMES[16],
                 "Repair $TARGET_DAILY existing broken locators",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
             Daily(
+                DAILY_NAMES[14],
+                "Reduce the number of predicates from $TARGET_DAILY existing locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
+                DAILY_NAMES[15],
+                "Implement $TARGET_DAILY new XPath locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
+                DAILY_NAMES[16],
+                "Implement $TARGET_DAILY new ID locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+            ),
+            Daily(
                 DAILY_NAMES[17],
-                "Implement the same locator value more than once in a test suite",
+                "Implement a newly locator value and use it more than once in a test suite",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
@@ -219,31 +218,15 @@ class DailyManager {
             ),
             Daily(
                 DAILY_NAMES[24],
-                "Run 20 locators successfully",
-                XP_DAILY,
-                20,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),
-
-
-
-            /*Daily(
-                DAILY_NAMES[27],
-                "Edit the same locator value more than once in a test suite",
+                "Implement $TARGET_DAILY new XPath locators with 3 or less predicates",
                 XP_DAILY,
                 TARGET_DAILY,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
             ),
-            Daily(
-                DAILY_NAMES[28],
-                "Remove $TARGET_DAILY broken locators",
-                XP_DAILY,
-                TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
-            ),*/
-
-
         )
+
+
+
 
         private val DAILY_NAME_TO_DESCRIPTION = ALL_DAILIES.associate { it.name to it.description }
         private val DAILY_NAME_TO_TARGET = ALL_DAILIES.associate { it.name to it.target }
@@ -256,7 +239,7 @@ class DailyManager {
             DAILY_NAMES[2] to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
             DAILY_NAMES[3] to { testOutcomes -> checkLocs2XPathConverted(testOutcomes) },
             DAILY_NAMES[4] to { testOutcomes -> checkLocs2IDConverted(testOutcomes) },
-            DAILY_NAMES[5] to { testOutcomes -> checkLocs2LinkTextConverted(testOutcomes) },
+            DAILY_NAMES[5] to { testOutcomes -> checkRunLoc20(testOutcomes) },
             DAILY_NAMES[6] to { testOutcomes -> checkRobustnessImprovement(testOutcomes) },
             DAILY_NAMES[7] to { testOutcomes -> checkShortenedLength10(testOutcomes) },
             DAILY_NAMES[8] to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
@@ -264,10 +247,10 @@ class DailyManager {
             DAILY_NAMES[10] to { testOutcomes -> checkJSInXPaths(testOutcomes) },
             DAILY_NAMES[11] to { testOutcomes -> checkChangedLocs5(testOutcomes) },
             DAILY_NAMES[12] to { testOutcomes -> checkLoweredLevel5(testOutcomes) },
-            DAILY_NAMES[13] to { testOutcomes -> checkNewXPath(testOutcomes) },
-            DAILY_NAMES[14] to { testOutcomes -> checkNewID(testOutcomes) },
-            DAILY_NAMES[15] to { testOutcomes -> checkNewLinkText(testOutcomes) },
-            DAILY_NAMES[16] to { testOutcomes -> checkRepair(testOutcomes) },
+            DAILY_NAMES[13] to { testOutcomes -> checkRepair(testOutcomes) },
+            DAILY_NAMES[14] to { testOutcomes -> reducePredicates(testOutcomes) },
+            DAILY_NAMES[15] to { testOutcomes -> checkNewXPath(testOutcomes) },
+            DAILY_NAMES[16] to { testOutcomes -> checkNewID(testOutcomes) },
             DAILY_NAMES[17] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
             DAILY_NAMES[18] to { testOutcomes -> checkNewXPathLength10(testOutcomes) },
             DAILY_NAMES[19] to { testOutcomes -> checkNewXPathLevel5(testOutcomes) },
@@ -275,8 +258,8 @@ class DailyManager {
             DAILY_NAMES[21] to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
             DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
             DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
-            DAILY_NAMES[24] to { testOutcomes -> checkRunLoc20(testOutcomes) },
-        )
+            DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithLessThan3Predicates(testOutcomes) },
+            )
 
 
 
@@ -495,27 +478,6 @@ class DailyManager {
             return count
         }
 
-        private fun checkLocs2LinkTextConverted(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (!oldLocator.locatorType.equals("linkText", ignoreCase = true) &&
-                        !oldLocator.locatorType.equals("partialLinkText", ignoreCase = true)) {
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && (newLocator.locatorType.equals("linkText", ignoreCase = true)
-                                    || newLocator.locatorType.equals("partialLinkText", ignoreCase = true)))
-                            count++
-                    }
-                }
-            }
-            return count
-        }
-
         private fun checkRobustnessImprovement(testOutcomes: List<TestOutcome>): Int{
             var count = 0
             for(testOutcome in testOutcomes) {
@@ -632,8 +594,6 @@ class DailyManager {
             return existingModifiedLocs.size - oldSize //it returns the number of newly changed locs
         }
 
-
-
         private fun checkLoweredLevel5(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
@@ -655,30 +615,76 @@ class DailyManager {
             return count
         }
 
-        //TODO: check
+        private val stackTraceMap = mutableMapOf<String, String>()
         private fun checkRepair(testOutcomes: List<TestOutcome>): Int {
-            /*val repairedLocators = mutableSetOf<String>()
+            var repairs = 0
             for (testOutcome in testOutcomes) {
-                if (testOutcome.isPassed) {
-                    val newLocators = testOutcome.locatorsNew.associateBy { it.locatorName }
-                    // Iterate over old locators to find the ones that were broken
-                    val brokenLocators = testOutcome.locatorsOld.filter { oldLocator ->
-                        oldLocator.locatorValue in testOutcome.stacktrace // Check if it was broken and mentioned in the stack trace
-                    }
-
-                    // Check if these locators are now fixed
-                    for (brokenLocator in brokenLocators) {
-                        val newLocator = newLocators[brokenLocator.locatorName]
-                        if (newLocator != null && newLocator.locatorValue != brokenLocator.locatorValue) {
-                            repairedLocators.add(brokenLocator.locatorValue)
+                val testName = testOutcome.testName
+                //if no stacktrace exists, it is the first run of this test
+                if (!stackTraceMap.containsKey(testName)) {
+                    //if test failed, save stacktrace
+                    if (!testOutcome.isPassed)
+                        stackTraceMap[testName] = testOutcome.stacktrace.orEmpty()
+                    //else, skip as test never failed
+                    else
+                        continue
+                }
+                //if stacktrace exists, so the test failed in the past
+                else {
+                    //if stacktrace is the same as old, skip as nothing has changed
+                    if (testOutcome.hasSameStacktrace(stackTraceMap[testName]!!))
+                        continue
+                    //else, retrieve locators that were broken in previous stacktrace
+                    else {
+                        //find old locators that were broken in previous stacktrace
+                        val brokenLocators = testOutcome.locatorsOld.filter { loc ->
+                            stackTraceMap[testName]!!.trim().contains(loc.locatorValue.trim())
+                        }
+                        //if now test has passed, all broken locators count as repaired
+                        if(testOutcome.isPassed) {
+                            repairs += brokenLocators.size
+                            //remove old stacktrace
+                            stackTraceMap.remove(testName)
+                        }
+                        //else, count only repaired ones
+                        else {
+                            //find new locators same as old but whose values are no more present in current stacktrace
+                            val repairedLocators = testOutcome.locatorsNew.filter { loc ->
+                                loc.locatorName in brokenLocators.map { it.locatorName } &&
+                                        !testOutcome.stacktrace?.contains(loc.locatorValue)!!
+                            }
+                            repairs += repairedLocators.size
+                            //update stacktrace
+                            stackTraceMap[testName] = testOutcome.stacktrace.toString()
                         }
                     }
                 }
             }
-            return repairedLocators.size*/
-            return 0
+            return repairs
         }
 
+        private fun reducePredicates(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                if (!testOutcome.isPassed)
+                    continue
+                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
+                for (oldLocator in locatorsOld) {
+                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)) {
+                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
+                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)) {
+                            val oldPredicatesCount = oldLocator.locatorValue.split("[", "]").size / 2 - 1
+                            val newPredicatesCount = newLocator.locatorValue.split("[", "]").size / 2 - 1
+                            if (newPredicatesCount < oldPredicatesCount)
+                                count++
+                        }
+                    }
+                }
+            }
+            return count
+        }
 
 
 
@@ -719,25 +725,6 @@ class DailyManager {
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
                             newLocator.locatorType.equals("id", ignoreCase = true)
-                }
-                count += newLocators.size
-            }
-            return count
-        }
-
-        private fun checkNewLinkText(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                //new locator hashes only
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            (newLocator.locatorType.equals("linkText", ignoreCase = true) ||
-                                    newLocator.locatorType.equals("partialLinkText", ignoreCase = true))
                 }
                 count += newLocators.size
             }
@@ -805,7 +792,6 @@ class DailyManager {
             return count
         }
 
-
         private fun checkNewRobust(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
@@ -817,7 +803,7 @@ class DailyManager {
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
                             newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            computeFragilityCoefficient(newLocator) < 0.5 //TODO: is 0.5 enough?
+                            computeFragilityCoefficient(newLocator) < ROBUST_THRESHOLD
                 }
                 count += newLocators.size
             }
@@ -888,13 +874,32 @@ class DailyManager {
             return count
         }
 
-
         private fun checkRunLoc20(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
                 if(!testOutcome.isPassed)
                     continue
                 count += testOutcome.locatorsNew.size
+            }
+            return count
+        }
+
+        private fun checkNewXPathWithLessThan3Predicates(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                if (!testOutcome.isPassed)
+                    continue
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsNew
+                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
+                val regex = "\\[.*?\\]".toRegex() //to count predicates
+                //find locators that are actually new
+                val newLocators = locatorsNew.filter { newLocator ->
+                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
+                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
+                            regex.findAll(newLocator.locatorValue).count() <= 3
+                }
+                count += newLocators.size
             }
             return count
         }

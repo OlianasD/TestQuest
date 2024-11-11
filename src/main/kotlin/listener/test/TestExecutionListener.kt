@@ -1,11 +1,12 @@
 package listener.test
 
-import testquest.TestQuestAction
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
-import com.intellij.openapi.project.Project
 import gamification.GamificationManager
 import locator.Locator
+import testquest.TestQuestAction
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 data class TestOutcome(
     val testName: String,
@@ -13,14 +14,46 @@ data class TestOutcome(
     val locatorsNew: List<Locator>,
     val isPassed: Boolean,
     val stacktrace: String?
-)
+) {
+    override fun hashCode(): Int {
+        return testName.hashCode()
+    }
 
-class TestExecutionListener(private val project: Project) : SMTRunnerEventsListener {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TestOutcome) return false
+        return testName == other.testName
+    }
+
+    fun hasSameStacktrace(otherStackTrace: String): Boolean {
+        val thisStacktrace = extractNoSuchElementInfo(this.stacktrace)
+        val otherStacktrace = extractNoSuchElementInfo(otherStackTrace)
+        return thisStacktrace == otherStacktrace
+    }
+
+    private fun extractNoSuchElementInfo(stackTrace: String?): String {
+        if (stackTrace == "" || stackTrace == null)
+            return ""
+        val pattern: Pattern = Pattern.compile(
+            "org.openqa.selenium.NoSuchElementException:.*?Unable to locate element: \\{.*?\\}",
+            Pattern.DOTALL
+        )
+        val stackTraceAsCharSeq: CharSequence = stackTrace ?: ""
+        val matcher: Matcher = pattern.matcher(stackTraceAsCharSeq)
+        if (matcher.find())
+           return matcher.group()
+        return ""
+    }
+}
+
+
+class TestExecutionListener : SMTRunnerEventsListener {
 
     private lateinit var server: Server
     private val testOutcomes = mutableListOf<TestOutcome>() //to collect the outcome of each test
 
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
+        testOutcomes.clear() //TODO: currently, it resets the testOutcomes at the beginning of each new run
         try {
             //locs static i.e., any change to code before test execution
             //locs dynamic i.e., those used to check progression following actual execution

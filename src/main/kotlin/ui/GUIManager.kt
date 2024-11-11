@@ -525,14 +525,19 @@ object GUIManager {
     fun showLocatorScores(project: Project, locatorScores: Map<Locator, Double>) {
         locScoresframe?.dispose()//to close any already open window
         locScoresframe = JFrame("Locator Details Panel").apply {
-            defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+            defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE //avoid to close this window
             setSize(800, 400)
             setLocationRelativeTo(null)
+            isAlwaysOnTop = true
         }
         //create the table describing locators
-        val sortedLocators = locatorScores.entries.sortedBy { it.value }
+        val sortedLocators = locatorScores.entries.sortedByDescending { it.value }
         val columnNames = arrayOf("Score", "Line", "Locator Name", "Locator Type", "Locator Value", "Method Name", "Class Name")
-        val tableModel = DefaultTableModel(columnNames, 0)
+        val tableModel = object : DefaultTableModel(columnNames, 0) {
+            override fun isCellEditable(row: Int, column: Int): Boolean { //make table cells non editable
+                return false
+            }
+        }
         for ((locator, score) in sortedLocators) {
             val df = DecimalFormat("#.##", DecimalFormatSymbols(Locale.US))
             df.roundingMode = RoundingMode.CEILING
@@ -571,10 +576,10 @@ object GUIManager {
             }
         })
         locScoresframe!!.add(JScrollPane(table), BorderLayout.CENTER)
-        val closeButton = JButton("Close").apply {
+        /*val closeButton = JButton("Close").apply {
             addActionListener { locScoresframe!!.dispose() }
         }
-        locScoresframe!!.add(closeButton, BorderLayout.SOUTH)
+        locScoresframe!!.add(closeButton, BorderLayout.SOUTH)*/
         locScoresframe!!.isVisible = true
     }
 
