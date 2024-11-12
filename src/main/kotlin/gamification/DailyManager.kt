@@ -651,7 +651,7 @@ class DailyManager {
                             //find new locators same as old but whose values are no more present in current stacktrace
                             val repairedLocators = testOutcome.locatorsNew.filter { loc ->
                                 loc.locatorName in brokenLocators.map { it.locatorName } &&
-                                        !testOutcome.stacktrace?.contains(loc.locatorValue)!!
+                                        !testOutcome.stacktrace?.trim()?.contains(loc.locatorValue.trim())!!
                             }
                             repairs += repairedLocators.size
                             //update stacktrace
@@ -914,7 +914,7 @@ class DailyManager {
 
 
         /**AUXILIARY FUNCTIONS**/
-        fun computeFragilityCoefficient(loc: Locator): Double{
+        private fun computeFragilityCoefficient(loc: Locator): Double{
             val calc = LocatorsFragilityCalculator()
             return calc.calculateFragility(loc)
         }

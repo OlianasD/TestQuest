@@ -10,19 +10,20 @@ import java.util.regex.Pattern
 
 data class TestOutcome(
     val testName: String,
+    val className: String,
     val locatorsOld: List<Locator>,
     val locatorsNew: List<Locator>,
     val isPassed: Boolean,
     val stacktrace: String?
 ) {
     override fun hashCode(): Int {
-        return testName.hashCode()
+        return 31 * (testName.hashCode() + className.hashCode())
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TestOutcome) return false
-        return testName == other.testName
+        return testName == other.testName && className == other.className
     }
 
     fun hasSameStacktrace(otherStackTrace: String): Boolean {
@@ -91,7 +92,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
             val oldLocatorsInTest = TestQuestAction.locatorsOldDynamic.filter { it.methodName == test.name }
             val newLocatorsInTest = TestQuestAction.locatorsNewDynamic.filter { it.methodName == test.name }
             val testOutcome =
-                TestOutcome(test.name, oldLocatorsInTest, newLocatorsInTest, test.isPassed, test.stacktrace)
+                TestOutcome(test.name, test.parent.name, oldLocatorsInTest, newLocatorsInTest, test.isPassed, test.stacktrace)
             testOutcomes.add(testOutcome)
         }
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
