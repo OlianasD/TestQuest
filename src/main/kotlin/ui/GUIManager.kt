@@ -64,6 +64,11 @@ object GUIManager {
     }
 
 
+
+
+
+
+
     //to update the gui based on user progression
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
         SwingUtilities.invokeLater {
@@ -233,32 +238,7 @@ object GUIManager {
             dailiesPanel.background = JBColor.LIGHT_GRAY
             //dailiesPanel.preferredSize = Dimension(400, 270)
 
-            for (dailyProgress in userProfile.dailyProgresses) {
-                val dailyPanel = JPanel()
-                dailyPanel.layout = BoxLayout(dailyPanel, BoxLayout.X_AXIS)
-                dailyPanel.alignmentX = Component.LEFT_ALIGNMENT
-                dailyPanel.background = JBColor.LIGHT_GRAY
-                // Daily Description
-                showDailyDetails(dailyPanel, dailyProgress, font) //show daily info
-                // Discard button
-                val discarded = dailyProgress.discarded
-                if(!discarded) {
-                    val removeButton = JButton("Discard")
-                    removeButton.addActionListener {
-                        val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
-                        dailyPanel.remove(removeButton)//remove discard button as only 1 discard is allowed
-                        showDailyDetails(
-                            dailyPanel,
-                            newDailyProgress,
-                            font
-                        )//update panel with newly assigned daily info
-                        dailiesPanel.revalidate()
-                        dailiesPanel.repaint()
-                    }
-                    dailyPanel.add(removeButton)
-                }
-                dailiesPanel.add(dailyPanel)
-            }
+            populateDailiesPanel(dailiesPanel, userProfile, font)
             gbc.gridx = 0
             gbc.gridy = 1
             gbc.gridwidth = 1
@@ -361,22 +341,28 @@ object GUIManager {
             val dailyAssignmentModePanel = JPanel(FlowLayout(FlowLayout.RIGHT))
             dailyAssignmentModePanel.background = JBColor.LIGHT_GRAY
             val randomMode = JRadioButton("Random")
-            randomMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.random
+            randomMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM
             randomMode.addActionListener {
-                if (randomMode.isSelected)
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.random
+                if (randomMode.isSelected) {
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.RANDOM
+                    updateGUI(userProfile, false)
+                }
             }
             val targetedMode = JRadioButton("Targeted")
-            targetedMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.targeted
+            targetedMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED
             targetedMode.addActionListener {
-                if (targetedMode.isSelected)
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.targeted
+                if (targetedMode.isSelected) {
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.TARGETED
+                    GamificationManager.assignTargetDailies()//this includes updateGUI() but is preceded by assignment
+                }
             }
             val inclusiveMode = JRadioButton("Inclusive")
-            inclusiveMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.inclusive
+            inclusiveMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.INCLUSIVE
             inclusiveMode.addActionListener {
-                if (inclusiveMode.isSelected)
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.inclusive
+                if (inclusiveMode.isSelected) {
+                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.INCLUSIVE
+                    updateGUI(userProfile, false)
+                }
             }
             val modeGroup = ButtonGroup()
             modeGroup.add(randomMode)
@@ -390,7 +376,7 @@ object GUIManager {
             titledBorder.titleJustification = TitledBorder.CENTER
             modeSelectionPanel.border = titledBorder
             dailyAssignmentModePanel.add(modeSelectionPanel)
-            GamificationManager.updateUserProfile(userProfile)//TODO: store user profile with chosen mode
+            GamificationManager.updateUserProfile(userProfile)
             gbc.gridx = 1
             gbc.gridy = 3
             gbc.gridwidth = 1
@@ -412,7 +398,6 @@ object GUIManager {
             if (notifyChange)
                 showPopup("New Level: ${userProfile.level}\nNew Title: ${userProfile.title}\nNew XP: ${userProfile.currentXP}")
         }
-
     }
 
     //main panel
@@ -430,24 +415,104 @@ object GUIManager {
         frame.isVisible = true
     }
 
-
-    private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font){
-        val existingLabel = dailyPanel.components.find { it is JLabel } as? JLabel
-        existingLabel?.let {
-            dailyPanel.remove(it)
-        }
-        val dailyLabel = JLabel(dailyProgress.daily.description)
-        dailyLabel.font = font
-        dailyLabel.foreground = JBColor.BLACK
-        dailyPanel.add(dailyLabel)
-        // Tooltip for progression
-        dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
-        dailyLabel.addMouseListener(object : MouseAdapter() {
-            override fun mouseEntered(e: MouseEvent?) {
-                dailyLabel.toolTipText = "Progress: ${dailyProgress.progress}"
+    private fun populateDailiesPanel(dailiesPanel: JPanel, userProfile: UserProfile, font: Font) {
+        // Clear the panel before repopulating
+        dailiesPanel.removeAll()
+        for (dailyProgress in userProfile.dailyProgresses) {
+            val type = dailyProgress.daily.type
+            if (type.equals(GamificationManager.mode.name, ignoreCase = true)) {  // Show only the dailies of the current mode
+                val dailyPanel = JPanel()
+                dailyPanel.layout = BoxLayout(dailyPanel, BoxLayout.X_AXIS)
+                dailyPanel.alignmentX = Component.LEFT_ALIGNMENT
+                dailyPanel.background = JBColor.LIGHT_GRAY
+                // Show daily details
+                showDailyDetails(dailyPanel, dailyProgress, font)
+                // Discard button for random dailies
+                if (!dailyProgress.discarded && type.equals("random", ignoreCase = true)) {
+                    val removeButton = JButton("Discard")
+                    removeButton.addActionListener {
+                        val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
+                        dailyPanel.remove(removeButton)  // Remove discard button as only 1 discard is allowed
+                        showDailyDetails(dailyPanel, newDailyProgress, font)  // Update panel with newly assigned daily info
+                        dailiesPanel.revalidate()
+                        dailiesPanel.repaint()
+                    }
+                    dailyPanel.add(removeButton)
+                }
+                dailiesPanel.add(dailyPanel)
             }
-        })
+        }
+        // Revalidate and repaint the panel to reflect changes
+        dailiesPanel.revalidate()
+        dailiesPanel.repaint()
     }
+
+
+
+    private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font) {
+        dailyPanel.removeAll()//remove old elems
+        //create daily label
+        val dailyLabel = JLabel(dailyProgress.daily.description).apply {
+            this.font = font
+            foreground = JBColor.BLACK
+            toolTipText = "Progress: ${dailyProgress.progress}"
+        }
+        dailyPanel.add(dailyLabel)
+        //add locs details for targeted dailies
+        if (dailyProgress.daily.type.equals("targeted", ignoreCase = true) && dailyProgress.daily.targetedLocators.isNotEmpty()) {
+            val locatorsPanel = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            }
+            val smallFont = font.deriveFont((font.size * 0.6f).coerceAtLeast(8f))
+            var detailsVisible = false
+            //button to hide/show locs details
+            val toggleButton = JButton("Show Details").apply {
+                addActionListener {
+                    detailsVisible = !detailsVisible
+                    if (detailsVisible) {
+                        dailyProgress.daily.targetedLocators.forEach { locator ->
+                            val locatorInfo = "${locator.locatorName ?: "N/A"} " +
+                                    "[${locator.className}.${locator.methodName}, ${locator.line}]"
+                            val locatorLabel = JLabel(locatorInfo).apply {
+                                this.font = smallFont
+                                foreground = JBColor.DARK_GRAY
+                            }
+                            locatorsPanel.add(locatorLabel)
+                        }
+                        text = "Hide"
+                    } else {
+                        locatorsPanel.removeAll()
+                        text = "Show"
+                    }
+                    locatorsPanel.revalidate()
+                    locatorsPanel.repaint()
+                }
+            }
+            //make scroll panel for locs
+            val scrollPane = JScrollPane(locatorsPanel).apply {
+                preferredSize = Dimension(300, 100)
+                verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+                horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+            }
+            dailyPanel.add(toggleButton)
+            dailyPanel.add(scrollPane)
+        }
+        dailyPanel.revalidate()
+        dailyPanel.repaint()
+    }
+
+
+
+
+
+
+
+
+
+
+    /*SECTION MANAGING LOCATORS SCORE VISUALIZATION*/
+
+
 
 
     //to shows the global locators fragility score in a window
@@ -473,7 +538,7 @@ object GUIManager {
         // Border
         val window = JWindow()
         val panel = JPanel(BorderLayout())
-        panel.border = BorderFactory.createLineBorder(Color(255, 215, 0), 3)
+        panel.border = BorderFactory.createLineBorder(JBColor(Gray._255, Color(255, 215, 0)), 3)
         panel.add(label, BorderLayout.CENTER)
         panel.add(note, BorderLayout.SOUTH)
         window.add(panel)
@@ -496,7 +561,7 @@ object GUIManager {
     }
 
 
-
+    // to show balloon on top of each locator once mouse is over
     fun showBalloon(event: MouseEvent, name: String?, score: Double): Balloon {
         val tooltipText = "Fragility Score for $name: ${String.format("%.2f", score)}"
 
@@ -516,19 +581,15 @@ object GUIManager {
 
 
 
-
-
-    /*SECTION MANAGING LOCATORS SCORE VISUALIZATION*/
-
+    // to show single locator score
     private var locScoresframe: JFrame? = null
-
     fun showLocatorScores(project: Project, locatorScores: Map<Locator, Double>) {
         locScoresframe?.dispose()//to close any already open window
         locScoresframe = JFrame("Locator Details Panel").apply {
             defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE //avoid to close this window
             setSize(800, 400)
             setLocationRelativeTo(null)
-            isAlwaysOnTop = true
+            isAlwaysOnTop = false
         }
         //create the table describing locators
         val sortedLocators = locatorScores.entries.sortedByDescending { it.value }

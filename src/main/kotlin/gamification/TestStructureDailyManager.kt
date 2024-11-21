@@ -34,21 +34,24 @@ class TestStructureDailyManager {
                 "Run ${DailyManager.TARGET_DAILY} test cases successfully",
                 DailyManager.XP_DAILY,
                 DailyManager.TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
                 DAILY_NAMES[1],
                 "Run a test suite successfully",
                 DailyManager.XP_DAILY,
                 DailyManager.TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
                 DAILY_NAMES[3],
                 "Add an assert to a test case",
                 DailyManager.XP_DAILY,
                 DailyManager.TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             //TODO: this checks if test has not too many interactions/locs and too many assertions
             Daily(
@@ -56,7 +59,8 @@ class TestStructureDailyManager {
                 "Refactor a long test into two tests",
                 DailyManager.XP_DAILY,
                 DailyManager.TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
 
 

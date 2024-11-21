@@ -9,7 +9,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <editorFactoryListener
-                implementation="listener.locator.LocatorScoreListener"/>
+                implementation="listener.locator.LocatorChangeListener"/>
     </extensions>
 
     <actions>

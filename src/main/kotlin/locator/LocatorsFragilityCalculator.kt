@@ -135,7 +135,7 @@ class LocatorsFragilityCalculator {
         val goodPredicatesWeight = 1.0
         val goodPredicatesFactor = goodPredicatesCount * -0.2
         val badPredicatesWeight = 4.0
-        val maxBadPredicates = 2
+        val maxBadPredicates = 1
         val badPredicatesFactor = (badPredicatesCount / maxBadPredicates.toDouble())
         val lengthWeight = 2.0
         val maxLength = 50

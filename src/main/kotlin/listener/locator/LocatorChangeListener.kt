@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
+import gamification.GamificationManager
 import locator.Locator
 import locator.LocatorsExtractor
 import locator.LocatorsFragilityCalculator
@@ -19,10 +20,10 @@ import ui.GUIManager
 import utils.TestFilesExtractor
 
 
-class LocatorScoreListener private constructor() : EditorFactoryListener, Disposable {
+class LocatorChangeListener private constructor() : EditorFactoryListener, Disposable {
 
     companion object {
-        private val instance = LocatorScoreListener()
+        private val instance = LocatorChangeListener()
 
         fun registerListener(project: Project) {
             instance.registerListenerInternal(project)
@@ -39,7 +40,7 @@ class LocatorScoreListener private constructor() : EditorFactoryListener, Dispos
         if (!isRegistered) {
             EditorFactory.getInstance().allEditors.forEach { editor ->
                 if (!tooltipListeners.containsKey(editor)) {
-                    addTooltipListener(editor)
+                    manageChanges(editor)
                 }
             }
             EditorFactory.getInstance().addEditorFactoryListener(this, this)
@@ -47,7 +48,7 @@ class LocatorScoreListener private constructor() : EditorFactoryListener, Dispos
         }
     }
 
-    private fun addTooltipListener(editor: Editor) {
+    private fun manageChanges(editor: Editor) {
         //check if listener is about test file
         val virtualFile = FileDocumentManager.getInstance().getFile(editor.document)
         if (virtualFile == null || !isTestFile(virtualFile.path))
@@ -67,6 +68,9 @@ class LocatorScoreListener private constructor() : EditorFactoryListener, Dispos
                     TestQuestAction.locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
                     val updatedScores = loadLocatorScores()
                     listener.updateLocatorScores(updatedScores)
+                    //in case changes occurred in test file, updates targeted dailies as well
+                    if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED)
+                        GamificationManager.assignTargetDailies()
                 }
             }
         }, this)

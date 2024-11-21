@@ -4,7 +4,7 @@ data class DailyProgress(
     val daily: Daily,
     var progress: Int = 0,
     val discarded: Boolean = false,
-    var modifiedLocs: List<String> = emptyList() //used to store unique locators changed (used for some dailies/achs only)
+    var modifiedLocs: List<String> = emptyList(), //used to store unique locators changed (used for some dailies/achs only)
 )
 
 data class AchievementProgress(
@@ -23,7 +23,7 @@ class UserProfile(
     val dailyProgresses: MutableList<DailyProgress>,
     val completedAchievements: MutableList<Achievement>,
     var propic: String,
-    var timestamp: Long = System.currentTimeMillis()//to keep track of expiring dailies
+    var timestamp: Long = System.currentTimeMillis(),//to keep track of expiring dailies
 )
 
 {

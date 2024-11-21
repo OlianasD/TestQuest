@@ -13,14 +13,23 @@ class GamificationManager() {
     // targeted = daily assignment based on problems and bad practices observed by analysing test artifacts
     // inclusive = daily assignment to cover functionalities not covered by test artifacts, given the DOM
     enum class DailyAssignmentMode {
-        random, targeted, inclusive
+        RANDOM, TARGETED, INCLUSIVE
     }
 
     companion object {
+
+        fun fromString(value: String?): DailyAssignmentMode {
+            return when (value?.uppercase()) {
+                "INCLUSIVE" -> DailyAssignmentMode.INCLUSIVE
+                "TARGETED" -> DailyAssignmentMode.TARGETED
+                else -> DailyAssignmentMode.RANDOM
+            }
+        }
+
         var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml" //TODO: path
         var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
         lateinit var userProfile: UserProfile //the current user
-        var mode: DailyAssignmentMode = DailyAssignmentMode.random //this flag is initially set to random and can be changed via GUI
+        var mode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),
@@ -45,6 +54,14 @@ class GamificationManager() {
             Title("Supreme Magus", 1000000)
         )
 
+
+        fun analyzeEvents(testOutcomes: List<TestOutcome>){
+            val checks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
+            for(testOutcome in testOutcomes)
+                checks.add(testOutcome)
+            updateProgresses(checks, userProfile)
+            //TODO: ragionare su casi in cui locators nuovi o vecchi sono vuoti (es. a seguito di remove) e su altri casi se serve (add method, remove method, ...)
+        }
 
         //called when a daily expires or is discarded, a user profile name is changed, or a propic is changed
         fun updateUserProfile(userProfile: UserProfile){
@@ -80,14 +97,16 @@ class GamificationManager() {
                 userProfile.nextXP = Int.MAX_VALUE
         }
 
-        fun analyzeEvents(testOutcomes: List<TestOutcome>){
-            val checks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
-            for(testOutcome in testOutcomes)
-                checks.add(testOutcome)
-            updateProgresses(checks, userProfile)
-            //TODO: ragionare su casi in cui locators nuovi o vecchi sono vuoti (es. a seguito di remove)
-            //e su altri casi se serve (add method, remove method, ...)
+        //this method is called either when
+        // 1. user choose TARGETED mode for daily assignments
+        // 2. a test file changes
+        // 3. the plugin is opened
+        fun assignTargetDailies(){
+            DailyManager.assignTargetDailies(userProfile)
         }
+
+
+
     }
 
 
@@ -120,8 +139,11 @@ class GamificationManager() {
             AchievementManager.setupAchievements(userProfile)
             xmlWriter.addNewUserProfileToXML(usersDataFile, userProfile)
         }
-        else
+        else {
             userProfile = tempUserProfile
+            if(mode == DailyAssignmentMode.TARGETED)
+                assignTargetDailies()
+        }
         GUIManager.updateGUI(userProfile, false)
     }
 

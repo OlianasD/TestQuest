@@ -1,6 +1,7 @@
 package utils
 
 import gamification.*
+import locator.Locator
 import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
@@ -24,6 +25,7 @@ class XMLReader {
                 completedAchievements = mutableListOf(),
                 propic = userProfileNode.getElementsByTagName("propic").item(0).textContent,
             )
+            GamificationManager.mode = GamificationManager.fromString(userProfileNode.getAttribute("mode"))
             loadAchievementProgresses(userProfile, userProfileNode)
             loadDailyProgresses(userProfile, userProfileNode)
             return userProfile
@@ -84,14 +86,36 @@ class XMLReader {
         val dailyNodes = dailiesNode.getElementsByTagName("daily")
         for (i in 0 until dailyNodes.length) {
             val dailyNode = dailyNodes.item(i) as Element
-            val dailyName = dailyNode.getElementsByTagName("name").item(0).textContent
+            val dailyName = dailyNode.getAttribute("name")
             val dailyDescription = DailyManager.getDescriptionFromName(dailyName)
             val dailyXP = DailyManager.getXPFromName(dailyName)
             val dailyTarget = DailyManager.getTargetFromName(dailyName)
             val dailyIcon = DailyManager.getIconFromName(dailyName)
-            val dailyProgress = dailyNode.getElementsByTagName("progress").item(0).textContent.toInt()
-            val dailyDiscarded = dailyNode.getElementsByTagName("discarded").item(0).textContent.toBoolean()
+            val dailyProgress = dailyNode.getAttribute("progress").toInt()
+            val dailyDiscarded = dailyNode.getAttribute("discarded").toBoolean()
             val modifiedLocs = mutableListOf<String>()
+            val dailyType = dailyNode.getAttribute("type")
+            val targetedLocators = mutableListOf<Locator>()//to manage locators associated with targeted dailies
+            if (dailyType == "targeted") {
+                val locatorsNode = dailyNode.getElementsByTagName("locators")
+                if (locatorsNode.length > 0) {
+                    val locatorNodes = (locatorsNode.item(0) as Element).getElementsByTagName("locator")
+                    for (j in 0 until locatorNodes.length) {
+                        val locatorNode = locatorNodes.item(j) as Element
+                        val locator = Locator(
+                            locatorType = locatorNode.getAttribute("locatorType"),
+                            locatorValue = locatorNode.getAttribute("locatorValue"),
+                            line = locatorNode.getAttribute("line").toInt(),
+                            methodName = locatorNode.getAttribute("methodName"),
+                            className = locatorNode.getAttribute("className"),
+                            locatorName = locatorNode.getAttribute("locatorName").takeIf { it.isNotEmpty() },
+                            locatorPosition = locatorNode.getAttribute("locatorPosition").toInt(),
+                            filePath = locatorNode.getAttribute("filePath")
+                        )
+                        targetedLocators.add(locator)
+                    }
+                }
+            }
             if(dailyName.equals("edit5")) {
                 val modifiedLocsNode = dailyNode.getElementsByTagName("modified-locs")
                 if (modifiedLocsNode.length > 0) {
@@ -102,10 +126,9 @@ class XMLReader {
                     }
                 }
             }
-            val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon)
+            val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon, dailyType, targetedLocators)
             val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyDiscarded, modifiedLocs)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }
     }
-
 }

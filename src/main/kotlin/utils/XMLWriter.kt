@@ -1,5 +1,6 @@
 package utils
 
+import gamification.GamificationManager
 import gamification.UserProfile
 import org.w3c.dom.Document
 import javax.xml.transform.TransformerFactory
@@ -30,16 +31,35 @@ class XMLWriter {
                 node.getElementsByTagName("currentXP").item(0).textContent = userProfile.currentXP.toString()
                 node.getElementsByTagName("title").item(0).textContent = userProfile.title
                 node.getElementsByTagName("propic").item(0).textContent = userProfile.propic
+                node.setAttribute("mode", GamificationManager.mode.name)
                 val dailiesNode = node.getElementsByTagName("dailies").item(0) as Element
                 //daily expiration time is saved
                 dailiesNode.setAttribute("timestamp", userProfile.timestamp.toString())
+                //usage mode (random, targeted, inclusive) is saved
                 //update dailies
                 dailiesNode.textContent = ""
                 userProfile.dailyProgresses.forEach { dailyProgress ->
                     val dailyNode = doc.createElement("daily")
-                    dailyNode.appendChild(createElementWithText(doc, "name", dailyProgress.daily.name))
-                    dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
-                    dailyNode.appendChild(createElementWithText(doc, "discarded", dailyProgress.discarded.toString()))
+                    dailyNode.setAttribute("name", dailyProgress.daily.name)
+                    dailyNode.setAttribute("progress", dailyProgress.progress.toString())
+                    dailyNode.setAttribute("discarded", dailyProgress.discarded.toString())
+                    dailyNode.setAttribute("type", dailyProgress.daily.type)
+                    if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
+                        val locatorsNode = doc.createElement("locators")
+                        dailyProgress.daily.targetedLocators.forEach { locator ->
+                            val locatorNode = doc.createElement("locator")
+                            locatorNode.setAttribute("locatorName", locator.locatorName ?: "")
+                            locatorNode.setAttribute("locatorType", locator.locatorType)
+                            locatorNode.setAttribute("locatorValue", locator.locatorValue)
+                            locatorNode.setAttribute("methodName", locator.methodName)
+                            locatorNode.setAttribute("className", locator.className)
+                            locatorNode.setAttribute("line", locator.line.toString())
+                            locatorNode.setAttribute("locatorPosition", locator.locatorPosition.toString())
+                            locatorNode.setAttribute("filePath", locator.filePath)
+                            locatorsNode.appendChild(locatorNode)
+                        }
+                        dailyNode.appendChild(locatorsNode)
+                    }
                     if (dailyProgress.daily.name == "edit5") {
                         val modifiedLocsNode = doc.createElement("modified-locs")
                         dailyProgress.modifiedLocs.forEach { loc ->
@@ -98,6 +118,7 @@ class XMLWriter {
         userProfileNode.appendChild(createElementWithText(doc, "nextXP", userProfile.nextXP.toString()))
         userProfileNode.appendChild(createElementWithText(doc, "title", userProfile.title))
         userProfileNode.appendChild(createElementWithText(doc, "propic", userProfile.propic))
+        userProfileNode.setAttribute("mode", GamificationManager.mode.name)
         // Create achievements element
         val achievementsNode = doc.createElement("achievements")
         val completedNode = doc.createElement("completed")
@@ -125,9 +146,27 @@ class XMLWriter {
         dailiesNode.setAttribute("timestamp", System.currentTimeMillis().toString())//timestamp needed for expiration in 24h
         userProfile.dailyProgresses.forEach { dailyProgress ->
             val dailyNode = doc.createElement("daily")
-            dailyNode.appendChild(createElementWithText(doc, "name", dailyProgress.daily.name))
-            dailyNode.appendChild(createElementWithText(doc, "progress", dailyProgress.progress.toString()))
-            dailyNode.appendChild(createElementWithText(doc, "discarded", dailyProgress.discarded.toString()))
+            dailyNode.setAttribute("name", dailyProgress.daily.name)
+            dailyNode.setAttribute("progress", dailyProgress.progress.toString())
+            dailyNode.setAttribute("discarded", dailyProgress.discarded.toString())
+            dailyNode.setAttribute("type", dailyProgress.daily.type)
+            //handle targeted dailies with associated locators
+            if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
+                val locatorsNode = doc.createElement("locators")
+                dailyProgress.daily.targetedLocators.forEach { locator ->
+                    val locatorNode = doc.createElement("locator")
+                    locatorNode.setAttribute("locatorName", locator.locatorName ?: "")
+                    locatorNode.setAttribute("locatorType", locator.locatorType)
+                    locatorNode.setAttribute("locatorValue", locator.locatorValue)
+                    locatorNode.setAttribute("methodName", locator.methodName)
+                    locatorNode.setAttribute("className", locator.className)
+                    locatorNode.setAttribute("line", locator.line.toString())
+                    locatorNode.setAttribute("locatorPosition", locator.locatorPosition.toString())
+                    locatorNode.setAttribute("filePath", locator.filePath)
+                    locatorsNode.appendChild(locatorNode)
+                }
+                dailyNode.appendChild(locatorsNode)
+            }
             if (dailyProgress.daily.name == "edit5") { //TODO: test on new user getting assigned this daily
                 val modifiedLocsNode = doc.createElement("modified-locs")
                 dailyProgress.modifiedLocs.forEach { loc ->
@@ -140,6 +179,23 @@ class XMLWriter {
             dailiesNode.appendChild(dailyNode)
         }
         userProfileNode.appendChild(dailiesNode)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // Append the new userProfile to the root element
         userProfilesNode.appendChild(userProfileNode)
         // Write the changes back to the XML file with formatted output

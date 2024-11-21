@@ -1,6 +1,6 @@
 package testquest
 
-import listener.locator.LocatorScoreListener
+import listener.locator.LocatorChangeListener
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
@@ -24,21 +24,21 @@ class TestQuestAction : AnAction() {
         val testFilePaths = TestFilesExtractor.findTestFilePaths(project)
         if (testFilePaths.isNotEmpty()) {
 
+            //extract locators
+            val extractor = LocatorsExtractor()
+            locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
+            locatorsOldDynamic = locatorsNewStatic //old dynamic = locators at the beginning or those after each run
+
             //setup gamification profile
             val gamificationManager = GamificationManager()
             gamificationManager.showGUI()
             PluginData.userProfileId = "001" //TODO: change as a login
             gamificationManager.setupUserProfile(PluginData.userProfileId)
 
-            //extract locators
-            val extractor = LocatorsExtractor()
-            locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
-            locatorsOldDynamic = locatorsNewStatic //old dynamic = locators at the beginning or those after each run
-
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
             val estimation = locEstimator.calculateOverallFragility(locatorsNewStatic)
-            LocatorScoreListener.registerListener(project)
+            LocatorChangeListener.registerListener(project)
             GUIManager.showOverallLocsFragilityScore(estimation)
         }
         else {

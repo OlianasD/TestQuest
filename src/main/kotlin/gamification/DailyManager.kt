@@ -2,6 +2,7 @@ package gamification
 
 import listener.test.TestOutcome
 import locator.Locator
+import locator.LocatorsAnalyzer
 import locator.LocatorsFragilityCalculator
 import ui.GUIManager
 
@@ -14,7 +15,7 @@ class DailyManager {
         private const val DAILIES_PER_USER: Int = 5
         private const val ROBUST_THRESHOLD = 0.5 //threshold used to determine whether a locator is robust
 
-        private val DAILY_NAMES = listOf(
+        private val RANDOM_DAILY_NAMES = listOf(
             "xpathAbs",
             "xpathLength",
             "xpathLevel",
@@ -40,242 +41,397 @@ class DailyManager {
             "newUnwantedAttr",
             "newJS",
             "newLowPredicates"
-            )
+        )
 
         //TODO: change icons, xp, target accordingly
-        private val ALL_DAILIES = mutableListOf(
+        private val ALL_RANDOM_DAILIES = mutableListOf(
             Daily(
-                DAILY_NAMES[0],
+                RANDOM_DAILY_NAMES[0],
                 "Replace $TARGET_DAILY existing absolute XPath locators with $TARGET_DAILY relative ones",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[1],
+                RANDOM_DAILY_NAMES[1],
                 "Reduce the length of $TARGET_DAILY existing XPath locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[2],
+                RANDOM_DAILY_NAMES[2],
                 "Reduce the level of $TARGET_DAILY existing XPath locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[3],
+                RANDOM_DAILY_NAMES[3],
                 "Convert $TARGET_DAILY existing non-XPath locators to $TARGET_DAILY XPath ones",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[4],
+                RANDOM_DAILY_NAMES[4],
                 "Convert $TARGET_DAILY existing non-ID locators to $TARGET_DAILY ID ones",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[5],
+                RANDOM_DAILY_NAMES[5],
                 "Run 20 locators successfully",
                 XP_DAILY,
                 20,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[6],
+                RANDOM_DAILY_NAMES[6],
                 "Improve the robustness of $TARGET_DAILY existing locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[7],
+                RANDOM_DAILY_NAMES[7],
                 "Shorten the length of $TARGET_DAILY existing locators below 10 characters",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[8],
+                RANDOM_DAILY_NAMES[8],
                 "Add $TARGET_DAILY references to @id, @name, @class, @title, @alt " +
                         "or @value attributes to existing XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[9],
+                RANDOM_DAILY_NAMES[9],
                 "Remove $TARGET_DAILY references to @src, @href, @height, or @width " +
                         "attributes from existing XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[10],
+                RANDOM_DAILY_NAMES[10],
                 "Remove $TARGET_DAILY references to Javascript code from existing XPaths locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[11],
+                RANDOM_DAILY_NAMES[11],
                 "Modify 5 different existing locators",
                 XP_DAILY,
                 5,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[12],
+                RANDOM_DAILY_NAMES[12],
                 "Lower the level of $TARGET_DAILY existing locators below 5 tags",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[13],
+                RANDOM_DAILY_NAMES[13],
                 "Repair $TARGET_DAILY existing broken locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[14],
+                RANDOM_DAILY_NAMES[14],
                 "Reduce the number of predicates from $TARGET_DAILY existing locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[15],
+                RANDOM_DAILY_NAMES[15],
                 "Implement $TARGET_DAILY new XPath locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[16],
+                RANDOM_DAILY_NAMES[16],
                 "Implement $TARGET_DAILY new ID locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[17],
+                RANDOM_DAILY_NAMES[17],
                 "Implement a newly locator value and use it more than once in a test suite",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[18],
+                RANDOM_DAILY_NAMES[18],
                 "Implement $TARGET_DAILY new XPath locators with length below 10 characters",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[19],
+                RANDOM_DAILY_NAMES[19],
                 "Implement $TARGET_DAILY new XPath locators with level below 5 tags",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[20],
+                RANDOM_DAILY_NAMES[20],
                 "Implement $TARGET_DAILY new robust locators",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[21],
+                RANDOM_DAILY_NAMES[21],
                 "Implement $TARGET_DAILY new XPath locators with references to @id, @name, @class, @title, @alt" +
                         "or @value attributes",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[22],
+                RANDOM_DAILY_NAMES[22],
                 "Implement $TARGET_DAILY new XPath locators with no references to @src, @href, @height, or @width" +
                         "attributes",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[23],
+                RANDOM_DAILY_NAMES[23],
                 "Implement $TARGET_DAILY new XPath locators with no references to Javascript code",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                DAILY_NAMES[24],
+                RANDOM_DAILY_NAMES[24],
                 "Implement $TARGET_DAILY new XPath locators with 3 or less predicates",
                 XP_DAILY,
                 TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+        )
+
+        private val DAILY_NAME_TO_DESCRIPTION = ALL_RANDOM_DAILIES.associate { it.name to it.description }
+        private val DAILY_NAME_TO_TARGET = ALL_RANDOM_DAILIES.associate { it.name to it.target }
+        private val DAILY_NAME_TO_ICON = ALL_RANDOM_DAILIES.associate { it.name to it.icon }
+        private val DAILY_NAME_TO_XP = ALL_RANDOM_DAILIES.associate { it.name to it.xp }
+
+        private val RANDOM_DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
+            RANDOM_DAILY_NAMES[0] to { testOutcomes -> checkAbsXPathRemoved(testOutcomes) },
+            RANDOM_DAILY_NAMES[1] to { testOutcomes -> checkXPathLengthReduced(testOutcomes) },
+            RANDOM_DAILY_NAMES[2] to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
+            RANDOM_DAILY_NAMES[3] to { testOutcomes -> checkLocs2XPathConverted(testOutcomes) },
+            RANDOM_DAILY_NAMES[4] to { testOutcomes -> checkLocs2IDConverted(testOutcomes) },
+            RANDOM_DAILY_NAMES[5] to { testOutcomes -> checkRunLoc20(testOutcomes) },
+            RANDOM_DAILY_NAMES[6] to { testOutcomes -> checkRobustnessImprovement(testOutcomes) },
+            RANDOM_DAILY_NAMES[7] to { testOutcomes -> checkShortenedLength10(testOutcomes) },
+            RANDOM_DAILY_NAMES[8] to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
+            RANDOM_DAILY_NAMES[9] to { testOutcomes -> checkUnwantedAttrsInXPaths(testOutcomes) },
+            RANDOM_DAILY_NAMES[10] to { testOutcomes -> checkJSInXPaths(testOutcomes) },
+            RANDOM_DAILY_NAMES[11] to { testOutcomes -> checkChangedLocs5(testOutcomes) },
+            RANDOM_DAILY_NAMES[12] to { testOutcomes -> checkLoweredLevel5(testOutcomes) },
+            RANDOM_DAILY_NAMES[13] to { testOutcomes -> checkRepair(testOutcomes) },
+            RANDOM_DAILY_NAMES[14] to { testOutcomes -> reducePredicates(testOutcomes) },
+            RANDOM_DAILY_NAMES[15] to { testOutcomes -> checkNewXPath(testOutcomes) },
+            RANDOM_DAILY_NAMES[16] to { testOutcomes -> checkNewID(testOutcomes) },
+            RANDOM_DAILY_NAMES[17] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
+            RANDOM_DAILY_NAMES[18] to { testOutcomes -> checkNewXPathLength10(testOutcomes) },
+            RANDOM_DAILY_NAMES[19] to { testOutcomes -> checkNewXPathLevel5(testOutcomes) },
+            RANDOM_DAILY_NAMES[20] to { testOutcomes -> checkNewRobust(testOutcomes) },
+            RANDOM_DAILY_NAMES[21] to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
+            RANDOM_DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
+            RANDOM_DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
+            RANDOM_DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithLessThan3Predicates(testOutcomes) },
+            )
+
+
+
+
+        /***********************************************************************************/
+
+        private val TARGETED_DAILY_NAMES = listOf(
+            "absolute", "length", "level", "posPredicate", "badPredicate", "noIDOrXPath", "broken"
+        )
+
+        private val ALL_TARGETED_DAILIES = mutableListOf(
+            Daily(
+                TARGETED_DAILY_NAMES[0],
+                "Turns the following absolute XPath locators into relative ones",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[1],
+                "Reduce the length of the following XPath locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[2],
+                "Reduce the levels of the following XPath locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[3],
+                "Remove/Replace the positional predicates from the following XPath locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[4],
+                "Remove/Replace the weak predicates from the following XPath locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[5],
+                "Replace the following non-ID/XPath locators into ID/XPath ones",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[6],
+                "Repair the following broken locators",
+                XP_DAILY,
+                TARGET_DAILY,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
         )
 
 
 
+        private val TARGETED_DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
+            TARGETED_DAILY_NAMES[0] to { testOutcomes -> checkTargetedAbsolute(testOutcomes) },
+            TARGETED_DAILY_NAMES[1] to { testOutcomes -> checkTargetedLength(testOutcomes) },
+            TARGETED_DAILY_NAMES[2] to { testOutcomes -> checkTargetedLevel(testOutcomes) },
+            TARGETED_DAILY_NAMES[3] to { testOutcomes -> checkTargetedPosPredicate(testOutcomes) },
+            TARGETED_DAILY_NAMES[4] to { testOutcomes -> checkTargetedBadPredicate(testOutcomes) },
+            TARGETED_DAILY_NAMES[5] to { testOutcomes -> checkTargetedNoIDNoXpath(testOutcomes) },
+            TARGETED_DAILY_NAMES[6] to { testOutcomes -> checkTargetedBroken(testOutcomes) }
+        )
 
-        private val DAILY_NAME_TO_DESCRIPTION = ALL_DAILIES.associate { it.name to it.description }
-        private val DAILY_NAME_TO_TARGET = ALL_DAILIES.associate { it.name to it.target }
-        private val DAILY_NAME_TO_ICON = ALL_DAILIES.associate { it.name to it.icon }
-        private val DAILY_NAME_TO_XP = ALL_DAILIES.associate { it.name to it.xp }
-
-        private val DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
-            DAILY_NAMES[0] to { testOutcomes -> checkAbsXPathRemoved(testOutcomes) },
-            DAILY_NAMES[1] to { testOutcomes -> checkXPathLengthReduced(testOutcomes) },
-            DAILY_NAMES[2] to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
-            DAILY_NAMES[3] to { testOutcomes -> checkLocs2XPathConverted(testOutcomes) },
-            DAILY_NAMES[4] to { testOutcomes -> checkLocs2IDConverted(testOutcomes) },
-            DAILY_NAMES[5] to { testOutcomes -> checkRunLoc20(testOutcomes) },
-            DAILY_NAMES[6] to { testOutcomes -> checkRobustnessImprovement(testOutcomes) },
-            DAILY_NAMES[7] to { testOutcomes -> checkShortenedLength10(testOutcomes) },
-            DAILY_NAMES[8] to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
-            DAILY_NAMES[9] to { testOutcomes -> checkUnwantedAttrsInXPaths(testOutcomes) },
-            DAILY_NAMES[10] to { testOutcomes -> checkJSInXPaths(testOutcomes) },
-            DAILY_NAMES[11] to { testOutcomes -> checkChangedLocs5(testOutcomes) },
-            DAILY_NAMES[12] to { testOutcomes -> checkLoweredLevel5(testOutcomes) },
-            DAILY_NAMES[13] to { testOutcomes -> checkRepair(testOutcomes) },
-            DAILY_NAMES[14] to { testOutcomes -> reducePredicates(testOutcomes) },
-            DAILY_NAMES[15] to { testOutcomes -> checkNewXPath(testOutcomes) },
-            DAILY_NAMES[16] to { testOutcomes -> checkNewID(testOutcomes) },
-            DAILY_NAMES[17] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
-            DAILY_NAMES[18] to { testOutcomes -> checkNewXPathLength10(testOutcomes) },
-            DAILY_NAMES[19] to { testOutcomes -> checkNewXPathLevel5(testOutcomes) },
-            DAILY_NAMES[20] to { testOutcomes -> checkNewRobust(testOutcomes) },
-            DAILY_NAMES[21] to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
-            DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
-            DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
-            DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithLessThan3Predicates(testOutcomes) },
-            )
+        private fun checkTargetedAbsolute(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
+        private fun checkTargetedLength(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
+        private fun checkTargetedLevel(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
+        private fun checkTargetedPosPredicate(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
+        private fun checkTargetedBadPredicate(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
+        private fun checkTargetedNoIDNoXpath(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
+        private fun checkTargetedBroken(testOutcomes: List<TestOutcome>): Int {
+            return 0
+        }
 
 
 
 
 
-        //dailies are assigned to user
+
+
+        //dailies are assigned to user. initially, the usage mode is RANDOM so random dailies are assigned for setup
         fun setupDailies(userProfile: UserProfile) {
             val dailies: List<Daily>
-            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
-                dailies = ALL_DAILIES.shuffled().take(DAILIES_PER_USER)
-            else if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.targeted)
-                dailies = emptyList() //TODO: implement targeted assignment (i.e., assign daily based on observed issues)
-            else
-                dailies = emptyList() //TODO: implement inclusive assignment (i.e., assign daily based on uncovered functionalities)
+            dailies = ALL_RANDOM_DAILIES.shuffled().take(DAILIES_PER_USER)
             userProfile.assignDailies(dailies)
         }
+
+
+
+        fun assignTargetDailies(userProfile: UserProfile) {
+            val locAnalyzer = LocatorsAnalyzer()
+            val analysisMap = locAnalyzer.findTargetedProblems()
+            val currentTargetDailies = ALL_TARGETED_DAILIES.mapNotNull { daily ->
+                val locatorsForDaily = analysisMap[daily.name] ?: emptyList()
+                if (locatorsForDaily.isNotEmpty()) {
+                    Daily(
+                        name = daily.name,
+                        description = daily.description,
+                        xp = daily.xp,
+                        target = daily.target,
+                        icon = daily.icon,
+                        type = daily.type,
+                        targetedLocators = locatorsForDaily
+                    )
+                } else {
+                    null
+                }
+            }
+            //remove all old targeted dailies as they will be updated by new check
+            userProfile.dailyProgresses.removeAll { dailyProgress ->
+                dailyProgress.daily.type.equals("targeted", ignoreCase = true)
+            }
+            userProfile.assignDailies(currentTargetDailies)
+            GUIManager.updateGUI(userProfile, false)
+        }
+
+
+
+
+
 
         fun reassignDailiesFromExpire(userProfile: UserProfile){
             userProfile.dailyProgresses.clear()
@@ -287,14 +443,14 @@ class DailyManager {
 
         fun reassignDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
             //find all dailies but the one that is going to be discarded
-            val availableDailies = ALL_DAILIES.filter { d ->
+            val availableDailies = ALL_RANDOM_DAILIES.filter { d ->
                 userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
             }
             //new daily is selected with discarded set to true (only 1 discard within 24h is possible)
             val newDaily: Daily
-            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.random)
+            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM)
                 newDaily = availableDailies.shuffled().first()
-            else if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.targeted)
+            else if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED)
                 newDaily = availableDailies.last() //TODO: implement targeted assignment (i.e., assign daily based on observed issues)
             else
                 newDaily = availableDailies.last()//TODO: implement inclusive assignment (i.e., assign daily based on uncovered functionalities)
@@ -329,8 +485,8 @@ class DailyManager {
             var anyUpdate = false
             val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
             copyOfDailyProgresses.forEach { dp ->
-                ALL_DAILIES.find { it.name == dp.daily.name }?.let {
-                    val progress = DAILY_CHECKS[it.name]?.invoke(testOutcomes)
+                ALL_RANDOM_DAILIES.find { it.name == dp.daily.name }?.let {
+                    val progress = RANDOM_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
                     if (progress!! > 0) {
                         update(userProfile, it, progress)
                         anyUpdate = true

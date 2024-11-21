@@ -35,7 +35,8 @@ class PageObjectDailyManager {
                 "Create a Page Object",
                 DailyManager.XP_DAILY,
                 DailyManager.TARGET_DAILY,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png"
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             )
 
