@@ -30,6 +30,20 @@ class GamificationManager() {
         var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
         lateinit var userProfile: UserProfile //the current user
         var mode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
+        //PROPERTIES USED TO DETERMINE GOOD/BAD LOCATORS
+        const val MAX_LENGTH = 50
+        const val MAX_LEVEL = 5
+        const val MAX_POS_PRED = 3
+        val GOOD_PREDS = setOf(
+            "@id", "@name", "@class", "@title", "@alt", "@value")
+        val BAD_PREDS = setOf(
+            "src", "href", "height", "width")
+        val BAD_JS = setOf("onclick", "onload",
+            "onmouseover", "onmouseout", "onchange", "onsubmit",
+            "onfocus", "onkeydown")
+        const val ROBUST_THRESHOLD = 0.5 //threshold used to determine whether a locator is robust
+
+
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),
@@ -71,8 +85,9 @@ class GamificationManager() {
 
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
             val dailyUpdates = DailyManager.updateDailies(userProfile, testOutcomes)//check for each assigned daily
-            val achUpdates = AchievementManager.updateAchievements(userProfile, testOutcomes)
-            if(dailyUpdates || achUpdates) {
+            //val achUpdates = AchievementManager.updateAchievements(userProfile, testOutcomes)
+            //if(dailyUpdates || achUpdates) {
+            if(dailyUpdates) {
                 val xmlWriter = XMLWriter()
                 updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
@@ -105,16 +120,7 @@ class GamificationManager() {
             DailyManager.assignTargetDailies(userProfile)
         }
 
-
-
     }
-
-
-
-
-
-
-
 
 
     //upload user profile data from file if they exist or create a new user profile if they do not

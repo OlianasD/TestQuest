@@ -1,5 +1,6 @@
 package locator
 
+import gamification.GamificationManager
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -65,15 +66,13 @@ class LocatorsFragilityCalculator {
     //weights and factors affecting the robustness are: length, presence of numbers which may change
     private fun calculateLinkTextRobustness(value: String): Double {
         val lengthWeight = 1.0
-        val maxLength = 50
-        val lengthFactor = value.length.toDouble() / maxLength
+        val lengthFactor = value.length.toDouble() / GamificationManager.MAX_LENGTH
         val dateNumWeight = 1.0
         val numbersInText = value.count { it.isDigit() }
         val numberFactor = numbersInText * 0.2
         val totalScore = (lengthWeight * lengthFactor) + (dateNumWeight * numberFactor)
         return totalScore / (lengthWeight + dateNumWeight)
     }
-
 
     private fun calculateCssFragility(cssSelector: String): Double {
         val isSpecific = cssSelector.contains("#")
@@ -117,20 +116,16 @@ class LocatorsFragilityCalculator {
         val levels = xpath.count { it == '/' }
         val predicates = xpath.count { it == '[' }
         val length = xpath.length
-        val strongPredicates = listOf("@id", "@name", "@class", "@title", "@alt", "@value")
-        val fragilePredicates = listOf(
-            "@src", "@href", "@height", "@width",
-            "onclick", "onload", "onmouseover", "onmouseout", "onchange", "onsubmit", "onfocus", "onkeydown"
-        )
-        val goodPredicatesCount = strongPredicates.sumOf { xpath.split(it).size - 1 }
-        val badPredicatesCount = fragilePredicates.sumOf { xpath.split(it).size - 1 }
+        val goodPredicatesCount = GamificationManager.GOOD_PREDS.sumOf { xpath.split(it).size - 1 }
+        val badPredicatesCount = (GamificationManager.BAD_PREDS + GamificationManager.BAD_JS)
+            .sumOf { attribute -> xpath.split("@$attribute").size - 1 }
         val absoluteWeight = 1.0
         val absoluteFactor = if (isAbsolute) 5.0 else 0.1
         val levelsWeight = 2.0
-        val maxLevels = 5
+        val maxLevels = GamificationManager.MAX_LEVEL
         val levelsFactor = (levels / maxLevels.toDouble())
         val predicatesWeight = 2.5
-        val maxPredicates = 3
+        val maxPredicates = GamificationManager.MAX_POS_PRED
         val predicatesFactor = (predicates / maxPredicates.toDouble())
         val goodPredicatesWeight = 1.0
         val goodPredicatesFactor = goodPredicatesCount * -0.2
@@ -138,7 +133,7 @@ class LocatorsFragilityCalculator {
         val maxBadPredicates = 1
         val badPredicatesFactor = (badPredicatesCount / maxBadPredicates.toDouble())
         val lengthWeight = 2.0
-        val maxLength = 50
+        val maxLength = GamificationManager.MAX_LENGTH
         val lengthFactor = (length / maxLength.toDouble())
         val totalScore = (absoluteWeight * absoluteFactor) +
                 (levelsWeight * levelsFactor) +
