@@ -39,25 +39,32 @@ class LocatorChangeListener private constructor() : EditorFactoryListener, Dispo
         //this to save only test-related listeners
         if (!isRegistered) {
             EditorFactory.getInstance().allEditors.forEach { editor ->
-                if (!tooltipListeners.containsKey(editor)) {
-                    manageChanges(editor)
-                }
+                if (!tooltipListeners.containsKey(editor))
+                    registerMouseListener(editor)
             }
             EditorFactory.getInstance().addEditorFactoryListener(this, this)
+            manageChanges()
             isRegistered = true
         }
     }
 
-    private fun manageChanges(editor: Editor) {
-        //check if listener is about test file
-        val virtualFile = FileDocumentManager.getInstance().getFile(editor.document)
-        if (virtualFile == null || !isTestFile(virtualFile.path))
+
+    private fun registerMouseListener(testFile: Editor) {
+        val virtualFile = FileDocumentManager.getInstance().getFile(testFile.document)
+        if (virtualFile == null || !isTestFile(virtualFile.path) || tooltipListeners.containsKey(testFile)) {
             return
-        //instantiate mouse listener, then retrieve static changes and evaluate fragility score
+        }
+        //compute locators score to associate with mouse tooltip for each test file
         val locatorScores = loadLocatorScores()
-        val listener = LocatorTooltipListener(editor, locatorScores)
-        tooltipListeners[editor] = listener
-        editor.contentComponent.addMouseMotionListener(listener)
+        val listener = LocatorTooltipListener(testFile, locatorScores)
+        tooltipListeners[testFile] = listener
+        testFile.contentComponent.addMouseMotionListener(listener)
+    }
+
+
+
+    private fun manageChanges() {
+        //extract new locs, update scores, and update target dailies on changes over test files
         VirtualFileManager.getInstance().addVirtualFileListener(object : VirtualFileListener {
             override fun contentsChanged(event: VirtualFileEvent) {
                 val filePath = event.file.path
@@ -67,14 +74,24 @@ class LocatorChangeListener private constructor() : EditorFactoryListener, Dispo
                     TestQuestAction.locatorsOldStatic = TestQuestAction.locatorsNewStatic
                     TestQuestAction.locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
                     val updatedScores = loadLocatorScores()
-                    listener.updateLocatorScores(updatedScores)
-                    //in case changes occurred in test file, updates targeted dailies as well
-                    if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED)
+                    tooltipListeners.values.forEach { listener ->
+                        listener.updateLocatorScores(updatedScores)
+                    }
+                    if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
                         GamificationManager.assignTargetDailies()
+                    }
                 }
             }
         }, this)
     }
+
+
+
+
+
+
+
+
 
     private fun isTestFile(filePath: String): Boolean {
         return filePath.endsWith(".java") || filePath.endsWith(".kt")

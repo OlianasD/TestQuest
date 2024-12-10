@@ -56,12 +56,13 @@ class TestExecutionListener : SMTRunnerEventsListener {
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
         testOutcomes.clear() //TODO: currently, it resets the testOutcomes at the beginning of each new run
         try {
-            //locs static i.e., any change to code before test execution
-            //locs dynamic i.e., those used to check progression following actual execution
-            //old = those retrieved at plugin start and just after each test run (any change following is new)
-            //new = those just before each test run (to collect any possible change on code)
-            if (TestQuestAction.locatorsNewDynamic.isNotEmpty())
-                TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsNewDynamic
+            //old static = previous code change
+            //new static = latest code change
+            //old dynamic = previous code change BEFORE test execution (used to check dailies)
+            //new dynamic = latest code change BEFORE test execution (used to check dailies)
+            //if (TestQuestAction.locatorsNewDynamic.isNotEmpty())
+            //    TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsNewDynamic
+            TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
             TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic //retrieve locators at the start of testing
             server = Server()
             server.start()

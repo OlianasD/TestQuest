@@ -33,8 +33,8 @@ class PageObjectDailyManager {
             Daily(
                 DAILY_NAMES[0],
                 "Create a Page Object",
-                DailyManager.XP_DAILY,
-                DailyManager.TARGET_DAILY,
+                DailyManager.RANDOM_DAILY_XP,
+                DailyManager.DAILY_GOAL,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),

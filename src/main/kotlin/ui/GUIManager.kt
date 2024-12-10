@@ -20,6 +20,8 @@ import locator.Locator
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.io.File
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -35,8 +37,8 @@ import javax.swing.table.TableCellRenderer
 
 object GUIManager {
 
-    private var textArea: JTextArea? = null
-    //private var changed: Boolean = false
+    private var TestQuestWindow: JTextArea? = null // window to show main gamification aspects
+    private var LocsScoreWindow: JFrame? = null // window to show locator scores
 
     //to show immediate user progressions via popup
     private fun showPopup(message: String) {
@@ -371,11 +373,11 @@ object GUIManager {
             mainPanel.add(dailyAssignmentModePanel, gbc)
 
             // Refresh GUI & send notification in case of changes
-            textArea?.removeAll()
-            textArea?.layout = BorderLayout()
-            textArea?.add(mainPanel, BorderLayout.CENTER)
-            textArea?.revalidate()
-            textArea?.repaint()
+            TestQuestWindow?.removeAll()
+            TestQuestWindow?.layout = BorderLayout()
+            TestQuestWindow?.add(mainPanel, BorderLayout.CENTER)
+            TestQuestWindow?.revalidate()
+            TestQuestWindow?.repaint()
             mainPanel.revalidate()
             mainPanel.repaint()
             if (notifyChange)
@@ -384,20 +386,35 @@ object GUIManager {
     }
 
 
-    //main panel
+    //main panel creation
     fun showGUI() {
-        val frame = JFrame("Test Quest - A quest to improve locators robustness")
-        frame.defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
-        frame.layout = BorderLayout()
-        textArea = JTextArea()
-        textArea!!.isEditable = false
-        val scrollPane = JScrollPane(textArea)
-        frame.add(scrollPane, BorderLayout.CENTER)
-        frame.isResizable = false
-        frame.setSize(1000, 800)
-        frame.setLocationRelativeTo(null)
-        frame.isVisible = true
+        val frame = JFrame("Test Quest - A quest to improve locators robustness").apply {
+            defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+            layout = BorderLayout()
+            TestQuestWindow = JTextArea().apply { isEditable = false }
+            add(JScrollPane(TestQuestWindow), BorderLayout.CENTER)
+            isResizable = false
+            setSize(1000, 800)
+            setLocationRelativeTo(null)
+            isVisible = true
+        }
+        //hide the window about locators score once Test Quest is closed, and show it again once reopened
+        frame.addWindowListener(object : WindowAdapter() {
+            override fun windowOpened(e: WindowEvent?) {
+                LocsScoreWindow?.isVisible = true
+            }
+            override fun windowClosing(e: WindowEvent?) {
+                LocsScoreWindow?.isVisible = false
+            }
+        })
     }
+
+
+
+
+
+
+
 
     private fun populateDailiesPanel(dailiesPanel: JPanel, userProfile: UserProfile, font: Font) {
         // Clear the panel before repopulating
@@ -415,7 +432,7 @@ object GUIManager {
                 if (!dailyProgress.discarded && type.equals("random", ignoreCase = true)) {
                     val removeButton = JButton("Discard")
                     removeButton.addActionListener {
-                        val newDailyProgress = DailyManager.reassignDailyFromDiscard(userProfile, dailyProgress.daily)
+                        val newDailyProgress = DailyManager.reassignRandomDailyFromDiscard(userProfile, dailyProgress.daily)
                         dailyPanel.remove(removeButton)  // Remove discard button as only 1 discard is allowed
                         showDailyDetails(dailyPanel, newDailyProgress, font)  // Update panel with newly assigned daily info
                         dailiesPanel.revalidate()
@@ -433,27 +450,52 @@ object GUIManager {
 
 
 
+
+
+
+
+
+
+
+
     private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font) {
-        dailyPanel.removeAll()//remove old elems
-        //create daily label
-        val dailyLabel = JLabel(dailyProgress.daily.description).apply {
-            this.font = font
-            foreground = JBColor.BLACK
-            toolTipText = "Progress: ${dailyProgress.progress}"
-        }
-        dailyPanel.add(dailyLabel)
-        //add locs details for targeted dailies
-        if (dailyProgress.daily.type.equals("targeted", ignoreCase = true) && dailyProgress.daily.targetedLocators.isNotEmpty()) {
-            val locatorsPanel = JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        dailyPanel.removeAll() //remove old elements
+
+        //create daily label on mouse over for random dailies
+        if (dailyProgress.daily.type.equals("random", ignoreCase = true)) {
+            val progressPerc = (dailyProgress.progress / dailyProgress.daily.target!!) * 100
+            val dailyMessage = "Progress: ${progressPerc}%"
+            val dailyLabel = JLabel(dailyProgress.daily.description).apply {
+                this.font = font
+                foreground = JBColor.BLACK
+                toolTipText = dailyMessage
             }
-            val smallFont = font.deriveFont((font.size * 0.8f).coerceAtLeast(8f))
-            var detailsVisible = false
-            //button to hide/show locs details
-            val toggleButton = JButton("Show").apply {
-                addActionListener {
-                    detailsVisible = !detailsVisible
-                    if (detailsVisible) {
+            dailyPanel.add(dailyLabel)
+        }
+        //create daily label on mouse over and locs details for targeted dailies
+        else if (dailyProgress.daily.type.equals("targeted", ignoreCase = true)) {
+            //if no locators are associated, skip
+            if (dailyProgress.daily.targetedLocators.isEmpty())
+                return
+            val dailyMessage = "${dailyProgress.daily.xp} XP for each listed issue fixed"
+            val dailyLabel = JLabel(dailyProgress.daily.description).apply {
+                this.font = font
+                foreground = JBColor.BLACK
+                toolTipText = dailyMessage
+            }
+            dailyPanel.add(dailyLabel)
+            //else, add locators details for targeted dailies with show/hide buttons opening a dedicated window
+            var detailsFrame: JFrame? = null
+            val toggleButton = JButton("Show")
+            toggleButton.addActionListener {
+                if (detailsFrame == null || !detailsFrame!!.isVisible) {
+                    detailsFrame = JFrame(dailyProgress.daily.description).apply {
+                        defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+                        layout = BorderLayout()
+                        val locatorsPanel = JPanel().apply {
+                            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                        }
+                        val smallFont = font.deriveFont((font.size * 0.8f).coerceAtLeast(8f))
                         dailyProgress.daily.targetedLocators.forEach { locator ->
                             val locatorInfo = "${locator.locatorName ?: "N/A"} " +
                                     "[${locator.className}.${locator.methodName}, ${locator.line}]"
@@ -463,27 +505,46 @@ object GUIManager {
                             }
                             locatorsPanel.add(locatorLabel)
                         }
-                        text = "Hide"
-                    } else {
-                        locatorsPanel.removeAll()
-                        text = "Show"
+                        val scrollPane = JScrollPane(locatorsPanel).apply {
+                            preferredSize = Dimension(300, 150)
+                            verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+                            horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+                        }
+                        add(scrollPane, BorderLayout.CENTER)
+                        pack()
+                        setLocationRelativeTo(dailyPanel)
+                        isVisible = true
+                        //update button text if window is closed
+                        addWindowListener(object : java.awt.event.WindowAdapter() {
+                            override fun windowClosing(e: WindowEvent) {
+                                toggleButton.text = "Show"
+                                detailsFrame = null
+                            }
+                        })
                     }
-                    locatorsPanel.revalidate()
-                    locatorsPanel.repaint()
+                    toggleButton.text = "Hide"
+                } else {
+                    detailsFrame?.dispose()
+                    detailsFrame = null
+                    toggleButton.text = "Show"
                 }
             }
-            //make scroll panel for locs
-            val scrollPane = JScrollPane(locatorsPanel).apply {
-                preferredSize = Dimension(300, 100)
-                verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
-                horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-            }
             dailyPanel.add(toggleButton)
-            dailyPanel.add(scrollPane)
         }
         dailyPanel.revalidate()
         dailyPanel.repaint()
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -565,11 +626,10 @@ object GUIManager {
 
 
 
-    // to show single locator score
-    private var locScoresframe: JFrame? = null
+
     fun showLocatorScores(project: Project, locatorScores: Map<Locator, Double>) {
-        locScoresframe?.dispose()//to close any already open window
-        locScoresframe = JFrame("Locator Details Panel").apply {
+        LocsScoreWindow?.dispose()//to close any already open window
+        LocsScoreWindow = JFrame("Locator Details Panel").apply {
             defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE //avoid to close this window
             setSize(800, 400)
             setLocationRelativeTo(null)
@@ -620,12 +680,12 @@ object GUIManager {
                 }
             }
         })
-        locScoresframe!!.add(JScrollPane(table), BorderLayout.CENTER)
+        LocsScoreWindow!!.add(JScrollPane(table), BorderLayout.CENTER)
         /*val closeButton = JButton("Close").apply {
             addActionListener { locScoresframe!!.dispose() }
         }
         locScoresframe!!.add(closeButton, BorderLayout.SOUTH)*/
-        locScoresframe!!.isVisible = true
+        LocsScoreWindow!!.isVisible = true
     }
 
     private fun getScoreColor(score: Double): Color {

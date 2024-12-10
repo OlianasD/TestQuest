@@ -31,25 +31,25 @@ class TestStructureDailyManager {
         private val ALL_DAILIES = mutableListOf(
             Daily(
                 DAILY_NAMES[0],
-                "Run ${DailyManager.TARGET_DAILY} test cases successfully",
-                DailyManager.XP_DAILY,
-                DailyManager.TARGET_DAILY,
+                "Run ${DailyManager.DAILY_GOAL} test cases successfully",
+                DailyManager.RANDOM_DAILY_XP,
+                DailyManager.DAILY_GOAL,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
                 DAILY_NAMES[1],
                 "Run a test suite successfully",
-                DailyManager.XP_DAILY,
-                DailyManager.TARGET_DAILY,
+                DailyManager.RANDOM_DAILY_XP,
+                DailyManager.DAILY_GOAL,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
                 DAILY_NAMES[3],
                 "Add an assert to a test case",
-                DailyManager.XP_DAILY,
-                DailyManager.TARGET_DAILY,
+                DailyManager.RANDOM_DAILY_XP,
+                DailyManager.DAILY_GOAL,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
@@ -57,8 +57,8 @@ class TestStructureDailyManager {
             Daily(
                 DAILY_NAMES[3],
                 "Refactor a long test into two tests",
-                DailyManager.XP_DAILY,
-                DailyManager.TARGET_DAILY,
+                DailyManager.RANDOM_DAILY_XP,
+                DailyManager.DAILY_GOAL,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),

@@ -16,14 +16,16 @@ class LocatorsAnalyzer {
 
 
     fun findTargetedProblems(): MutableMap<String, List<Locator>> {
-        analysisMap.clear()
+        //analysisMap.clear()
+        analysisMap.keys.retainAll(listOf("broken"))
         calculateAbsoluteLocators()
         calculateLongLocators()
         calculateDeepLocators()
         calculatePositionalPredicateLocators()
         calculateBadPredicateLocators()
         calculateNonIDOrXPathLocators()
-        calculateBrokenLocators()
+        if(!analysisMap.containsKey("broken"))//this to check whether a map already exists (if so, it is not reset)
+            calculateBrokenLocators()
         return analysisMap
     }
 

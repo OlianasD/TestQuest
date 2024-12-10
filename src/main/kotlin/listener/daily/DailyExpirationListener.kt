@@ -55,7 +55,7 @@ class DailyExpirationListener {
         val diffTime = currentTime - dailyTS
         //if dailies are expired, remove them and assign new ones, then updates the GUI
         if (diffTime > twentyFourHoursInMillis) {
-            DailyManager.reassignDailiesFromExpire(tempUserProfile)
+            DailyManager.reassignRandomDailiesFromExpire(tempUserProfile)
             GamificationManager.userProfile = tempUserProfile
             waitTime = twentyFourHoursInMillis.toLong() //set next time to check TODO: test when dailies expire
         } else {

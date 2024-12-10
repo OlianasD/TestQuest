@@ -91,7 +91,8 @@ class GamificationManager() {
                 val xmlWriter = XMLWriter()
                 updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
-                GUIManager.updateGUI(userProfile, true)
+                DailyManager.assignTargetedDailies(userProfile) //this to update in case of broken locators and to update GUI
+                //GUIManager.updateGUI(userProfile, true)
             }
             else
                 GUIManager.updateGUI(userProfile, false)
@@ -117,7 +118,7 @@ class GamificationManager() {
         // 2. a test file changes
         // 3. the plugin is opened
         fun assignTargetDailies(){
-            DailyManager.assignTargetDailies(userProfile)
+            DailyManager.assignTargetedDailies(userProfile)
         }
 
     }
@@ -141,7 +142,7 @@ class GamificationManager() {
                 completedAchievements = mutableListOf(),
                 propic = unknownUserPic
             )
-            DailyManager.setupDailies(userProfile)
+            DailyManager.setupRandomDailies(userProfile)
             AchievementManager.setupAchievements(userProfile)
             xmlWriter.addNewUserProfileToXML(usersDataFile, userProfile)
         }
