@@ -404,7 +404,7 @@ class DailyManager {
             }
             userProfile.timestamp = System.currentTimeMillis()//this to assign a new expiration time for new dailies
             setupRandomDailies(userProfile)//note that even the same expired dailies could be reassigned
-            GUIManager.updateGUI(userProfile, notifyChange = false)
+            GUIManager.updateGUI(userProfile, false)
             GamificationManager.updateUserProfile(userProfile)
         }
 
@@ -442,8 +442,9 @@ class DailyManager {
             return DAILY_NAME_TO_XP[name] ?: 0
         }
 
-        fun updateDailies(userProfile: UserProfile, testOutcomes: List<TestOutcome>): Boolean {
-            var anyUpdate = false
+        fun updateDailies(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>>? {
+            val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
+
             //find the dailies to update according to gaming mode
             val dailiesToUpdate = when (GamificationManager.mode) {
                 GamificationManager.DailyAssignmentMode.RANDOM -> ALL_RANDOM_DAILIES
@@ -460,31 +461,39 @@ class DailyManager {
                         GamificationManager.DailyAssignmentMode.INCLUSIVE -> TODO()
                     }
                     if (progress!! > 0) {
-                        update(userProfile, it, progress)
-                        anyUpdate = true
+                        val updateResult = update(userProfile, it, progress)
+                        progresses.add(updateResult)
                     }
                 }
             }
-            return anyUpdate //this to keep track of any changes and update the GUI
+            return progresses //this to keep track of any changes and update the GUI
         }
 
-        private fun update(userProfile: UserProfile, daily: Daily, progress: Int) {
+        private fun update(userProfile: UserProfile, daily: Daily, progress: Int): Pair<Int, Daily?> {
             //TODO: check user profile wrt xml
+            var gainedXP = 0 //to track the gained xp
+            var involvedDaily: Daily? = null //to track the involved daily
+
             if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM) {
                 val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
                 dailyProgress?.let { dp ->
                     dp.progress += progress
                     if (dp.progress >= dp.daily.target!!) { // if the daily has been completed, assign xp and remove it from list
-                        userProfile.currentXP += dp.daily.xp
+                        gainedXP = dp.daily.xp
+                        involvedDaily = dp.daily
+                        userProfile.currentXP += gainedXP
                         userProfile.dailyProgresses.removeIf { it.daily.name == dp.daily.name }
                     }
                 }
             }
             //since targeted dailies might involve a large number of locators, the xp is given for each (counted by progress)
             else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
-                userProfile.currentXP += daily.xp * progress
+                gainedXP = daily.xp * progress
+                involvedDaily = daily
+                userProfile.currentXP += gainedXP
             }
             //TODO: INCLUSIVE
+            return Pair(gainedXP, involvedDaily)
         }
 
 

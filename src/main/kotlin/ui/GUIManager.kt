@@ -39,30 +39,37 @@ object GUIManager {
 
     private var TestQuestWindow: JTextArea? = null // window to show main gamification aspects
     private var LocsScoreWindow: JFrame? = null // window to show locator scores
+    private var currentPopup: JDialog? = null // window to show user changes (e.g., progression, daily mode change)
+
 
     //to show immediate user progressions via popup
     private fun showPopup(message: String) {
-        val pane = JPanel().apply {
-            layout = BorderLayout()
-            background = Color(0, 0, 0, 180)
+        SwingUtilities.invokeLater {
+            currentPopup?.dispose() //if an active popup is present, hide it
+            val pane = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                background = JBColor(Gray._0, Color(0, 0, 0, 180))
+            }
+            val label = JLabel("<html><div style='padding: 10px; color: white; font-size: 16px;'>$message</div></html>").apply {
+                horizontalAlignment = SwingConstants.CENTER
+            }
+            pane.add(label)
+            val dialog = JDialog().apply {
+                title = ""
+                isUndecorated = true
+                isModal = false
+                contentPane.add(pane)
+                pack()
+                val screenSize = Toolkit.getDefaultToolkit().screenSize
+                setLocation(screenSize.width - width - 20, screenSize.height - height - 100)
+                isVisible = true
+            }
+            currentPopup = dialog //save current popup reference
+            //the popup disposes in 10 secs
+            Timer(10000) {
+                dialog.dispose()
+            }.start()
         }
-        val label = JLabel("<html><div style='padding: 10px; color: white; font-size: 16px;'>$message</div></html>").apply {
-            horizontalAlignment = SwingConstants.CENTER
-        }
-        pane.add(label, BorderLayout.CENTER)
-        val dialog = JDialog().apply {
-            title = ""
-            isUndecorated = true
-            isModal = false
-            contentPane.add(pane)
-            setSize(300, 100)
-            val screenSize = Toolkit.getDefaultToolkit().screenSize
-            setLocation(screenSize.width - width - 20, screenSize.height - height - 100)  // Più in alto sull'asse Y
-            isVisible = true
-        }
-        Timer(5000) {
-            dialog.dispose()
-        }.start()
     }
 
 
@@ -71,8 +78,9 @@ object GUIManager {
 
 
 
+
     //to update the gui based on user progression
-    fun updateGUI(userProfile: UserProfile, notifyChange: Boolean) {
+    fun updateGUI(userProfile: UserProfile, notifyChange: Boolean, msg: String = "") {
         SwingUtilities.invokeLater {
             // Main panel
             val mainPanel = JPanel(GridBagLayout())
@@ -191,9 +199,7 @@ object GUIManager {
                     imageBox.add(imageLabel)
                     imageBox.revalidate()
                     imageBox.repaint()
-                    //if (notifyChange) {
-                    showPopup("Image updated")
-                    //}
+                    showPopup("Profile picture updated")
                 }
             }
             gbcInner.gridx = 2
@@ -380,8 +386,10 @@ object GUIManager {
             TestQuestWindow?.repaint()
             mainPanel.revalidate()
             mainPanel.repaint()
-            if (notifyChange)
-                showPopup("New Level: ${userProfile.level}\nNew Title: ${userProfile.title}\nNew XP: ${userProfile.currentXP}")
+            if (notifyChange) {
+                val formattedMsg = "<html>${msg.replace("\n", "<br>")}</html>"
+                showPopup(formattedMsg)
+            }
         }
     }
 
@@ -549,15 +557,7 @@ object GUIManager {
 
 
 
-
-
-
-
-
-
-    /*SECTION MANAGING LOCATORS SCORE VISUALIZATION*/
-
-
+    /** SECTION MANAGING LOCATORS SCORE VISUALIZATION **/
 
 
     //to shows the global locators fragility score in a window
@@ -577,7 +577,7 @@ object GUIManager {
         // Description label
         val note = JLabel("<html><div style='padding: 5px; font-size:11px; color:#FFFFFF;'>"
                 + "The fragility score indicates the likelihood of locators breaking due to software changes. " +
-                "Lower scores are better.</div></html>")
+                "Lower scores are preferable.</div></html>")
         note.horizontalAlignment = SwingConstants.CENTER
 
         // Border
@@ -589,7 +589,7 @@ object GUIManager {
         window.add(panel)
 
         // Panel size and position
-        window.setSize(350, 120)
+        window.setSize(370, 120)
         val screenSize = Toolkit.getDefaultToolkit().screenSize
         val x = 10
         val y = (screenSize.height - window.height) / 2
@@ -599,8 +599,8 @@ object GUIManager {
         window.isAlwaysOnTop = true
         window.isVisible = true
 
-        // Panel close in 5 seconds
-        Timer(5000) {
+        // Panel close in 10 seconds
+        Timer(10000) {
             window.dispose()
         }.start()
     }

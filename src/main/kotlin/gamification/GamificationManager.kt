@@ -30,6 +30,7 @@ class GamificationManager() {
         var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
         lateinit var userProfile: UserProfile //the current user
         var mode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
+
         //PROPERTIES USED TO DETERMINE GOOD/BAD LOCATORS
         const val MAX_LENGTH = 50
         const val MAX_LEVEL = 5
@@ -41,7 +42,7 @@ class GamificationManager() {
         val BAD_JS = setOf("onclick", "onload",
             "onmouseover", "onmouseout", "onchange", "onsubmit",
             "onfocus", "onkeydown")
-        const val ROBUST_THRESHOLD = 0.5 //threshold used to determine whether a locator is robust
+        const val ROBUST_THRESHOLD = 0.5
 
 
 
@@ -86,19 +87,23 @@ class GamificationManager() {
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
             val dailyUpdates = DailyManager.updateDailies(userProfile, testOutcomes)//check for each assigned daily
             //val achUpdates = AchievementManager.updateAchievements(userProfile, testOutcomes)
-            //if(dailyUpdates || achUpdates) {
-            if(dailyUpdates) {
+            if (!dailyUpdates.isNullOrEmpty()) { //|| achUpdates.isNullOrEmpty
+                val totalXp = dailyUpdates.sumOf { it.first } //total xp gained
+                //val dailyDescriptions = dailyUpdates.mapNotNull { it.second?.description } //list of involved dailies
+                var msg = "$totalXp XP gained from (partially) completed dailies\n"
                 val xmlWriter = XMLWriter()
-                updateTitleAndLvl(userProfile)
+                val isNewTitle = updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
                 DailyManager.assignTargetedDailies(userProfile) //this to update in case of broken locators and to update GUI
-                //GUIManager.updateGUI(userProfile, true)
+                if(isNewTitle)
+                    msg += "New Level & Title reached!"
+                GUIManager.updateGUI(userProfile, true, msg)
             }
             else
                 GUIManager.updateGUI(userProfile, false)
         }
 
-        private fun updateTitleAndLvl(userProfile: UserProfile) {
+        private fun updateTitleAndLvl(userProfile: UserProfile): Boolean {
             val newTitle = allTitles
                 .filter { it.xp <= userProfile.currentXP }
                 .maxByOrNull { it.xp }
@@ -108,9 +113,11 @@ class GamificationManager() {
                 val currentIndex = allTitles.indexOfFirst { it.name == userProfile.title }
                 if (currentIndex != -1 && currentIndex + 1 < allTitles.size)
                     userProfile.nextXP = allTitles[currentIndex + 1].xp
+                return true
             }
             else if (newTitle == null)
                 userProfile.nextXP = Int.MAX_VALUE
+            return false
         }
 
         //this method is called either when

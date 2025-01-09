@@ -1,6 +1,9 @@
 import testquest.TestQuestAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.util.PsiTreeUtil
 import locator.Locator
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionListener
@@ -25,8 +28,15 @@ class LocatorTooltipListener(
         val logicalPosition = editor.xyToLogicalPosition(mousePoint)
         val currentLine = logicalPosition.line + 1
 
-        //if mouse position is a locator, show the score and balloon
-        val locator = TestQuestAction.locatorsNewStatic.find { it.line == currentLine }
+        //retrieve class name of mouse position
+        val project = editor.project ?: return
+        val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
+        val topLevelClass = PsiTreeUtil.findChildOfType(psiFile, PsiClass::class.java)
+        val className = topLevelClass?.name ?: "Unknown Class"
+
+        //if mouse position is a locator (identified by mouse position and class), show the score and balloon
+        //TODO: beware of multiple test class files with same name
+        val locator = TestQuestAction.locatorsNewStatic.find { it.line == currentLine && it.className == className }
         if (locatorScores.containsKey(locator)) {
             val score = locatorScores[locator]!!
             hoverTimer = Timer(500) {

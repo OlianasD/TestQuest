@@ -37,7 +37,11 @@ object TestFilesExtractor {
         for (child in children) {
             if (child.isDirectory) {
                 exploreDirectory(child, testFilePaths)
-            } else if (child.isFile && child.name.endsWith("Test.java")) { //TODO: only Test* files?
+            }
+            //TODO: locators are currently extracted from files named _Test or _Page (in case of PageObjects)
+            else if (child.isFile &&
+                (child.name.endsWith("Test.java") || child.name.endsWith("Page.java"))
+                ) {
                 testFilePaths.add(child.toPath())
             }
         }

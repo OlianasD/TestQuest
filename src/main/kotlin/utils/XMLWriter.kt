@@ -29,6 +29,7 @@ class XMLWriter {
                 node.getElementsByTagName("name").item(0).textContent = userProfile.name
                 node.getElementsByTagName("level").item(0).textContent = userProfile.level.toString()
                 node.getElementsByTagName("currentXP").item(0).textContent = userProfile.currentXP.toString()
+                node.getElementsByTagName("nextXP").item(0).textContent = userProfile.nextXP.toString()
                 node.getElementsByTagName("title").item(0).textContent = userProfile.title
                 node.getElementsByTagName("propic").item(0).textContent = userProfile.propic
                 node.setAttribute("mode", GamificationManager.mode.name)
