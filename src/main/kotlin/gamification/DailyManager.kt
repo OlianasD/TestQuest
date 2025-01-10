@@ -386,9 +386,6 @@ class DailyManager {
                     type = daily.type,
                     targetedLocators = locatorsForDaily
                 )
-                //} else {
-                //    null
-                //}
             }
             //remove all old targeted dailies as they will be updated by new check
             userProfile.dailyProgresses.removeAll { dailyProgress ->
