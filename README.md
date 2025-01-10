@@ -7,7 +7,7 @@ TestQuest is a Kotlin plugin for IntelliJ IDEA to support Web test maintenance b
 
 The process describing how TestQuest works is sketched in the following Figure.
 
-<img src="./testquest.pdf" alt="TestQuest Approach" width="50%" />
+<img src="./testquest.png" alt="TestQuest Approach" width="50%" />
 
 ...
 
