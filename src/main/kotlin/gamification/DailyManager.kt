@@ -376,7 +376,6 @@ class DailyManager {
             val analysisMap = locAnalyzer.findTargetedProblems()
             val currentTargetDailies = ALL_TARGETED_DAILIES.map { daily ->
                 val locatorsForDaily = analysisMap[daily.name] ?: emptyList()
-                //if (locatorsForDaily.isNotEmpty()) {
                 Daily(
                     name = daily.name,
                     description = daily.description,
