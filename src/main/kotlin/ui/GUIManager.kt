@@ -17,6 +17,7 @@ import gamification.DailyProgress
 import gamification.GamificationManager
 import gamification.UserProfile
 import locator.Locator
+import locator.LocatorsAnalyzer
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -466,10 +467,13 @@ object GUIManager {
 
 
 
-    private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font) {
-        dailyPanel.removeAll() //remove old elements
 
-        //create daily label on mouse over for random dailies
+    private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font) {
+        dailyPanel.removeAll() // Remove old elements
+
+        val locatorsToVerifyMap = LocatorsAnalyzer.getFixedAndPendingLocatorsMap() //retrieve map of fixed locators still to verify
+
+        // Create daily label on mouse over for random dailies
         if (dailyProgress.daily.type.equals("random", ignoreCase = true)) {
             val progressPerc = (dailyProgress.progress / dailyProgress.daily.target!!) * 100
             val dailyMessage = "Progress: ${progressPerc}%"
@@ -480,10 +484,11 @@ object GUIManager {
             }
             dailyPanel.add(dailyLabel)
         }
-        //create daily label on mouse over and locs details for targeted dailies
+        // Create daily label on mouse over and locators details for targeted dailies
         else if (dailyProgress.daily.type.equals("targeted", ignoreCase = true)) {
-            //if no locators are associated, skip
-            if (dailyProgress.daily.targetedLocators.isEmpty())
+            // If no locators (neither to fix or fixed to be verified) are associated with daily, skip
+            if (dailyProgress.daily.targetedLocators.isEmpty() &&
+                (locatorsToVerifyMap.isEmpty() || locatorsToVerifyMap[dailyProgress.daily.name]!!.isEmpty()))
                 return
             val dailyMessage = "${dailyProgress.daily.xp} XP for each listed issue fixed"
             val dailyLabel = JLabel(dailyProgress.daily.description).apply {
@@ -492,7 +497,8 @@ object GUIManager {
                 toolTipText = dailyMessage
             }
             dailyPanel.add(dailyLabel)
-            //else, add locators details for targeted dailies with show/hide buttons opening a dedicated window
+
+            // Show locators details for targeted dailies with show/hide buttons opening a dedicated window
             var detailsFrame: JFrame? = null
             val toggleButton = JButton("Show")
             toggleButton.addActionListener {
@@ -504,7 +510,28 @@ object GUIManager {
                             layout = BoxLayout(this, BoxLayout.Y_AXIS)
                         }
                         val smallFont = font.deriveFont((font.size * 0.8f).coerceAtLeast(8f))
+
+                        // show targeted locators for the current daily
                         dailyProgress.daily.targetedLocators.forEach { locator ->
+                            val locatorInfo = "${locator.locatorName ?: "N/A"} " +
+                                    "[${locator.className}.${locator.methodName}, line ${locator.line}]"
+                            val locatorLabel = JLabel(locatorInfo).apply {
+                                this.font = smallFont
+                                foreground = JBColor.DARK_GRAY
+                            }
+                            locatorsPanel.add(locatorLabel)
+                        }
+
+                        // separator between targeted locators and potentially fixed locators (to verify via test execution)
+                        val separatorLabel = JLabel("---- Fixed and pending locators (test execution needed) ----").apply {
+                            this.font = smallFont
+                            foreground = JBColor.GRAY
+                        }
+                        locatorsPanel.add(separatorLabel)
+
+                        // show info of potentially fixed locators to verify
+                        val locatorsFromMap = locatorsToVerifyMap[dailyProgress.daily.name]
+                        locatorsFromMap?.forEach { locator ->
                             val locatorInfo = "${locator.locatorName ?: "N/A"} " +
                                     "[${locator.className}.${locator.methodName}, ${locator.line}]"
                             val locatorLabel = JLabel(locatorInfo).apply {
@@ -513,6 +540,7 @@ object GUIManager {
                             }
                             locatorsPanel.add(locatorLabel)
                         }
+
                         val scrollPane = JScrollPane(locatorsPanel).apply {
                             preferredSize = Dimension(300, 150)
                             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
@@ -522,7 +550,8 @@ object GUIManager {
                         pack()
                         setLocationRelativeTo(dailyPanel)
                         isVisible = true
-                        //update button text if window is closed
+
+                        // Update button text if window is closed
                         addWindowListener(object : java.awt.event.WindowAdapter() {
                             override fun windowClosing(e: WindowEvent) {
                                 toggleButton.text = "Show"
@@ -542,13 +571,6 @@ object GUIManager {
         dailyPanel.revalidate()
         dailyPanel.repaint()
     }
-
-
-
-
-
-
-
 
 
 

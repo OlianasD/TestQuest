@@ -373,7 +373,7 @@ class DailyManager {
 
         fun assignTargetedDailies(userProfile: UserProfile) {
             val locAnalyzer = LocatorsAnalyzer()
-            val analysisMap = locAnalyzer.findTargetedProblems()
+            val analysisMap = locAnalyzer.findTargetedIssuedLocators()
             val currentTargetDailies = ALL_TARGETED_DAILIES.map { daily ->
                 val locatorsForDaily = analysisMap[daily.name] ?: emptyList()
                 Daily(

@@ -4,6 +4,7 @@ import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
 import gamification.GamificationManager
 import locator.Locator
+import locator.LocatorsAnalyzer
 import testquest.TestQuestAction
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -14,7 +15,9 @@ data class TestOutcome(
     val locatorsOld: List<Locator>,
     val locatorsNew: List<Locator>,
     val isPassed: Boolean,
-    val stacktrace: String?
+    val stacktrace: String?,
+    val errorLine: Int,
+    val locatorsPassed: List<Locator> //TODO: assumption = all locs placed before a error line num are considered 'passed'
 ) {
     override fun hashCode(): Int {
         return 31 * (testName.hashCode() + className.hashCode())
@@ -45,6 +48,7 @@ data class TestOutcome(
            return matcher.group()
         return ""
     }
+
 }
 
 
@@ -60,8 +64,6 @@ class TestExecutionListener : SMTRunnerEventsListener {
             //new static = latest code change
             //old dynamic = previous code change BEFORE test execution (used to check dailies)
             //new dynamic = latest code change BEFORE test execution (used to check dailies)
-            //if (TestQuestAction.locatorsNewDynamic.isNotEmpty())
-            //    TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsNewDynamic
             TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
             TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic //retrieve locators at the start of testing
             server = Server()
@@ -77,6 +79,9 @@ class TestExecutionListener : SMTRunnerEventsListener {
             println("Server stopped!")
             //check how events affected tasks
             GamificationManager.analyzeEvents(testOutcomes)
+            testOutcomes.forEach { testOutcome ->
+                LocatorsAnalyzer.removeConfirmedFixedLocatorsFromMap(testOutcome.locatorsPassed)
+            }
         }
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
     }
@@ -92,8 +97,17 @@ class TestExecutionListener : SMTRunnerEventsListener {
             //collect old/new locators + other outcomes related to executed test
             val oldLocatorsInTest = TestQuestAction.locatorsOldDynamic.filter { it.methodName == test.name }
             val newLocatorsInTest = TestQuestAction.locatorsNewDynamic.filter { it.methodName == test.name }
-            val testOutcome =
-                TestOutcome(test.name, test.parent.name, oldLocatorsInTest, newLocatorsInTest, test.isPassed, test.stacktrace)
+
+            //find potential error line and locators successfully executed before it (they might be all if no error)
+            val errorLineNum = getLineNumberError(test.stacktrace)
+            val passedLocs: List<Locator>
+            if (errorLineNum != -1)
+                passedLocs = getLocatorsBeforeError(errorLineNum, newLocatorsInTest)
+            else
+                passedLocs = newLocatorsInTest
+
+            val testOutcome = TestOutcome(test.name, test.parent.name, oldLocatorsInTest, newLocatorsInTest,
+                test.isPassed, test.stacktrace, errorLineNum, passedLocs)
             testOutcomes.add(testOutcome)
         }
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
@@ -143,8 +157,25 @@ class TestExecutionListener : SMTRunnerEventsListener {
 
 
 
+    private fun getLineNumberError(stackTrace: String?): Int {
+        val lines = stackTrace?.lines()
+        if (lines != null) {
+            for (line in lines) {
+                if (line.contains("at ")) {
+                    val matchResult = Regex("at (.+)\\((.+):(\\d+)\\)").find(line)
+                    if (matchResult != null) {
+                        val (_, _, lineNumber) = matchResult.destructured
+                        return lineNumber.toIntOrNull()!!
+                    }
+                }
+            }
+        }
+        return -1
+    }
 
-
+    private fun getLocatorsBeforeError(line: Int, locatorsInTest: List<Locator>): List<Locator> {
+        return locatorsInTest.filter { locator -> locator.line < line }
+    }
 
 
 

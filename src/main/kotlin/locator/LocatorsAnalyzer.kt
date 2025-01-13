@@ -8,25 +8,55 @@ import testquest.TestQuestAction
 class LocatorsAnalyzer {
 
     companion object {
-        // Global map shared across all instances
-        private val analysisMap = mutableMapOf<String, List<Locator>>()
+        //Global map storing all locators issues detected
+        private val targetedIssuedLocators = mutableMapOf<String, List<Locator>>()
+        //Global map storing locators issues detected and fixed, to be verified once tests are executed
+        private val targetedFixedAndPendingLocators = mutableMapOf<String, MutableList<Locator>>()
+
+        fun getFixedAndPendingLocatorsMap(): MutableMap<String, MutableList<Locator>>{
+            return targetedFixedAndPendingLocators
+        }
+
+        //this method is called to remove the list of fixed locators from pending, in order to provide reward
+        fun removeConfirmedFixedLocatorsFromMap(locatorsToRemove: List<Locator>) {
+            //remove fixed and confirmed locators (i.e., locators fixed, following a test execution to confirm)
+            targetedFixedAndPendingLocators.keys.forEach { key ->
+                val existingLocators = targetedFixedAndPendingLocators[key]?.toMutableList() ?: return@forEach
+                val updatedLocators = existingLocators.filterNot { existingLocator ->
+                    locatorsToRemove.any { it.hashCode() == existingLocator.hashCode() }
+                }
+                if (updatedLocators.isEmpty()) {
+                    targetedFixedAndPendingLocators[key] = emptyList<Locator>().toMutableList()
+                } else {
+                    targetedFixedAndPendingLocators[key] = updatedLocators.toMutableList()
+                }
+            }
+        }
+
     }
+
+
+
+
 
     private var locators = TestQuestAction.locatorsNewStatic
 
-
-    fun findTargetedProblems(): MutableMap<String, List<Locator>> {
-        //analysisMap.clear()
-        analysisMap.keys.retainAll(listOf("broken"))
+    fun findTargetedIssuedLocators(): MutableMap<String, List<Locator>> {
+        val initialAnalysisMap = targetedIssuedLocators.toMap() //copy map to keep track of problems fixed BEFORE any new problem found
+        targetedIssuedLocators.keys.retainAll(listOf("broken"))//remove broken locators as they are dynamically computed during test execution
         calculateAbsoluteLocators()
         calculateLongLocators()
         calculateDeepLocators()
         calculatePositionalPredicateLocators()
         calculateBadPredicateLocators()
         calculateNonIDOrXPathLocators()
-        if(!analysisMap.containsKey("broken"))//this to check whether a map already exists (if so, it is not reset)
+        if(!targetedIssuedLocators.containsKey("broken"))//if map is new, create an empty list of broken locators
             calculateBrokenLocators()
-        return analysisMap
+        //compute differences between initial map and map after evalaution
+        //so to retrieve fixed problems to be later confirmed via test execution
+        if(initialAnalysisMap.isNotEmpty())
+            calculateFixedAndPendingLocators(initialAnalysisMap)
+        return targetedIssuedLocators
     }
 
     //save absolute xpath locators
@@ -34,13 +64,13 @@ class LocatorsAnalyzer {
         val absoluteLocators = locators.filter {
             it.locatorType.equals("xpath", ignoreCase = true) && it.locatorValue.startsWith("/html")
         }
-        analysisMap["absolute"] = absoluteLocators
+        targetedIssuedLocators["absolute"] = absoluteLocators
     }
 
     //save xpath locators with length more than MAX_LENGTH chars
     private fun calculateLongLocators() {
         val longLocators = locators.filter { it.locatorValue.length > GamificationManager.MAX_LENGTH }
-        analysisMap["length"] = longLocators
+        targetedIssuedLocators["length"] = longLocators
     }
 
     //save xpath locators with more than MAX_LEVEL levels
@@ -49,7 +79,7 @@ class LocatorsAnalyzer {
             it.locatorType.equals("xpath", ignoreCase = true) &&
                     it.locatorValue.split("/").count { node -> node.isNotEmpty() } > GamificationManager.MAX_LEVEL
         }
-        analysisMap["level"] = deepLocators
+        targetedIssuedLocators["level"] = deepLocators
     }
 
     //save xpath locators with more than MAX_POS_PRED positional predicates
@@ -58,7 +88,7 @@ class LocatorsAnalyzer {
             it.locatorType.equals("xpath", ignoreCase = true) &&
                     Regex("\\[\\d+]").findAll(it.locatorValue).count() > GamificationManager.MAX_POS_PRED
         }
-        analysisMap["posPredicate"] = positionalPredicateLocators
+        targetedIssuedLocators["posPredicate"] = positionalPredicateLocators
     }
 
     //save xpath locators with bad predicates
@@ -71,7 +101,7 @@ class LocatorsAnalyzer {
                         locator.locatorValue.contains("@$jsAttribute", ignoreCase = true)
                     })
         }
-        analysisMap["badPredicate"] = badPredicateLocators
+        targetedIssuedLocators["badPredicate"] = badPredicateLocators
     }
 
     //save locators that are neither ID or Xpath
@@ -80,16 +110,16 @@ class LocatorsAnalyzer {
             !it.locatorType.equals("id", ignoreCase = true) &&
                     !it.locatorType.equals("xpath", ignoreCase = true)
         }
-        analysisMap["noIDOrXPath"] = nonIDOrXPathLocators
+        targetedIssuedLocators["noIDOrXPath"] = nonIDOrXPathLocators
     }
 
     private fun calculateBrokenLocators() {
-        analysisMap["broken"] = emptyList()
+        targetedIssuedLocators["broken"] = emptyList()
     }
 
     //this value is updated once targeted dailies are present and tests are executed
     fun calculateBrokenLocators(brokenLocs: List<Locator>) {
-        val currentList = analysisMap["broken"] ?: emptyList()
+        val currentList = targetedIssuedLocators["broken"] ?: emptyList()
         val newLocators = brokenLocs.filter { newLoc ->
             currentList.none { existingLoc ->
                 existingLoc.locatorValue == newLoc.locatorValue &&
@@ -98,17 +128,17 @@ class LocatorsAnalyzer {
             }
         }
         val updatedList = currentList + newLocators
-        analysisMap["broken"] = updatedList
+        targetedIssuedLocators["broken"] = updatedList
     }
 
 
 
     fun getBrokenLocs(): List<Locator>? {
-        return analysisMap["broken"]
+        return targetedIssuedLocators["broken"]
     }
 
     fun updateBrokenLocs(repairedLocs: List<Locator>) {
-        val currentList = analysisMap["broken"] ?: emptyList()
+        val currentList = targetedIssuedLocators["broken"] ?: emptyList()
         val updatedList = currentList.filterNot { loc ->
             repairedLocs.any { toRemove ->
                 loc.locatorValue == toRemove.locatorValue &&
@@ -116,8 +146,65 @@ class LocatorsAnalyzer {
                         loc.className == toRemove.className
             }
         }
-        analysisMap["broken"] = updatedList
+        targetedIssuedLocators["broken"] = updatedList
     }
+
+
+
+
+    //the logic is that a potentially fixed locator is present in initialAnalysisMap and no more present in analysisMap
+    //i.e., the map before and after analyzing the test suite
+    private fun calculateFixedAndPendingLocators(initialAnalysisMap: Map<String, List<Locator>>) {
+
+        initialAnalysisMap.forEach { (key, initialLocators) ->
+
+            // Get existing issued locators (if any)
+            val issuedLocators = targetedIssuedLocators[key] ?: emptyList()
+
+            // Mutable map to track the most recent locator by hash
+            val fixedLocatorsMap = mutableMapOf<Int, Locator>()
+
+            // Find issued locators that are now fixed and pending (i.e., no more present in targetedIssuedLocators)
+            initialLocators.forEach { initialLocator ->
+                val wasFixed = issuedLocators.none { it.hashCode() == initialLocator.hashCode() }
+                if (wasFixed)
+                    fixedLocatorsMap[initialLocator.hashCode()] = initialLocator
+            }
+
+            // Get existing fixed and pending locators list (if any)
+            val fixedAndPendingLocators = targetedFixedAndPendingLocators[key]?.toMutableList() ?: mutableListOf()
+
+            // Add newly fixed and pending locators without overwriting existing ones
+            fixedLocatorsMap.values.forEach { newLocator ->
+                val locatorExists = fixedAndPendingLocators.any { it.hashCode() == newLocator.hashCode() }
+                if (!locatorExists)
+                    fixedAndPendingLocators.add(newLocator)
+            }
+
+            // Remove fixed and pending locators that are also issued
+            // e.g., they are fixed and made issued again before confirmation
+            val filteredFixedAndPendingLocators = fixedAndPendingLocators.filterNot { fixedLocator ->
+                issuedLocators.any { it.hashCode() == fixedLocator.hashCode() }
+            }
+
+            // Remove fixed and pending locators that actually do not exist anymore
+            val finalFixedAndPendingLocators = filteredFixedAndPendingLocators.filter { fixedLocator ->
+                locators.any { it.hashCode() == fixedLocator.hashCode() }
+            }
+
+            // Update the map with the filtered locators
+            targetedFixedAndPendingLocators[key] = finalFixedAndPendingLocators.toMutableList()
+        }
+
+
+    }
+
+
+
+
+
+
+
 
 
 }
