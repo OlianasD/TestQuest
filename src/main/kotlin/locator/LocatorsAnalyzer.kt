@@ -52,7 +52,7 @@ class LocatorsAnalyzer {
         calculateNonIDOrXPathLocators()
         if(!targetedIssuedLocators.containsKey("broken"))//if map is new, create an empty list of broken locators
             calculateBrokenLocators()
-        //compute differences between initial map and map after evalaution
+        //compute differences between initial map and map after evaluation
         //so to retrieve fixed problems to be later confirmed via test execution
         if(initialAnalysisMap.isNotEmpty())
             calculateFixedAndPendingLocators(initialAnalysisMap)
@@ -118,18 +118,19 @@ class LocatorsAnalyzer {
     }
 
     //this value is updated once targeted dailies are present and tests are executed
-    fun calculateBrokenLocators(brokenLocs: List<Locator>) {
+    fun calculateBrokenLocators(brokenLoc: Locator) {
         val currentList = targetedIssuedLocators["broken"] ?: emptyList()
-        val newLocators = brokenLocs.filter { newLoc ->
-            currentList.none { existingLoc ->
-                existingLoc.locatorValue == newLoc.locatorValue &&
-                        existingLoc.methodName == newLoc.methodName &&
-                        existingLoc.className == newLoc.className
-            }
+        val isAlreadyPresent = currentList.any { existingLoc ->
+            existingLoc.locatorValue == brokenLoc.locatorValue &&
+                    existingLoc.methodName == brokenLoc.methodName &&
+                    existingLoc.className == brokenLoc.className
         }
-        val updatedList = currentList + newLocators
-        targetedIssuedLocators["broken"] = updatedList
+        if (!isAlreadyPresent) {
+            val updatedList = currentList + brokenLoc
+            targetedIssuedLocators["broken"] = updatedList
+        }
     }
+
 
 
 
@@ -174,10 +175,12 @@ class LocatorsAnalyzer {
             // Get existing fixed and pending locators list (if any)
             val fixedAndPendingLocators = targetedFixedAndPendingLocators[key]?.toMutableList() ?: mutableListOf()
 
-            // Add newly fixed and pending locators without overwriting existing ones
+            // Add newly fixed and pending locators and overwrite old ones (e.g., if they change line position)
             fixedLocatorsMap.values.forEach { newLocator ->
-                val locatorExists = fixedAndPendingLocators.any { it.hashCode() == newLocator.hashCode() }
-                if (!locatorExists)
+                val existingIndex = fixedAndPendingLocators.indexOfFirst { it.hashCode() == newLocator.hashCode() }
+                if (existingIndex != -1)
+                    fixedAndPendingLocators[existingIndex] = newLocator
+                else
                     fixedAndPendingLocators.add(newLocator)
             }
 
@@ -187,9 +190,10 @@ class LocatorsAnalyzer {
                 issuedLocators.any { it.hashCode() == fixedLocator.hashCode() }
             }
 
-            // Remove fixed and pending locators that actually do not exist anymore
-            val finalFixedAndPendingLocators = filteredFixedAndPendingLocators.filter { fixedLocator ->
-                locators.any { it.hashCode() == fixedLocator.hashCode() }
+            // Remove fixed and pending locators that actually do not exist anymore and keep info updated
+            // (e.g., in case a fixed locator is moved from a line to another)
+            val finalFixedAndPendingLocators = locators.filter { locator ->
+                filteredFixedAndPendingLocators.any { it.hashCode() == locator.hashCode() }
             }
 
             // Update the map with the filtered locators

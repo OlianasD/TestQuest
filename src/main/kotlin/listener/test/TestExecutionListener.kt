@@ -12,12 +12,17 @@ import java.util.regex.Pattern
 data class TestOutcome(
     val testName: String,
     val className: String,
-    val locatorsOld: List<Locator>,
-    val locatorsNew: List<Locator>,
+    val locatorsOld: List<Locator>, //the list of whole locs associated with test BEFORE changes/test execution
+    val locatorsNew: List<Locator>, //the list of whole locs associated with test AFTER changes/test execution
+    //TODO: locatorsNew is old implementation which may be removed unless all new locs are needed
+    // the check for gaming progression is now based on locatorsPassed as only them are counted for progression
     val isPassed: Boolean,
     val stacktrace: String?,
     val errorLine: Int,
-    val locatorsPassed: List<Locator> //TODO: assumption = all locs placed before a error line num are considered 'passed'
+    val locatorsPassed: List<Locator>, //the list of locs before a broken loc (if any)
+    // TODO: assumption = all locs placed before a error line num are considered 'passed'
+    val locatorBroken: Locator? = null, //the locator (if any) that brought to a test failure
+    val locatorsNotExecuted: List<Locator> = emptyList() //the list of locs after a broken loc (if any) thus not executed
 ) {
     override fun hashCode(): Int {
         return 31 * (testName.hashCode() + className.hashCode())
@@ -88,26 +93,34 @@ class TestExecutionListener : SMTRunnerEventsListener {
 
     override fun onTestFinished(test: SMTestProxy) {
         try {
-            println("Test finished!")
-            val eventList = Server.events
-            println("Events:")
-            for (event in eventList) {
-                println(event)
-            }
+
             //collect old/new locators + other outcomes related to executed test
             val oldLocatorsInTest = TestQuestAction.locatorsOldDynamic.filter { it.methodName == test.name }
             val newLocatorsInTest = TestQuestAction.locatorsNewDynamic.filter { it.methodName == test.name }
 
-            //find potential error line and locators successfully executed before it (they might be all if no error)
+            //find error line (if any), locators successfully passed before it, locator cause of break (if any), and locators not executed as after it
+            //notice that:
+            // 1. errorLineNum might notify an error that is not related to a locator (e.g., NullPointerExc)
+            // 2. brokenLoc refers specifically to a locator that is not found (i.e., NoSuchElementExc)
             val errorLineNum = getLineNumberError(test.stacktrace)
             val passedLocs: List<Locator>
-            if (errorLineNum != -1)
+            var brokenLoc: Locator? = null
+            var nonExecutedLocs: List<Locator> = emptyList()
+            if (errorLineNum != -1) {
                 passedLocs = getLocatorsBeforeError(errorLineNum, newLocatorsInTest)
+                nonExecutedLocs = getLocatorsAfterError(errorLineNum, newLocatorsInTest)
+                //find broken loc from stacktrace
+                brokenLoc = newLocatorsInTest.firstOrNull { loc -> test.stacktrace!!.trim().
+                    contains("NoSuchElementException") && test.stacktrace!!.contains(loc.locatorValue) }
+                if(brokenLoc != null) {
+                    val locsAnalizer = LocatorsAnalyzer()
+                    locsAnalizer.calculateBrokenLocators(brokenLoc) //update broken locators for next targeted dailies
+                }
+            }
             else
                 passedLocs = newLocatorsInTest
-
             val testOutcome = TestOutcome(test.name, test.parent.name, oldLocatorsInTest, newLocatorsInTest,
-                test.isPassed, test.stacktrace, errorLineNum, passedLocs)
+                test.isPassed, test.stacktrace, errorLineNum, passedLocs, brokenLoc, nonExecutedLocs)
             testOutcomes.add(testOutcome)
         }
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
@@ -157,27 +170,38 @@ class TestExecutionListener : SMTRunnerEventsListener {
 
 
 
+
+
+
+
     private fun getLineNumberError(stackTrace: String?): Int {
-        val lines = stackTrace?.lines()
-        if (lines != null) {
-            for (line in lines) {
-                if (line.contains("at ")) {
-                    val matchResult = Regex("at (.+)\\((.+):(\\d+)\\)").find(line)
-                    if (matchResult != null) {
-                        val (_, _, lineNumber) = matchResult.destructured
-                        return lineNumber.toIntOrNull()!!
-                    }
-                }
-            }
-        }
-        return -1
+        if (stackTrace == null)
+            return -1
+        val index = stackTrace.indexOf("Test.java:")
+        if (index == -1)
+            return -1
+        //returns line number associated with direct test error, if any
+        //TODO: to check when PO are implemented
+        val substring = stackTrace.substring(index + "Test.java:".length).trim()
+        val lineNumber = substring.takeWhile { it.isDigit() }
+        if (lineNumber.isNotEmpty())
+            return lineNumber.toInt()
+        else
+            return -1
     }
+
+
+
+
+
 
     private fun getLocatorsBeforeError(line: Int, locatorsInTest: List<Locator>): List<Locator> {
         return locatorsInTest.filter { locator -> locator.line < line }
     }
 
-
+    private fun getLocatorsAfterError(line: Int, locatorsInTest: List<Locator>): List<Locator> {
+        return locatorsInTest.filter { locator -> locator.line > line }
+    }
 
 
 

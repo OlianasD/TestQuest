@@ -32,7 +32,7 @@ class TestQuestAction : AnAction() {
             //setup gamification profile
             val gamificationManager = GamificationManager()
             gamificationManager.showGUI()
-            PluginData.userProfileId = "002" //TODO: change as a login
+            PluginData.userProfileId = "001" //TODO: change as a login
             gamificationManager.setupUserProfile(PluginData.userProfileId)
 
             //estimate overall fragility and show it on GUI

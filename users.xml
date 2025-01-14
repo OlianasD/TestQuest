@@ -2,15 +2,203 @@
     <userProfile mode="TARGETED">
         <id>002</id>
         <name>John Doe</name>
-        <level>1</level>
-        <currentXP>140</currentXP>
-        <nextXP>150</nextXP>
-        <title>Muggle</title>
+        <level>4</level>
+        <currentXP>795</currentXP>
+        <nextXP>1600</nextXP>
+        <title>Gifted Acolyte</title>
+        <propic>C:\Users\User\Desktop\demo\pics\user\default-user.png</propic>
+        <achievements>
+            <completed/>
+            <ongoing>
+                <achievement>
+                    <name>I did it!</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Kill them all</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Keep it short</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The higher they are, the louder they fall</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Ops... I made a mistake!</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I'm starting to learn things</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Perfectionism</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Immortality</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>An inside job</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I feel so lonely</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The gift of synthesis</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The bigger the better</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Strength lies in differences</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The cake is a lie</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The clone war</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Expand the colony</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>You are not welcome anymore</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>What's the difference?</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Is this a test?</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Test Marathon</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The Beginner's Luck</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>That's no luck anymore</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>First aid</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>ER Medical Drama</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I didn't touch it!</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Flawless Victory</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Frankenstein</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Locatorwarts School of Robustness and Testing</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Kill them all</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Kill them all</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Kill them all</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Is this a locator?</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Stillness</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I am a bit confused</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>What am I doing?</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Domino Effect</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>You are a wizard, Harry</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Look To My Coming, At First Light On The Fifth Day</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Ho there wanderer, stay thy course a while and indulge an old man</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>A wizard does not make mistakes</name>
+                    <progress>0</progress>
+                </achievement>
+            </ongoing>
+        </achievements>
+        <dailies timestamp="1736845472357">
+            <daily discarded="false" name="loc2id" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="levelLoweredMax" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="runLocs20" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="newJS" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="xpathAbs" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="absolute" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="length" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="level" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="posPredicate" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="badPredicate" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="noIDOrXPath" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="broken" progress="0" type="TARGETED"/>
+        </dailies>
+    </userProfile>
+    <userProfile mode="TARGETED">
+        <id>001</id>
+        <name>John Doe</name>
+        <level>2</level>
+        <currentXP>215</currentXP>
+        <nextXP>400</nextXP>
+        <title>Mage Homunculus</title>
         <propic>C:\Users\User\Desktop\demo\pics\user\default-user.png</propic>
         <achievements>
             <completed/>
             <ongoing><achievement><name>I did it!</name><progress>0</progress></achievement><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Keep it short</name><progress>0</progress></achievement><achievement><name>The higher they are, the louder they fall</name><progress>0</progress></achievement><achievement><name>Ops... I made a mistake!</name><progress>0</progress></achievement><achievement><name>I'm starting to learn things</name><progress>0</progress></achievement><achievement><name>Perfectionism</name><progress>0</progress></achievement><achievement><name>Immortality</name><progress>0</progress></achievement><achievement><name>An inside job</name><progress>0</progress></achievement><achievement><name>I feel so lonely</name><progress>0</progress></achievement><achievement><name>The gift of synthesis</name><progress>0</progress></achievement><achievement><name>The bigger the better</name><progress>0</progress></achievement><achievement><name>Strength lies in differences</name><progress>0</progress></achievement><achievement><name>The cake is a lie</name><progress>0</progress></achievement><achievement><name>The clone war</name><progress>0</progress></achievement><achievement><name>Expand the colony</name><progress>0</progress></achievement><achievement><name>You are not welcome anymore</name><progress>0</progress></achievement><achievement><name>What's the difference?</name><progress>0</progress></achievement><achievement><name>Is this a test?</name><progress>0</progress></achievement><achievement><name>Test Marathon</name><progress>0</progress></achievement><achievement><name>The Beginner's Luck</name><progress>0</progress></achievement><achievement><name>That's no luck anymore</name><progress>0</progress></achievement><achievement><name>First aid</name><progress>0</progress></achievement><achievement><name>ER Medical Drama</name><progress>0</progress></achievement><achievement><name>I didn't touch it!</name><progress>0</progress></achievement><achievement><name>Flawless Victory</name><progress>0</progress></achievement><achievement><name>Frankenstein</name><progress>0</progress></achievement><achievement><name>Locatorwarts School of Robustness and Testing</name><progress>0</progress></achievement><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Is this a locator?</name><progress>0</progress></achievement><achievement><name>Stillness</name><progress>0</progress></achievement><achievement><name>I am a bit confused</name><progress>0</progress></achievement><achievement><name>What am I doing?</name><progress>0</progress></achievement><achievement><name>Domino Effect</name><progress>0</progress></achievement><achievement><name>You are a wizard, Harry</name><progress>0</progress></achievement><achievement><name>Look To My Coming, At First Light On The Fifth Day</name><progress>0</progress></achievement><achievement><name>Ho there wanderer, stay thy course a while and indulge an old man</name><progress>0</progress></achievement><achievement><name>A wizard does not make mistakes</name><progress>0</progress></achievement></ongoing>
         </achievements>
-        <dailies timestamp="1736443381174"><daily discarded="false" name="newLengthShorterMax" progress="0" type="RANDOM"/><daily discarded="false" name="newRobust" progress="0" type="RANDOM"/><daily discarded="false" name="newLowPredicates" progress="0" type="RANDOM"/><daily discarded="false" name="xpathLength" progress="0" type="RANDOM"/><daily discarded="false" name="runLocs20" progress="0" type="RANDOM"/><daily discarded="false" name="absolute" progress="0" type="TARGETED"/><daily discarded="false" name="length" progress="0" type="TARGETED"/><daily discarded="false" name="level" progress="0" type="TARGETED"/><daily discarded="false" name="posPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="badPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="noIDOrXPath" progress="0" type="TARGETED"/><daily discarded="false" name="broken" progress="0" type="TARGETED"/></dailies>
+        <dailies timestamp="1736877579423"><daily discarded="false" name="newSameLoc" progress="0" type="RANDOM"/><daily discarded="false" name="newXPath" progress="0" type="RANDOM"/><daily discarded="false" name="addAttrToXPath" progress="0" type="RANDOM"/><daily discarded="false" name="robustness" progress="0" type="RANDOM"/><daily discarded="false" name="remAttrFromXPath" progress="0" type="RANDOM"/><daily discarded="false" name="absolute" progress="0" type="TARGETED"/><daily discarded="false" name="length" progress="0" type="TARGETED"/><daily discarded="false" name="level" progress="0" type="TARGETED"/><daily discarded="false" name="posPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="badPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="noIDOrXPath" progress="0" type="TARGETED"/><daily discarded="false" name="broken" progress="0" type="TARGETED"/></dailies>
     </userProfile>
 </userProfiles>

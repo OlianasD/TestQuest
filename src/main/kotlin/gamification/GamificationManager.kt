@@ -69,6 +69,9 @@ class GamificationManager() {
             Title("Supreme Magus", 1000000)
         )
 
+        fun getXpForTitle(titleName: String): Int {
+            return allTitles.find { it.name == titleName }?.xp ?: -1
+        }
 
         fun analyzeEvents(testOutcomes: List<TestOutcome>){
             val checks = mutableListOf<TestOutcome>() //to collect the "good" outcomes between old and new locs
@@ -85,10 +88,10 @@ class GamificationManager() {
         }
 
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
-            val dailyUpdates = DailyManager.updateDailies(userProfile, testOutcomes)//check for each assigned daily
+            val dailyProgresses = DailyManager.updateDailyProgresses(userProfile, testOutcomes)//check for each assigned daily
             //val achUpdates = AchievementManager.updateAchievements(userProfile, testOutcomes)
-            if (!dailyUpdates.isNullOrEmpty()) { //|| achUpdates.isNullOrEmpty
-                val totalXp = dailyUpdates.sumOf { it.first } //total xp gained
+            if (!dailyProgresses.isNullOrEmpty()) { //|| achUpdates.isNullOrEmpty
+                val totalXp = dailyProgresses.sumOf { it.first } //total xp gained
                 //val dailyDescriptions = dailyUpdates.mapNotNull { it.second?.description } //list of involved dailies
                 var msg = "$totalXp XP gained from (partially) completed dailies\n"
                 val xmlWriter = XMLWriter()
@@ -104,12 +107,15 @@ class GamificationManager() {
         }
 
         private fun updateTitleAndLvl(userProfile: UserProfile): Boolean {
+            //e.g., if current user is level 3 and has 15/400 xp, to find if new level is reached
+            // we need to count 15 + base XP needed to reach level 3 to determine whole XP
             val newTitle = allTitles
-                .filter { it.xp <= userProfile.currentXP }
-                .maxByOrNull { it.xp }
+                .maxByOrNull { if (it.xp + getXpForTitle(userProfile.title) <= userProfile.currentXP + getXpForTitle(userProfile.title)) it.xp
+                else Int.MIN_VALUE }
             if (newTitle != null && userProfile.title != newTitle.name) {
                 userProfile.title = newTitle.name
                 userProfile.level++
+                userProfile.currentXP -= userProfile.nextXP //xp is restarted considering exceeding XP from new lvl reached
                 val currentIndex = allTitles.indexOfFirst { it.name == userProfile.title }
                 if (currentIndex != -1 && currentIndex + 1 < allTitles.size)
                     userProfile.nextXP = allTitles[currentIndex + 1].xp

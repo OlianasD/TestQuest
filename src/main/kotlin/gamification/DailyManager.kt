@@ -438,7 +438,7 @@ class DailyManager {
             return DAILY_NAME_TO_XP[name] ?: 0
         }
 
-        fun updateDailies(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>>? {
+        fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>>? {
             val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
 
             //find the dailies to update according to gaming mode
@@ -511,16 +511,7 @@ class DailyManager {
         private fun checkTargetedAbsoluteRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed) {
-                    //save if any locator was broken
-                    val brokenLocators = testOutcome.locatorsNew.filter { loc ->
-                        testOutcome.stacktrace!!.trim().contains(loc.locatorValue.trim())
-                    }
-                    val locsAnalizer = LocatorsAnalyzer()
-                    locsAnalizer.calculateBrokenLocators(brokenLocators)
-                    continue
-                }
-                val locatorsNewMap = testOutcome.locatorsNew.associateBy { it.hashCode() }
+                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
                 for (oldLocator in testOutcome.locatorsOld) {
                     val newLocator = locatorsNewMap[oldLocator.hashCode()]
                     if (newLocator != null &&
@@ -537,16 +528,7 @@ class DailyManager {
         private fun checkTargetedLengthReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed) {
-                    //save if any locator was broken
-                    val brokenLocators = testOutcome.locatorsNew.filter { loc ->
-                        testOutcome.stacktrace!!.trim().contains(loc.locatorValue.trim())
-                    }
-                    val locsAnalizer = LocatorsAnalyzer()
-                    locsAnalizer.calculateBrokenLocators(brokenLocators)
-                    continue
-                }
-                val locatorsNewMap = testOutcome.locatorsNew.associateBy { it.hashCode() }
+                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
                 for (oldLocator in testOutcome.locatorsOld) {
                     val newLocator = locatorsNewMap[oldLocator.hashCode()]
                     if (newLocator != null &&
@@ -562,16 +544,7 @@ class DailyManager {
         private fun checkTargetedLevelReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed) {
-                    //save if any locator was broken
-                    val brokenLocators = testOutcome.locatorsNew.filter { loc ->
-                        testOutcome.stacktrace!!.trim().contains(loc.locatorValue.trim())
-                    }
-                    val locsAnalizer = LocatorsAnalyzer()
-                    locsAnalizer.calculateBrokenLocators(brokenLocators)
-                    continue
-                }
-                val locatorsNewMap = testOutcome.locatorsNew.associateBy { it.hashCode() }
+                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
                 for (oldLocator in testOutcome.locatorsOld) {
                     val newLocator = locatorsNewMap[oldLocator.hashCode()]
                     val oldLevels = oldLocator.locatorValue.split("/").count { it.isNotEmpty() }
@@ -590,16 +563,7 @@ class DailyManager {
             var count = 0
             val predicateRegex = Regex("\\[\\d+]")
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed) {
-                    //save if any locator was broken
-                    val brokenLocators = testOutcome.locatorsNew.filter { loc ->
-                        testOutcome.stacktrace!!.trim().contains(loc.locatorValue.trim())
-                    }
-                    val locsAnalizer = LocatorsAnalyzer()
-                    locsAnalizer.calculateBrokenLocators(brokenLocators)
-                    continue
-                }
-                val locatorsNewMap = testOutcome.locatorsNew.associateBy { it.hashCode() }
+                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
                 for (oldLocator in testOutcome.locatorsOld) {
                     val newLocator = locatorsNewMap[oldLocator.hashCode()]
                     val oldPredicateCount = predicateRegex.findAll(oldLocator.locatorValue).count()
@@ -618,16 +582,7 @@ class DailyManager {
             var count = 0
             val problematicAttributes = GamificationManager.BAD_PREDS + GamificationManager.BAD_JS
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed) {
-                    //save if any locator was broken
-                    val brokenLocators = testOutcome.locatorsNew.filter { loc ->
-                        testOutcome.stacktrace!!.trim().contains(loc.locatorValue.trim())
-                    }
-                    val locsAnalizer = LocatorsAnalyzer()
-                    locsAnalizer.calculateBrokenLocators(brokenLocators)
-                    continue
-                }
-                val locatorsNewMap = testOutcome.locatorsNew.associateBy { it.hashCode() }
+                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
                 for (oldLocator in testOutcome.locatorsOld) {
                     val newLocator = locatorsNewMap[oldLocator.hashCode()]
                     val hadBadPredicate = problematicAttributes.any { attr ->
@@ -647,16 +602,7 @@ class DailyManager {
         private fun checkTargetedNoIDNoXpathChanged(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed) {
-                    //save if any locator was broken
-                    val brokenLocators = testOutcome.locatorsNew.filter { loc ->
-                        testOutcome.stacktrace!!.trim().contains(loc.locatorValue.trim())
-                    }
-                    val locsAnalizer = LocatorsAnalyzer()
-                    locsAnalizer.calculateBrokenLocators(brokenLocators)
-                    continue
-                }
-                val locatorsNewMap = testOutcome.locatorsNew.associateBy { it.hashCode() }
+                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
                 for (oldLocator in testOutcome.locatorsOld) {
                     val newLocator = locatorsNewMap[oldLocator.hashCode()]
                     val wasNonIDOrXpath = !oldLocator.locatorType.equals("id", ignoreCase = true) &&
@@ -676,27 +622,21 @@ class DailyManager {
             var count = 0
             val locsAnalizer = LocatorsAnalyzer()
             val repairedLocators = mutableListOf<Locator>()
-            val allBrokenLocs = locsAnalizer.getBrokenLocs()
+            //for each test, count previously broken loc that is no more present in stacktrace of the previously broken test
             for (testOutcome in testOutcomes) {
-                //find locs that were broken for this test
-                val testBrokenLocs = allBrokenLocs?.filter { loc ->
-                    loc.methodName == testOutcome.testName && loc.className == testOutcome.className
-                }
-                //count previously broken locs that are no more present in stacktrace of the previously broken test
-                if (testBrokenLocs != null) {
-                    for(loc in testBrokenLocs){
-                        if(loc.methodName == testOutcome.testName && loc.className == testOutcome.className)
-                            if(testOutcome.stacktrace != null){
-                                val stackTrace = testOutcome.stacktrace.trim()
-                                val locValue = loc.locatorValue.trim()
-                                if(!stackTrace.contains(locValue)) {
-                                    count++
-                                    repairedLocators.add(loc) //loc repaired as the test did fail but not for that loc
-                                }
+                val loc = testOutcome.locatorBroken
+                if (loc != null) {
+                    if(loc.methodName == testOutcome.testName && loc.className == testOutcome.className)
+                        if(testOutcome.stacktrace != null){
+                            val stackTrace = testOutcome.stacktrace.trim()
+                            val locValue = loc.locatorValue.trim()
+                            if(!stackTrace.contains(locValue)) {
+                                count++
+                                repairedLocators.add(loc) //loc repaired as the test did fail but not for that loc
                             }
-                            else
-                                repairedLocators.add(loc) //loc repaired as the test did not fail
-                    }
+                        }
+                        else
+                            repairedLocators.add(loc) //loc repaired as the test did not fail
                 }
             }
             locsAnalizer.updateBrokenLocs(repairedLocators)
@@ -713,9 +653,7 @@ class DailyManager {
             var count = 0
             for (testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
@@ -735,9 +673,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
@@ -755,9 +691,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
@@ -776,9 +710,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (!oldLocator.locatorType.equals("xpath", ignoreCase = true)) {
@@ -795,9 +727,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (!oldLocator.locatorType.equals("id", ignoreCase = true)) {
@@ -814,9 +744,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()]
@@ -832,9 +760,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorValue.length > GamificationManager.MAX_LENGTH){
@@ -851,9 +777,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
@@ -871,9 +795,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
@@ -891,9 +813,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
@@ -912,16 +832,15 @@ class DailyManager {
                 .find { it.daily.name == "edit5" }
             val existingModifiedLocs = dailyProgress!!.modifiedLocs.toMutableSet()
             val oldSize = existingModifiedLocs.size
-            for (testOutcome in testOutcomes)
-                if (testOutcome.isPassed) {
-                    //it checks if locators have changed values and are different from those that were already changed
-                    val locatorsOldMap = testOutcome.locatorsOld.associateBy { it.locatorName }
-                    testOutcome.locatorsNew.forEach { locatorNew ->
-                        val locatorOld = locatorsOldMap[locatorNew.locatorName]
-                        if (locatorOld != null && locatorNew.locatorValue != locatorOld.locatorValue)
-                            existingModifiedLocs.add(locatorNew.locatorName.toString())
-                    }
+            for (testOutcome in testOutcomes) {
+                //it checks if locators have changed values and are different from those that were already changed
+                val locatorsOldMap = testOutcome.locatorsOld.associateBy { it.locatorName }
+                testOutcome.locatorsPassed.forEach { locatorNew ->
+                    val locatorOld = locatorsOldMap[locatorNew.locatorName]
+                    if (locatorOld != null && locatorNew.locatorValue != locatorOld.locatorValue)
+                        existingModifiedLocs.add(locatorNew.locatorName.toString())
                 }
+            }
             dailyProgress.modifiedLocs = existingModifiedLocs.toList()
             return existingModifiedLocs.size - oldSize //it returns the number of newly changed locs
         }
@@ -930,9 +849,7 @@ class DailyManager {
             var count = 0
             for(testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
@@ -947,6 +864,7 @@ class DailyManager {
             return count
         }
 
+        //TODO: this method is old and its implementation must be adapted to testOutcome.locatorsPassed
         private val stackTraceMap = mutableMapOf<String, String>()
         private fun checkRepair(testOutcomes: List<TestOutcome>): Int {
             var repairs = 0
@@ -999,9 +917,7 @@ class DailyManager {
             var count = 0
             for (testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true)) {
@@ -1021,10 +937,8 @@ class DailyManager {
         private fun checkNewXPath(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 //new locator hashes only
                 val newLocators = locatorsNew.filter { newLocator ->
@@ -1040,10 +954,8 @@ class DailyManager {
         private fun checkNewID(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 //new locator hashes only
                 val newLocators = locatorsNew.filter { newLocator ->
@@ -1061,10 +973,8 @@ class DailyManager {
             val newLocators = mutableListOf<Locator>()
             //locators are considered from the whole test suite and not separated by method
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 oldLocatorsHashes.addAll(testOutcome.locatorsOld.map { it.hashCode() })
-                newLocators.addAll(testOutcome.locatorsNew)
+                newLocators.addAll(testOutcome.locatorsPassed)
             }
             //new locator hashes only
             val filteredNewLocators = newLocators.filter { newLocator ->
@@ -1080,10 +990,8 @@ class DailyManager {
         private fun checkNewXPathLengthMax(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 //new locator hashes only
                 val newLocators = locatorsNew.filter { newLocator ->
@@ -1099,10 +1007,8 @@ class DailyManager {
         private fun checkNewXPathLevelMax(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
@@ -1119,10 +1025,8 @@ class DailyManager {
         private fun checkNewRobust(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
@@ -1137,10 +1041,8 @@ class DailyManager {
         private fun checkNewXPathWithWantedAttrs(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
@@ -1157,10 +1059,8 @@ class DailyManager {
         private fun checkNewXPathWithoutUnwantedAttrs(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
@@ -1177,10 +1077,8 @@ class DailyManager {
         private fun checkNewXPathWithoutJS(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 val newLocators = locatorsNew.filter { newLocator ->
                     !oldLocatorsHashes.contains(newLocator.hashCode()) &&
@@ -1197,9 +1095,7 @@ class DailyManager {
         private fun checkRunLoc20(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for(testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
-                    continue
-                count += testOutcome.locatorsNew.size
+                count += testOutcome.locatorsPassed.size
             }
             return count
         }
@@ -1207,10 +1103,8 @@ class DailyManager {
         private fun checkNewXPathWithFewPosPredicates(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 val regex = "\\[.*?]".toRegex() //to count positional predicates
                 //find locators that are actually new

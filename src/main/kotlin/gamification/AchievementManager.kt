@@ -341,10 +341,14 @@ class AchievementManager {
         private fun iDidIt(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
-                if(!testOutcome.isPassed || locatorsOld.size == locatorsNew.size || locatorsOld.isNotEmpty())
-                    continue
-                return 1
+                val locatorsNew = testOutcome.locatorsPassed
+                val hasNewLocator = locatorsNew.any { newLocator ->
+                    locatorsOld.none { oldLocator ->
+                        oldLocator.hashCode() == newLocator.hashCode()
+                    }
+                }
+                if (hasNewLocator)
+                    return 1
             }
             return 0
         }
@@ -352,10 +356,8 @@ class AchievementManager {
         private fun killThemAll(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
@@ -373,10 +375,8 @@ class AchievementManager {
         private fun keepItShort(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()]
@@ -394,10 +394,8 @@ class AchievementManager {
         private fun theHigherTheyAreTheLouderTheyFall(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()]
@@ -429,7 +427,7 @@ class AchievementManager {
             val calc = LocatorsFragilityCalculator()
             for (testOutcome in testOutcomes) {
                 val locsOld = testOutcome.locatorsOld
-                val locsNew = testOutcome.locatorsNew
+                val locsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locsNew.associateBy { it.hashCode() }
                 for (oldLocator in locsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()] ?: continue
@@ -456,11 +454,10 @@ class AchievementManager {
                         return 1
                     }
                     // check if the test breaks because of that new locator
-                    if (!testOutcome.isPassed &&
-                        testOutcome.stacktrace!!.contains("NoSuchElementException") &&
-                        testOutcome.stacktrace.contains(newLocator.locatorValue)) {
+                    if (!testOutcome.isPassed && testOutcome.locatorBroken != null &&
+                        testOutcome.locatorBroken.locatorValue == newLocator.locatorValue
+                    )
                         return 1
-                    }
                 }
             }
             return 0
@@ -470,15 +467,12 @@ class AchievementManager {
             val calc = LocatorsFragilityCalculator()
             for (testOutcome in testOutcomes) {
                 val locsOld = testOutcome.locatorsOld
-                val locsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locsNew.associateBy { it.hashCode() }
                 for (oldLocator in locsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()] ?: continue
-                    if (calc.calculateFragility(newLocator) < calc.calculateFragility(oldLocator)) {
+                    if (calc.calculateFragility(newLocator) < calc.calculateFragility(oldLocator))
                         return 1
-                    }
                 }
             }
             return 0
@@ -489,15 +483,12 @@ class AchievementManager {
             val calc = LocatorsFragilityCalculator()
             for (testOutcome in testOutcomes) {
                 val locsOld = testOutcome.locatorsOld
-                val locsNew = testOutcome.locatorsNew
-                if (!testOutcome.isPassed)
-                    continue
+                val locsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locsNew.associateBy { it.hashCode() }
                 for (oldLocator in locsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()] ?: continue
-                    if (calc.calculateFragility(newLocator) < calc.calculateFragility(oldLocator)) {
+                    if (calc.calculateFragility(newLocator) < calc.calculateFragility(oldLocator))
                         count++
-                    }
                 }
             }
             return count
@@ -506,9 +497,8 @@ class AchievementManager {
         private fun immortality(testOutcomes: List<TestOutcome>): Int {
             val counterFileName = "locator_counts${currentUser.id}.txt"//create a counter file for locators if not exists
             val survivingCounterLocatorFile = File(counterFileName)
-            if (!survivingCounterLocatorFile.exists()) {
+            if (!survivingCounterLocatorFile.exists())
                 survivingCounterLocatorFile.createNewFile()
-            }
             val counters = mutableMapOf<Int, Int>()
             survivingCounterLocatorFile.readLines().forEach { line ->
                 val parts = line.split(',')
@@ -521,10 +511,8 @@ class AchievementManager {
                 }
             }
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsMap = locatorsOld.associateBy { it.hashCode() }
                 for (newLocator in locatorsNew) {
                     val newKey = newLocator.hashCode()
@@ -577,9 +565,7 @@ class AchievementManager {
 
         private fun iFeelSoLonely(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsNew.forEach { newLocator ->
                     if (locatorsNew.count { it.locatorType == newLocator.locatorType } == 1) {
                         return 1
@@ -591,11 +577,9 @@ class AchievementManager {
 
         private fun theGiftOfSynthesis(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsNew.forEach { newLocator ->
-                    if (newLocator.locatorValue.length == 1) {//assumption: shortest locator when length == 1
+                    if (newLocator.locatorValue.length == 1) {//TODO: assumption is shortest locator when length == 1
                         return 1
                     }
                 }
@@ -605,11 +589,9 @@ class AchievementManager {
 
         private fun theBiggerTheBetter(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
-                if(!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsNew.forEach { newLocator ->
-                    if (newLocator.locatorValue.length > 50) {//assumption: longest locator when length > 50
+                    if (newLocator.locatorValue.length > 50) {//TODO: assumption is longest locator when length > 50
                         return 1
                     }
                 }
@@ -627,9 +609,7 @@ class AchievementManager {
             }
             locatorTypesFile.readLines().forEach { line -> foundTypes.add(line.trim()) }
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsNew.forEach { locator -> foundTypes.add(locator.locatorType) }
                 locatorTypesFile.printWriter().use { writer ->
                     foundTypes.forEach { type ->
@@ -646,9 +626,7 @@ class AchievementManager {
 
         private fun theCakeIsALie(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsNew.forEach { newLocator ->
                     if (newLocator.locatorName == "cake") {
                         return 1
@@ -661,9 +639,7 @@ class AchievementManager {
         private fun theCloneWar(testOutcomes: List<TestOutcome>): Int {
             val locatorCounts = mutableMapOf<Locator, Int>()
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsNew.forEach { newLocator ->
                     locatorCounts[newLocator] = locatorCounts.getOrDefault(newLocator, 0) + 1
                     if (locatorCounts[newLocator] == 10)
@@ -687,10 +663,8 @@ class AchievementManager {
                 }
             }
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsMap = locatorsOld.associateBy { it.hashCode() }
                 //if locator is new, add it to file
                 locatorsNew.forEach { newLocator ->
@@ -732,10 +706,8 @@ class AchievementManager {
                 }
             }
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
-                val locatorsNew = testOutcome.locatorsNew
                 val locatorsOld = testOutcome.locatorsOld
+                val locatorsNew = testOutcome.locatorsPassed
                 locatorsOld.forEach { oldLocator ->
                     if (!locatorsNew.contains(oldLocator)) {
                         val oldLocatorHash = oldLocator.hashCode()
@@ -757,10 +729,8 @@ class AchievementManager {
 
         private fun whatTheDifference(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
-                if (!testOutcome.isPassed)
-                    continue
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
                 for (newLocator in locatorsNew) {
                     val newLocatorHash = newLocator.hashCode()
@@ -965,7 +935,7 @@ class AchievementManager {
         private fun flawlessVictory(testOutcomes: List<TestOutcome>): Int {
             val calc = LocatorsFragilityCalculator()
             for (testOutcome in testOutcomes) {
-                for (locator in testOutcome.locatorsNew) {
+                for (locator in testOutcome.locatorsPassed) {
                     val fragilityScore = calc.calculateFragility(locator)
                     if (fragilityScore <= 0.1)
                         return 1
@@ -977,7 +947,7 @@ class AchievementManager {
         private fun frankenstein(testOutcomes: List<TestOutcome>): Int {
             val calc = LocatorsFragilityCalculator()
             for (testOutcome in testOutcomes) {
-                for (locator in testOutcome.locatorsNew) {
+                for (locator in testOutcome.locatorsPassed) {
                     val fragilityScore = calc.calculateFragility(locator)
                     if (fragilityScore >= 1)
                         return 1
@@ -1002,7 +972,7 @@ class AchievementManager {
             }
             for (testOutcome in testOutcomes) {
                 val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsNew
+                val locatorsNew = testOutcome.locatorsPassed
                 val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
                 for (oldLocator in locatorsOld) {
                     val newLocator = newLocatorsMap[oldLocator.hashCode()]
