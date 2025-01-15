@@ -31,6 +31,7 @@ class GamificationManager() {
         lateinit var userProfile: UserProfile //the current user
         var mode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
 
+
         //PROPERTIES USED TO DETERMINE GOOD/BAD LOCATORS
         const val MAX_LENGTH = 50
         const val MAX_LEVEL = 5
@@ -69,7 +70,7 @@ class GamificationManager() {
             Title("Supreme Magus", 1000000)
         )
 
-        fun getXpForTitle(titleName: String): Int {
+        private fun getXpForTitle(titleName: String): Int {
             return allTitles.find { it.name == titleName }?.xp ?: -1
         }
 
@@ -89,11 +90,18 @@ class GamificationManager() {
 
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
             val dailyProgresses = DailyManager.updateDailyProgresses(userProfile, testOutcomes)//check for each assigned daily
-            //val achUpdates = AchievementManager.updateAchievements(userProfile, testOutcomes)
-            if (!dailyProgresses.isNullOrEmpty()) { //|| achUpdates.isNullOrEmpty
+            val achProgresses = AchievementManager.updateAchievementProgresses(userProfile, testOutcomes)
+            if (dailyProgresses.isNotEmpty() || achProgresses.isNotEmpty()){
                 val totalXp = dailyProgresses.sumOf { it.first } //total xp gained
-                //val dailyDescriptions = dailyUpdates.mapNotNull { it.second?.description } //list of involved dailies
-                var msg = "$totalXp XP gained from (partially) completed dailies\n"
+                var msg = ""
+                if(dailyProgresses.isNotEmpty() && totalXp > 0) {
+                    msg = "$totalXp XP gained from (partially) completed dailies\n"
+                    //val dailyDescriptions = dailyProgresses.mapNotNull { it.second?.description }
+                }
+                if (achProgresses.isNotEmpty()) {
+                    val completedAchievements = achProgresses.filterNotNull().joinToString(", ") { it.name }
+                    msg += "Achievements completed: $completedAchievements\n"
+                }
                 val xmlWriter = XMLWriter()
                 val isNewTitle = updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
@@ -107,22 +115,28 @@ class GamificationManager() {
         }
 
         private fun updateTitleAndLvl(userProfile: UserProfile): Boolean {
-            //e.g., if current user is level 3 and has 15/400 xp, to find if new level is reached
-            // we need to count 15 + base XP needed to reach level 3 to determine whole XP
+            //e.g., if current user is level 3 and has 15/400 xp left, to find if new level is reached
+            // we need to count 15 + base XP needed to reach level 3 to determine whole XP and then the next lvl title
             val newTitle = allTitles
-                .maxByOrNull { if (it.xp + getXpForTitle(userProfile.title) <= userProfile.currentXP + getXpForTitle(userProfile.title)) it.xp
+                .maxByOrNull {
+                    if (it.xp + getXpForTitle(userProfile.title) <= userProfile.currentXP + getXpForTitle(userProfile.title)) it.xp
                 else Int.MIN_VALUE }
-            if (newTitle != null && userProfile.title != newTitle.name) {
+            if (newTitle != null && userProfile.title != newTitle.name) {//if a new title is found
                 userProfile.title = newTitle.name
-                userProfile.level++
-                userProfile.currentXP -= userProfile.nextXP //xp is restarted considering exceeding XP from new lvl reached
                 val currentIndex = allTitles.indexOfFirst { it.name == userProfile.title }
-                if (currentIndex != -1 && currentIndex + 1 < allTitles.size)
+                if(currentIndex + 1 >= allTitles.size) { //if max title/lvl reached
+                    userProfile.nextXP = allTitles[allTitles.size - 1].xp
+                    userProfile.currentXP = allTitles[allTitles.size - 1].xp
+                }
+                else {
                     userProfile.nextXP = allTitles[currentIndex + 1].xp
+                    userProfile.currentXP -= allTitles[currentIndex].xp //xp is restarted considering exceeding XP from lvl reached
+                }
+                userProfile.level = currentIndex + 1
                 return true
             }
             else if (newTitle == null)
-                userProfile.nextXP = Int.MAX_VALUE
+                userProfile.nextXP = allTitles[allTitles.size -1].xp
             return false
         }
 
@@ -161,6 +175,7 @@ class GamificationManager() {
         }
         else {
             userProfile = tempUserProfile
+            AchievementManager.updateUserProfile(userProfile)
             if(mode == DailyAssignmentMode.TARGETED)
                 assignTargetDailies()
         }

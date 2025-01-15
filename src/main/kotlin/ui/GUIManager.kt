@@ -475,7 +475,7 @@ object GUIManager {
 
         // Create daily label on mouse over for random dailies
         if (dailyProgress.daily.type.equals("random", ignoreCase = true)) {
-            val progressPerc = (dailyProgress.progress / dailyProgress.daily.target!!) * 100
+            val progressPerc = (dailyProgress.progress * 100 / dailyProgress.daily.target!!)
             val dailyMessage = "Progress: ${progressPerc}%"
             val dailyLabel = JLabel(dailyProgress.daily.description).apply {
                 this.font = font

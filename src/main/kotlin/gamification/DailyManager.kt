@@ -438,7 +438,7 @@ class DailyManager {
             return DAILY_NAME_TO_XP[name] ?: 0
         }
 
-        fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>>? {
+        fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>> {
             val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
 
             //find the dailies to update according to gaming mode
@@ -457,8 +457,9 @@ class DailyManager {
                         GamificationManager.DailyAssignmentMode.INCLUSIVE -> TODO()
                     }
                     if (progress!! > 0) {
-                        val updateResult = update(userProfile, it, progress)
-                        progresses.add(updateResult)
+                        val dailyProgress = update(userProfile, it, progress)
+                        progresses.add(dailyProgress)  //TODO:  add a more sophisticated check/return type
+                                                       // if a more sophisticated notification must be provided
                     }
                 }
             }
@@ -485,6 +486,11 @@ class DailyManager {
             //since targeted dailies might involve a large number of locators, the xp is given for each (counted by progress)
             else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
                 gainedXP = daily.xp * progress
+
+                //TODO: remove the following just for testing
+                //gainedXP = 50000000
+
+
                 involvedDaily = daily
                 userProfile.currentXP += gainedXP
             }

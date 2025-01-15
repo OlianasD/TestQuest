@@ -69,19 +69,19 @@ class TestExecutionListener : SMTRunnerEventsListener {
             //new static = latest code change
             //old dynamic = previous code change BEFORE test execution (used to check dailies)
             //new dynamic = latest code change BEFORE test execution (used to check dailies)
-            TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
-            TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic //retrieve locators at the start of testing
+            if(TestQuestAction.locatorsOldStatic.isNotEmpty()) //this to manage the case when tests are run with no locs changed
+                TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
+            TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic
             server = Server()
             server.start()
-            println("Server started!")
         }
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
     }
 
+    //this is called at the end of the whole testing process
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
         try {
             server.stop()
-            println("Server stopped!")
             //check how events affected tasks
             GamificationManager.analyzeEvents(testOutcomes)
             testOutcomes.forEach { testOutcome ->
@@ -91,6 +91,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
         catch (_: RuntimeException) {}//this to handle the case of tests runned even if TestQuest is not opened
     }
 
+    //this is called at the end of each test execution
     override fun onTestFinished(test: SMTestProxy) {
         try {
 

@@ -37,6 +37,12 @@ class AchievementManager {
                 "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
             ),
             Achievement(
+                "Stillness",
+                "Do not change any locator for 24 hours",
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+            ),
+            Achievement(
                 "Ops... I made a mistake!",
                 "Worsen the quality of a locator",
                 1,
@@ -127,7 +133,7 @@ class AchievementManager {
                 "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
             ),
             Achievement(
-                "Test Marathon",
+                "I joined the Test Marathon",
                 "Execute 1000 tests successfully",
                 1,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
@@ -184,7 +190,7 @@ class AchievementManager {
 
 
 
-            Achievement(
+            /*Achievement(
                 "Kill them all",
                 "Implement 100 robust locators",
                 100,
@@ -205,12 +211,6 @@ class AchievementManager {
             Achievement(
                 "Is this a locator?",
                 "Open the plugin for the first time",
-                1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
-            ),
-            Achievement(
-                "Stillness",
-                "Do not change any locator for 24 hours",
                 1,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
             ),
@@ -255,7 +255,7 @@ class AchievementManager {
                 "Reach level 20",
                 1,
                 "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
-            ),
+            ),*/
 
         )
 
@@ -271,6 +271,10 @@ class AchievementManager {
                 userProfile.achievementProgresses.add(achProgress)
                 currentUser = userProfile
             }
+        }
+
+        fun updateUserProfile(userProfile: UserProfile){
+            currentUser = userProfile
         }
 
         private lateinit var currentUser: UserProfile
@@ -300,8 +304,8 @@ class AchievementManager {
             "Keep it short" to ::keepItShort,
             "The higher they are, the louder they fall" to ::theHigherTheyAreTheLouderTheyFall,
             "Stillness" to ::stillness,
-            "I made a mistake" to ::iMadeAMistake,
-            "Perfectionism" to ::learningThings,
+            "Ops... I made a mistake!" to ::iMadeAMistake,
+            "I'm starting to learn things" to ::learningThings,
             "Perfectionism" to ::perfectionism,
             "Immortality" to ::immortality,
             "An inside job" to ::anInsideJob,
@@ -565,9 +569,11 @@ class AchievementManager {
 
         private fun iFeelSoLonely(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
-                val locatorsNew = testOutcome.locatorsPassed
-                locatorsNew.forEach { newLocator ->
-                    if (locatorsNew.count { it.locatorType == newLocator.locatorType } == 1) {
+                val locatorsOld = testOutcome.locatorsOld
+                val locatorsPassed = testOutcome.locatorsPassed
+                locatorsPassed.forEach { passedLocator ->
+                    val isUniqueType = locatorsOld.none { it.locatorType == passedLocator.locatorType }
+                    if (isUniqueType) {
                         return 1
                     }
                 }
@@ -1001,28 +1007,40 @@ class AchievementManager {
 
 
 
-        fun updateAchievements(userProfile: UserProfile, testOutcomes: List<TestOutcome>): Boolean {
-            var anyUpdate = false
+        fun updateAchievementProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Achievement?> {
+            val progresses = mutableListOf<Achievement?>() //to track the progresses (i.e., achievement completed)
             val copyOfAchievementProgresses = ArrayList(userProfile.achievementProgresses) //needed since the list is updated during loop
             copyOfAchievementProgresses.forEach { ap ->
-                val progress = achievementChecks[ap.achievement.name]?.invoke(testOutcomes)
-                if (progress!! > 0) {
-                    update(userProfile, ap.achievement, progress)
-                    anyUpdate = true
+                try {
+                    val progress = achievementChecks[ap.achievement.name]?.invoke(testOutcomes)
+                    if (progress != null && progress > 0) {
+                        val achievementProgress = update(userProfile, ap.achievement, progress)
+                        achievementProgress?.let { progresses.add(it) } //TODO:  add a more sophisticated check/return type
+                                                                        // if a more sophisticated notification must be provided
+                    }
+                } catch (e: Exception) {
+                    println("Exception occurred while processing achievement: ${ap.achievement.name}")
+                    e.printStackTrace()
                 }
+
+
             }
-            return anyUpdate
+            return progresses //this to keep track of any changes and update the GUI
         }
 
-        private fun update(userProfile: UserProfile, achievement: Achievement, progress: Int) {
+        private fun update(userProfile: UserProfile, achievement: Achievement, progress: Int): Achievement? {
+            var involvedAchievement: Achievement? = null //to track the involved achievement
+
             val achievementProgress = userProfile.achievementProgresses.find { it.achievement.name == achievement.name }
             achievementProgress?.let { ap ->
                 ap.progress += progress
                 if (ap.progress >= ap.achievement.target) { // if the achievement has been completed, remove it from list
                     userProfile.completedAchievements.add(ap.achievement)
                     userProfile.achievementProgresses.removeIf { it.achievement.name == achievement.name }
+                    involvedAchievement = ap.achievement
                 }
             }
+            return involvedAchievement
         }
 
 
