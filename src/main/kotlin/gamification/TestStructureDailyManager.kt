@@ -22,7 +22,11 @@ class TestStructureDailyManager {
             "addTearDown",
             "removeGlobVar",
             "removeExpSleep",
-            "setDriverForEachTest"
+            "setDriverForEachTest",
+            "giveMeaningfulMethodName",//TODO: this may need external resources
+            "shortenMethodName",
+            "shortenVarName",
+            "meaningfulVarName",//TODO: this may need external resources
         )
 
 

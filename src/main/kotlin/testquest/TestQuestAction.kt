@@ -8,6 +8,8 @@ import gamification.GamificationManager
 import locator.Locator
 import locator.LocatorsExtractor
 import locator.LocatorsFragilityCalculator
+import pageobject.PageObject
+import pageobject.PageObjectExtractor
 import ui.GUIManager
 import utils.TestFilesExtractor
 
@@ -25,9 +27,17 @@ class TestQuestAction : AnAction() {
         if (testFilePaths.isNotEmpty()) {
 
             //extract locators
-            val extractor = LocatorsExtractor()
-            locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
+            val locExtractor = LocatorsExtractor()
+            locatorsNewStatic = testFilePaths.flatMap { locExtractor.parseLocators(it) }
             locatorsOldDynamic = locatorsNewStatic //old dynamic = locators at the beginning or those after each run
+
+
+            //extract PageObjects (i.e., classes named as _Page.java)
+            val poExtractor = PageObjectExtractor()
+            POsNew = testFilePaths
+                .filter { it.fileName.toString().endsWith("Page.java") }
+                .map { filePath -> poExtractor.parsePageObject(filePath, locatorsNewStatic) }
+
 
             //setup gamification profile
             val gamificationManager = GamificationManager()
@@ -58,6 +68,10 @@ class TestQuestAction : AnAction() {
         //this to store dynamic changes used for most tasks before-after test execution
         var locatorsOldDynamic: List<Locator> = listOf()
         var locatorsNewDynamic: List<Locator> = listOf()
+        //this to store changes on PageObjects
+        var POsNew: List<PageObject> = listOf()
+        var POsOld: List<PageObject> = listOf()
+
 
 
     }

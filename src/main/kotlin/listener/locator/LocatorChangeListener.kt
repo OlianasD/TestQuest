@@ -15,6 +15,7 @@ import gamification.GamificationManager
 import locator.Locator
 import locator.LocatorsExtractor
 import locator.LocatorsFragilityCalculator
+import pageobject.PageObjectExtractor
 import testquest.TestQuestAction
 import ui.GUIManager
 import utils.TestFilesExtractor
@@ -67,12 +68,19 @@ class LocatorChangeListener private constructor() : EditorFactoryListener, Dispo
         //extract new locs, update scores, and update target dailies on changes over test files
         VirtualFileManager.getInstance().addVirtualFileListener(object : VirtualFileListener {
             override fun contentsChanged(event: VirtualFileEvent) {
-                val filePath = event.file.path
+                val filePath = event.file.path //TODO: maybe next activities could be limited to this file only
                 if (isTestFile(filePath)) {
                     val testFilePaths = TestFilesExtractor.findTestFilePaths(proj)
                     val extractor = LocatorsExtractor()
                     TestQuestAction.locatorsOldStatic = TestQuestAction.locatorsNewStatic
                     TestQuestAction.locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
+
+                    //TODO: to evaluate the following PO extraction
+                    val poExtractor = PageObjectExtractor()
+                    TestQuestAction.POsNew = testFilePaths
+                        .filter { it.fileName.toString().endsWith("Page.java") }
+                        .map { filePath -> poExtractor.parsePageObject(filePath, TestQuestAction.locatorsNewStatic) }
+
                     val updatedScores = loadLocatorScores()
                     tooltipListeners.values.forEach { listener ->
                         listener.updateLocatorScores(updatedScores)

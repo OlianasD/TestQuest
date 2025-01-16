@@ -42,7 +42,7 @@ dependencies {
   implementation("org.ow2.asm:asm:9.2")
   testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
   implementation("org.seleniumhq.selenium:selenium-java:4.21.0")
-  implementation("com.github.javaparser:javaparser-core:3.23.1")
+  implementation("com.github.javaparser:javaparser-core:3.24.0")
   implementation("org.slf4j:slf4j-api:2.0.9")
   implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
   implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")

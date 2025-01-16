@@ -18,7 +18,9 @@ class DailyManager {
 
         /**********************************RANDOM DAILIES**********************************/
 
+        //TODO: refactor this class by organizing dailies as LocatorsDailyManager, PODailyManager, TestDailyManager
         private val RANDOM_DAILY_NAMES = listOf(
+            /************ DAILIES ABOUT LOCATORS ************/
             "xpathAbs",
             "xpathLength",
             "xpathLevel",
@@ -43,11 +45,27 @@ class DailyManager {
             "newWantedAttr",
             "newUnwantedAttr",
             "newJS",
-            "newLowPredicates"
+            "newLowPredicates",
+            /************ DAILIES ABOUT POS ************/
+            "addPO", //create a PO within test suite (i.e., basically just a class named _Page is ok)
+            "addMethodToPO", //add a method to a PO (i.e., basically just an empty method is ok)
+            "addLocsToMethod", //add locs to a method
+            "moveLocs2Method", //move locs from test to a method
+            "returnPOInMethod", //add a PO as return type for a method
+            "moveAssertsToTest", //move asserts from method to test
+            "adaptLocs2Format", //adapt locs to have format: WebElement e = driver.findElement(By...)
+            "interactWithLocsInMethod", //add Selenium instructions in method to interact with locators
+            "addAncestorPO", //add an 'extend' between POs
+            "moveCommonMethodToAncestorPO", //move a method shared among POs to an ancestor
+            "instantiatePO", //instantiate a PO within a test
+            "callMethod", // call a method from a PO within a test
+            "callUnusedMethod", //call an unused method from a PO within a test
         )
+
 
         //TODO: change icons, xp, target accordingly
         private val ALL_RANDOM_DAILIES = mutableListOf(
+            /************ DAILIES ABOUT LOCATORS ************/
             Daily(
                 RANDOM_DAILY_NAMES[0],
                 "Replace $DAILY_GOAL existing absolute XPath locators with $DAILY_GOAL relative ones",
@@ -248,7 +266,118 @@ class DailyManager {
                 "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
+            /************ DAILIES ABOUT POS ************/
+            Daily(
+                RANDOM_DAILY_NAMES[25],
+                "Create a PageObject within the test suite",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[26],
+                "Add a method to any PageObject",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[27],
+                "Implement $DAILY_GOAL new locators to any PageObject method",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[28],
+                "Move $DAILY_GOAL locators from tests to any PageObject method",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[29],
+                "Define a PageObject as return type for any PageObject method that does not",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[30],
+                "Move $DAILY_GOAL asserts existing in any PageObject method to a test",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[31],
+                "Adapts $DAILY_GOAL locators retrieval from any PageObject method to the canonical form",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[32],
+                "Add $DAILY_GOAL interactions with locators in any PageObject method",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[32],
+                "Assign an ancestor PageObject to any PageObject",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[33],
+                "Move a duplicated method from multiple PageObjects to a common ancestor",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[34],
+                "Instantiate a PageObject within any test",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[35],
+                "Call a PageObject method from any test",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[36],
+                "Call an unused PageObject method from any test",
+                RANDOM_DAILY_XP,
+                1,
+                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
         )
+
+
+
+
+
+
 
         private val DAILY_NAME_TO_DESCRIPTION = ALL_RANDOM_DAILIES.associate { it.name to it.description }
         private val DAILY_NAME_TO_TARGET = ALL_RANDOM_DAILIES.associate { it.name to it.target }
@@ -405,11 +534,11 @@ class DailyManager {
         }
 
         fun reassignRandomDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
-            //find all dailies but the one that is going to be discarded
+            //find all dailies but the ones already assigned to user
             val availableDailies = ALL_RANDOM_DAILIES.filter { d ->
                 userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
             }
-            //new daily is selected with discarded set to true (only 1 discard within 24h is possible)
+            //a new daily is randomly selected with discarded set to true (only 1 discard within 24h is possible)
             val newDaily: Daily = availableDailies.shuffled().first()
             val newDailyProgress = DailyProgress(
                 newDaily,
