@@ -1,24 +1,26 @@
-package pageobject
+package extractor.pageobject
 
 import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
-import com.github.javaparser.ast.expr.AnnotationExpr
-import com.github.javaparser.ast.expr.MethodCallExpr
-import locator.Locator
+import com.github.javaparser.ast.type.Type
+import extractor.locator.Locator
+import extractor.locator.LocatorsExtractor
 import java.nio.file.Path
 
 data class PageObject(
     val name: String,
     val methods: List<MethodInfo>, // PO methods
-    val ancestors: List<String>, // PO ancestors
-    val nonCanonicalLocators: List<String> // locators defined differently from WebElement e = driver.findBy...
+    val ancestors: List<String>, // PO ancestors names
+    val nonCanonicalLocators: List<Locator> // locators defined with no names or as annotations
 )
 
+//method info for the methods within each PO
 data class MethodInfo(
     val name: String,
-    val returnType: String,
+    val returnType: Type,
+    val paramTypes: List<Type>,
     val locators: List<Locator>, // list of locators within method
     val assertionLines: List<String>, // list of assertions associated with method info (hopefully, none)
     val seleniumCommands: List<String> // list of selenium commands associated with method info
@@ -27,7 +29,7 @@ data class MethodInfo(
 class PageObjectExtractor {
 
     companion object {
-        // TODO: extend the list with further commands if needed
+        // TODO: extend the list with further commands, if needed (e.g., via Action or JavascriptExecutor)
         val SELENIUM_COMMANDS = listOf(
             "click",
             "sendKeys",
@@ -35,16 +37,12 @@ class PageObjectExtractor {
             "submit",
             "clear",
             "getAttribute",
-            "getCssValue",
             "isDisplayed",
             "isEnabled",
             "isSelected",
             "getTagName",
             "doubleClick",
-            "contextClick",
-            "dragAndDrop",
-            "moveToElement",
-            "scrollIntoView"
+            "getText"
         )
     }
 
@@ -61,25 +59,18 @@ class PageObjectExtractor {
             .extendedTypes.map { it.nameAsString }
 
         val methods = mutableListOf<MethodInfo>()
-        val nonCanonicalLocators = mutableListOf<String>()
+        var nonCanonicalLocators = mutableListOf<Locator>()
 
         //for each part of the PageObject
         cu.types[0].members.forEach { member ->
             when (member) {
 
-                //check for @FindBy annotations (non canonical way to declare locators)
-                is FieldDeclaration -> {
-                    member.annotations.forEach { annotation ->
-                        if (annotation.nameAsString == "FindBy") {
-                            nonCanonicalLocators.add(annotation.toString()) // Always add to non-canonical locators
-                        }
-                    }
-                }
-
                 //check for method body
                 is MethodDeclaration -> {
                     val methodName = member.nameAsString // to retrieve method name
-                    val returnType = member.type.toString() // to retrieve method return type
+                    val returnType = member.type // to retrieve method return type
+                    val parameterTypes = member.parameters.map { it.type }  // to retrieve parameter types
+
                     val methodLocators = locators.filter { // to retrieve method locators from input locators
                         it.className == className && it.methodName == methodName
                     }
@@ -96,16 +87,13 @@ class PageObjectExtractor {
                         if (SELENIUM_COMMANDS.any { statementString.contains(it) }) {
                             seleniumCommands.add(statementString)
                         }
-                        // to retrieve locators with no names assigned
-                        if (statementString.contains("findElement") && !statementString.contains("=")) {
-                            nonCanonicalLocators.add(statementString)
-                        }
                     }
 
                     methods.add(
                         MethodInfo(
                             name = methodName,
                             returnType = returnType,
+                            paramTypes = parameterTypes,
                             locators = methodLocators,
                             assertionLines = assertionLines,
                             seleniumCommands = seleniumCommands
@@ -114,6 +102,13 @@ class PageObjectExtractor {
                 }
             }
         }
+
+        // to retrieve non canonical locators from all locators associated with pageobject
+        // i.e., having no name (e.g., driver.findElement(...).action)
+        // i.e., having no method name being annotations (e.g., @FindBy(...))
+        nonCanonicalLocators = methods
+            .flatMap { it.locators }
+            .filter { it.methodName.isEmpty() || it.locatorName == null }.toMutableList()
 
         return PageObject(
             name = className,

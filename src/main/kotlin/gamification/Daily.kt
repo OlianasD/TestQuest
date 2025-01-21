@@ -1,6 +1,6 @@
 package gamification
 
-import locator.Locator
+import extractor.locator.Locator
 
 class Daily(
     val name: String,

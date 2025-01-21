@@ -1,10 +1,9 @@
 package gamification
 
 import listener.test.TestOutcome
-import locator.Locator
+import extractor.locator.Locator
 import locator.LocatorsFragilityCalculator
 import java.io.File
-import java.util.Calendar
 
 class AchievementManager {
 

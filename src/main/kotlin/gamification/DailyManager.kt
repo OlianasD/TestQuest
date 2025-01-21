@@ -1,7 +1,7 @@
 package gamification
 
 import listener.test.TestOutcome
-import locator.Locator
+import extractor.locator.Locator
 import locator.LocatorsAnalyzer
 import locator.LocatorsFragilityCalculator
 import ui.GUIManager
@@ -410,7 +410,25 @@ class DailyManager {
             RANDOM_DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
             RANDOM_DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
             RANDOM_DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithFewPosPredicates(testOutcomes) },
+            RANDOM_DAILY_NAMES[25] to { testOutcomes -> checkNewPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[26] to { testOutcomes -> checkNewPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkAddedLocsToPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[28] to { testOutcomes -> checkReturnedPOInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[29] to { testOutcomes -> checkMovedAssertsFromPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[30] to { testOutcomes -> checkAdaptedLocsFormatInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[31] to { testOutcomes -> checkInteractionsWithLocsInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkNewAncestorPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[33] to { testOutcomes -> checkMovedCommonMethodToAncestoPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkInstantiationPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
             )
+
+
+
+
+
+
 
 
 
@@ -641,7 +659,7 @@ class DailyManager {
 
 
 
-        /******* TARGETED DAILY CHECKS*******/
+        /******* TARGETED DAILY CHECKS ABOUT LOCATORS *******/
 
         private fun checkTargetedAbsoluteRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
@@ -782,7 +800,7 @@ class DailyManager {
 
 
 
-        /******* RANDOM DAILY CHECKS*******/
+        /******* RANDOM DAILY CHECKS ABOUT LOCATORS *******/
 
         private fun checkAbsXPathRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
@@ -1252,6 +1270,84 @@ class DailyManager {
             }
             return count
         }
+
+
+
+
+
+        /******* RANDOM DAILY CHECKS ABOUT PAGE OBJECTS *******/
+        private fun checkNewPO(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkNewPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkAddedLocsToPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkReturnedPOInPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkMovedAssertsFromPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkAdaptedLocsFormatInPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkInteractionsWithLocsInPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkNewAncestorPO(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkMovedCommonMethodToAncestoPO(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkInstantiationPO(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkCalledPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+        private fun checkCalledUnusedPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return 0;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

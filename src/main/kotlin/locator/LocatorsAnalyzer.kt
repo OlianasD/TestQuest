@@ -1,5 +1,6 @@
 package locator
 
+import extractor.locator.Locator
 import gamification.GamificationManager
 import testquest.TestQuestAction
 

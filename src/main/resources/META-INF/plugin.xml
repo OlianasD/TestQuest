@@ -10,7 +10,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <editorFactoryListener
-                implementation="listener.locator.LocatorChangeListener"/>
+                implementation="listener.changes.CodeChangeListener"/>
     </extensions>
 
     <actions>

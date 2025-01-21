@@ -16,7 +16,7 @@ import gamification.DailyManager
 import gamification.DailyProgress
 import gamification.GamificationManager
 import gamification.UserProfile
-import locator.Locator
+import extractor.locator.Locator
 import locator.LocatorsAnalyzer
 import java.awt.*
 import java.awt.event.MouseAdapter

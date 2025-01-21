@@ -152,9 +152,149 @@
         <title>Muggle</title>
         <propic>C:\Users\User\Desktop\demo\pics\user\default-user.png</propic>
         <achievements>
-            <completed><achievement><name>Is this a test?</name></achievement><achievement><name>The Beginner's Luck</name></achievement><achievement><name>I did it!</name></achievement><achievement><name>I feel so lonely</name></achievement><achievement><name>Flawless Victory</name></achievement></completed>
-            <ongoing><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Keep it short</name><progress>0</progress></achievement><achievement><name>The higher they are, the louder they fall</name><progress>0</progress></achievement><achievement><name>Stillness</name><progress>0</progress></achievement><achievement><name>Ops... I made a mistake!</name><progress>0</progress></achievement><achievement><name>I'm starting to learn things</name><progress>0</progress></achievement><achievement><name>Perfectionism</name><progress>0</progress></achievement><achievement><name>Immortality</name><progress>0</progress></achievement><achievement><name>An inside job</name><progress>0</progress></achievement><achievement><name>The gift of synthesis</name><progress>0</progress></achievement><achievement><name>The bigger the better</name><progress>0</progress></achievement><achievement><name>Strength lies in differences</name><progress>0</progress></achievement><achievement><name>The cake is a lie</name><progress>0</progress></achievement><achievement><name>The clone war</name><progress>0</progress></achievement><achievement><name>Expand the colony</name><progress>0</progress></achievement><achievement><name>You are not welcome anymore</name><progress>0</progress></achievement><achievement><name>What's the difference?</name><progress>0</progress></achievement><achievement><name>I joined the Test Marathon</name><progress>0</progress></achievement><achievement><name>That's no luck anymore</name><progress>0</progress></achievement><achievement><name>First aid</name><progress>0</progress></achievement><achievement><name>ER Medical Drama</name><progress>0</progress></achievement><achievement><name>I didn't touch it!</name><progress>0</progress></achievement><achievement><name>Frankenstein</name><progress>0</progress></achievement><achievement><name>Locatorwarts School of Robustness and Testing</name><progress>0</progress></achievement></ongoing>
+            <completed>
+                <achievement>
+                    <name>Is this a test?</name>
+                </achievement>
+                <achievement>
+                    <name>The Beginner's Luck</name>
+                </achievement>
+                <achievement>
+                    <name>I did it!</name>
+                </achievement>
+                <achievement>
+                    <name>I feel so lonely</name>
+                </achievement>
+                <achievement>
+                    <name>Flawless Victory</name>
+                </achievement>
+            </completed>
+            <ongoing>
+                <achievement>
+                    <name>Kill them all</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Keep it short</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The higher they are, the louder they fall</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Stillness</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Ops... I made a mistake!</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I'm starting to learn things</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Perfectionism</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Immortality</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>An inside job</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The gift of synthesis</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The bigger the better</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Strength lies in differences</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The cake is a lie</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>The clone war</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Expand the colony</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>You are not welcome anymore</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>What's the difference?</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I joined the Test Marathon</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>That's no luck anymore</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>First aid</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>ER Medical Drama</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>I didn't touch it!</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Frankenstein</name>
+                    <progress>0</progress>
+                </achievement>
+                <achievement>
+                    <name>Locatorwarts School of Robustness and Testing</name>
+                    <progress>0</progress>
+                </achievement>
+            </ongoing>
         </achievements>
-        <dailies timestamp="1736959802224"><daily discarded="false" name="newUnwantedAttr" progress="0" type="RANDOM"/><daily discarded="false" name="addAttrToXPath" progress="0" type="RANDOM"/><daily discarded="false" name="newID" progress="0" type="RANDOM"/><daily discarded="false" name="newLevelLowerMax" progress="0" type="RANDOM"/><daily discarded="false" name="loc2xpath" progress="0" type="RANDOM"/><daily discarded="false" name="absolute" progress="0" type="TARGETED"/><daily discarded="false" name="length" progress="0" type="TARGETED"/><daily discarded="false" name="level" progress="0" type="TARGETED"/><daily discarded="false" name="posPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="badPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="noIDOrXPath" progress="0" type="TARGETED"/><daily discarded="false" name="broken" progress="0" type="TARGETED"/></dailies>
+        <dailies timestamp="1737111004457">
+            <daily discarded="false" name="remJSFromXPath" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="addMethodToPO" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="addLocsToMethod" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="interactWithLocsInMethod" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="moveCommonMethodToAncestorPO" progress="0" type="RANDOM"/>
+            <daily discarded="false" name="absolute" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="length" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="level" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="posPredicate" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="badPredicate" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="noIDOrXPath" progress="0" type="TARGETED"/>
+            <daily discarded="false" name="broken" progress="0" type="TARGETED"/>
+        </dailies>
+    </userProfile>
+    <userProfile mode="TARGETED">
+        <id>003</id>
+        <name>John Doe</name>
+        <level>1</level>
+        <currentXP>0</currentXP>
+        <nextXP>150</nextXP>
+        <title>Muggle</title>
+        <propic>C:\Users\User\Desktop\demo\pics\user\default-user.png</propic>
+        <achievements>
+            <completed/>
+            <ongoing><achievement><name>I did it!</name><progress>0</progress></achievement><achievement><name>Kill them all</name><progress>0</progress></achievement><achievement><name>Keep it short</name><progress>0</progress></achievement><achievement><name>The higher they are, the louder they fall</name><progress>0</progress></achievement><achievement><name>Stillness</name><progress>0</progress></achievement><achievement><name>Ops... I made a mistake!</name><progress>0</progress></achievement><achievement><name>I'm starting to learn things</name><progress>0</progress></achievement><achievement><name>Perfectionism</name><progress>0</progress></achievement><achievement><name>Immortality</name><progress>0</progress></achievement><achievement><name>An inside job</name><progress>0</progress></achievement><achievement><name>I feel so lonely</name><progress>0</progress></achievement><achievement><name>The gift of synthesis</name><progress>0</progress></achievement><achievement><name>The bigger the better</name><progress>0</progress></achievement><achievement><name>Strength lies in differences</name><progress>0</progress></achievement><achievement><name>The cake is a lie</name><progress>0</progress></achievement><achievement><name>The clone war</name><progress>0</progress></achievement><achievement><name>Expand the colony</name><progress>0</progress></achievement><achievement><name>You are not welcome anymore</name><progress>0</progress></achievement><achievement><name>What's the difference?</name><progress>0</progress></achievement><achievement><name>Is this a test?</name><progress>0</progress></achievement><achievement><name>I joined the Test Marathon</name><progress>0</progress></achievement><achievement><name>The Beginner's Luck</name><progress>0</progress></achievement><achievement><name>That's no luck anymore</name><progress>0</progress></achievement><achievement><name>First aid</name><progress>0</progress></achievement><achievement><name>ER Medical Drama</name><progress>0</progress></achievement><achievement><name>I didn't touch it!</name><progress>0</progress></achievement><achievement><name>Flawless Victory</name><progress>0</progress></achievement><achievement><name>Frankenstein</name><progress>0</progress></achievement><achievement><name>Locatorwarts School of Robustness and Testing</name><progress>0</progress></achievement></ongoing>
+        </achievements>
+        <dailies timestamp="1737367440394"><daily discarded="false" name="addAttrToXPath" progress="0" type="RANDOM"/><daily discarded="false" name="returnPOInMethod" progress="0" type="RANDOM"/><daily discarded="false" name="instantiatePO" progress="0" type="RANDOM"/><daily discarded="false" name="newLengthShorterMax" progress="0" type="RANDOM"/><daily discarded="false" name="callMethod" progress="0" type="RANDOM"/><daily discarded="false" name="absolute" progress="0" type="TARGETED"/><daily discarded="false" name="length" progress="0" type="TARGETED"/><daily discarded="false" name="level" progress="0" type="TARGETED"/><daily discarded="false" name="posPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="badPredicate" progress="0" type="TARGETED"/><daily discarded="false" name="noIDOrXPath" progress="0" type="TARGETED"/><daily discarded="false" name="broken" progress="0" type="TARGETED"/></dailies>
     </userProfile>
 </userProfiles>

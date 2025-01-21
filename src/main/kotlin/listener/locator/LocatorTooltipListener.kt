@@ -4,7 +4,7 @@ import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.util.PsiTreeUtil
-import locator.Locator
+import extractor.locator.Locator
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionListener
 import javax.swing.Timer
