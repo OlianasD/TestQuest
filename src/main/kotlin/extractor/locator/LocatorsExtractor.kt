@@ -57,41 +57,31 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
     private var filePath: String = ""  //the path to the current test file
 
 
-    // Visitor to find all variable assignments and driver.findElement calls
-    override fun visit(mce: MethodCallExpr, locators: MutableList<Locator>) {
-        super.visit(mce, locators)
-        if (mce.nameAsString == "findElement" && mce.scope.isPresent) {
-            val scope = mce.scope.get()
-            if (scope.toString() == "driver") {
-                //Extract locator details
-                val argument = mce.arguments[0].toString()
-                val locator = extractLocator(argument)
-                val locatorType = locator.first
-                val locatorValue = locator.second
-                //Find the associated variable name if present
-                val locatorName = findVariableName(mce)
-                //Increment and track the locator position
-                locatorCounter++
-                locators.add(
-                    Locator(locatorType, locatorValue, mce.begin.get().line, currentMethodName,
-                    currentClassName, locatorName, locatorCounter, filePath)
-                )
-            }
-        }
+    //main method called to parse Java file and extract locators via visitors
+    fun parseLocators(filePath: Path): List<Locator> {
+        this.filePath = filePath.toString() //to keep track of current file
+        val parser = JavaParser()
+        val cu: CompilationUnit? = parser.parse(filePath).result.orElse(null)
+        val locators = mutableListOf<Locator>()
+        visit(cu, locators)
+        return locators.map { it.copy(filePath = filePath.toString()) }
     }
 
-    override fun visit(md: MethodDeclaration, locators: MutableList<Locator>) {
-        currentMethodName = md.nameAsString
-        locatorCounter = 0 //Reset locator position counter for each new method
-        super.visit(md, locators)
-    }
-
+    //visitor to capture locators from a test/PO class
     override fun visit(cid: ClassOrInterfaceDeclaration, locators: MutableList<Locator>) {
         currentClassName = cid.nameAsString
+        locatorCounter = 0 //to reset locator position for each class
         super.visit(cid, locators)
     }
 
-    //visitor to capture annotations
+    //visitor to capture locators from a method
+    override fun visit(md: MethodDeclaration, locators: MutableList<Locator>) {
+        currentMethodName = md.nameAsString
+        locatorCounter = 0 //to reset locator position for each method
+        super.visit(md, locators)
+    }
+
+    //visitor to capture locators from annotations
     override fun visit(fd: FieldDeclaration, locators: MutableList<Locator>) {
         super.visit(fd, locators)
         for (annotation in fd.annotations) {
@@ -103,7 +93,7 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
                         locatorType = locator.first,
                         locatorValue = locator.second,
                         line = fd.begin.get().line,
-                        methodName = currentMethodName,
+                        methodName = "",
                         className = currentClassName,
                         locatorName = fd.variables.firstOrNull()?.nameAsString,
                         locatorPosition = locatorCounter,
@@ -114,18 +104,30 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
         }
     }
 
-    // Function to parse Java file and extract locators
-    fun parseLocators(filePath: Path): List<Locator> {
-        this.filePath = filePath.toString() //to keep track of current file
-        val parser = JavaParser()
-        val cu: CompilationUnit? = parser.parse(filePath).result.orElse(null)
-        val locators = mutableListOf<Locator>()
-        visit(cu, locators)
-        //return locators
-        return locators.map { it.copy(filePath = filePath.toString()) }
+    //visitor to capture locators from statements
+    override fun visit(mce: MethodCallExpr, locators: MutableList<Locator>) {
+        super.visit(mce, locators)
+        if (mce.nameAsString == "findElement" && mce.scope.isPresent) {
+            val scope = mce.scope.get()
+            if (scope.toString() == "driver") {
+                //extract locator details
+                val argument = mce.arguments[0].toString()
+                val locator = extractLocator(argument)
+                val locatorType = locator.first
+                val locatorValue = locator.second
+                //find the associated variable name if present
+                val locatorName = findVariableName(mce)
+                //increment and track the locator position
+                locatorCounter++
+                locators.add(
+                    Locator(locatorType, locatorValue, mce.begin.get().line, currentMethodName,
+                        currentClassName, locatorName, locatorCounter, filePath)
+                )
+            }
+        }
     }
 
-    // Helper method to extract locator type and value
+    //helper method to extract locator type and value
     private fun extractLocator(locatorString: String): Pair<String, String> {
         if (locatorString.contains("By.linkText(")) {
             val variableName = locatorString.substringAfter("By.linkText(").substringBefore(")").trim()
@@ -145,7 +147,7 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
         }
     }
 
-    // Helper method to find the variable name if available
+    //helper method to find the variable name if available
     private fun findVariableName(mce: MethodCallExpr): String? {
         val parentNode = mce.parentNode.orElse(null)
         // Check if the parent is an assignment (VariableDeclarationExpr)
@@ -160,7 +162,7 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
         return null
     }
 
-    //method to extract annotations as locators
+    //helper method to build annotation as locator
     //two types of annotations: without or with locator type made explicit (e.g., @FindBy("//div[2]") vs @FindBy(xpath="//div[2]"))
     private fun extractFindByAnnotation(annotation: com.github.javaparser.ast.expr.AnnotationExpr): Pair<String, String>? {
         val supportedLocatorTypes = listOf(

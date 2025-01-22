@@ -214,13 +214,13 @@ class TestExecutionListener : SMTRunnerEventsListener {
             .filter { it.methodName == test.name && it.className == testClassName }
             .toMutableList()
         //then, retrieve locators from PO method calls
-        val oldPageObjectCalls = TestQuestAction.TestInfoOld[test.name] ?: emptyList()
+        val oldPageObjectCalls = TestQuestAction.POCallsOld[test.name] ?: emptyList()
         for (call in oldPageObjectCalls) {
             val oldPageObject = TestQuestAction.POsOld.find { it.name == call.pageObject }
             val oldMethodInfo = oldPageObject?.methods?.find { it.name == call.method }
             if (oldMethodInfo != null) oldLocatorsInTest.addAll(oldMethodInfo.locators)
         }
-        val newPageObjectCalls = TestQuestAction.TestInfoNew[test.name] ?: emptyList()
+        val newPageObjectCalls = TestQuestAction.POCallsNew[test.name] ?: emptyList()
         for (call in newPageObjectCalls) {
             val newPageObject = TestQuestAction.POsNew.find { it.name == call.pageObject }
             val newMethodInfo = newPageObject?.methods?.find { it.name == call.method }
@@ -251,7 +251,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
         //else, retrieve locators passed, broken (if any), and unexercised
         else {
             testErrorLineNum = errorInfo.second!!.third
-            val poCalls = TestQuestAction.TestInfoNew[test.name] ?: emptyList()
+            val poCalls = TestQuestAction.POCallsNew[test.name] ?: emptyList()
             //get all passed locators from test method preceding test error
             passedLocs.addAll(newLocatorsInTest.filter {
                 it.methodName == test.name && it.className == test.parent.name && it.line < testErrorLineNum

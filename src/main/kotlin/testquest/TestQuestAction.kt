@@ -3,7 +3,6 @@ package testquest
 import listener.changes.CodeChangeListener
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import gamification.GamificationManager
 import extractor.locator.Locator
@@ -12,7 +11,7 @@ import locator.LocatorsFragilityCalculator
 import extractor.pageobject.PageObject
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCall
-import extractor.test.TestInfoExtractor
+import extractor.test.PageObjectCallExtractor
 import ui.GUIManager
 import utils.TestFilesExtractor
 
@@ -24,10 +23,11 @@ class TestQuestAction : AnAction() {
 
 
     override fun actionPerformed(e: AnActionEvent) {
-        val project = e.project ?: return
 
-        val actionText = e.presentation.text
-        val testFilePaths = TestFilesExtractor.findTestFilePaths(project) //get only Test.java and Page.java files
+        //get Test.java and Page.java files from project
+        val project = e.project ?: return
+        val testFilePaths = TestFilesExtractor.findTestFilePaths(project)
+
         if (testFilePaths.isNotEmpty()) {
 
             //extract locators (i.e., from classes named as _Test.java or _Page.java)
@@ -41,12 +41,12 @@ class TestQuestAction : AnAction() {
                 .filter { it.fileName.toString().endsWith("Page.java") }
                 .map { filePath -> poExtractor.parsePageObject(filePath, locatorsNewStatic) }
 
-            //extract Test Info about PO usages in Tests (if any, from classes named as _Test.java)
-            val testExtractor = TestInfoExtractor()
-            TestInfoNew = testFilePaths
+            //extract PageObjects calls about PO usages in Tests (if any, from classes named as _Test.java)
+            val poCallsExtractor = PageObjectCallExtractor()
+            POCallsNew = testFilePaths
                 .filter { it.fileName.toString().endsWith("Test.java") }
                 .flatMap { filePath ->
-                    testExtractor.parseTestInfo(filePath.toFile()).entries
+                    poCallsExtractor.parsePOCalls(filePath.toFile()).entries
                 }
                 .associate { it.key to it.value }
 
@@ -62,10 +62,11 @@ class TestQuestAction : AnAction() {
             CodeChangeListener.registerListener(project)
             GUIManager.showOverallLocsFragilityScore(estimation)
         }
+
         else {
             Messages.showMessageDialog(
-                "Test files not found at $testFilePaths under project $project with action $actionText",
-                actionText,
+                "Test files not found at $testFilePaths under project $project",
+                e.presentation.text,
                 Messages.getInformationIcon()
             )
         }
@@ -81,9 +82,9 @@ class TestQuestAction : AnAction() {
         //this to store changes on PageObjects before-after test execution (computed dynamically)
         var POsNew: List<PageObject> = listOf()
         var POsOld: List<PageObject> = listOf()
-        //this to store test-PO info after changes
-        var TestInfoNew: Map<String, List<PageObjectCall>> = emptyMap()
-        var TestInfoOld: Map<String, List<PageObjectCall>> = emptyMap()
+        //this to store PO calls in tests before-after changes
+        var POCallsNew: Map<String, List<PageObjectCall>> = emptyMap()
+        var POCallsOld: Map<String, List<PageObjectCall>> = emptyMap()
 
 
 

@@ -42,7 +42,10 @@ class PageObjectExtractor {
             "isSelected",
             "getTagName",
             "doubleClick",
-            "getText"
+            "getText",
+            "selectByVisibleText",
+            "selectByValue",
+            "selectByIndex"
         )
     }
 
@@ -58,10 +61,8 @@ class PageObjectExtractor {
             .asClassOrInterfaceDeclaration()
             .extendedTypes.map { it.nameAsString }
 
-        val methods = mutableListOf<MethodInfo>()
-        var nonCanonicalLocators = mutableListOf<Locator>()
-
         //for each part of the PageObject
+        val methods = mutableListOf<MethodInfo>()
         cu.types[0].members.forEach { member ->
             when (member) {
 
@@ -76,19 +77,25 @@ class PageObjectExtractor {
                     }
                     val assertionLines = mutableListOf<String>()
                     val seleniumCommands = mutableListOf<String>()
+
+                    //TODO: at the moment, it extracts the whole line. in the future, we may want to implement a more precise extraction
+                    //asserts and selenium commands are detected, skipping commented statements
                     val methodBody = member.body.orElse(null)
-                    methodBody?.statements?.forEach { statement ->
-                        val statementString = statement.toString()
-                        // to retrieve method assertions (hopefully none)
-                        if (statementString.contains("assert")) {
-                            assertionLines.add(statementString)
-                        }
-                        // to retrieve method commands on locators
-                        if (SELENIUM_COMMANDS.any { statementString.contains(it) }) {
-                            seleniumCommands.add(statementString)
+                    if (methodBody != null) {
+                        val comments = methodBody.getAllContainedComments().map { it.toString().trim() }
+                        methodBody.statements.forEach { statement ->
+                            val statementString = statement.toString().trim()
+                            //to skip commented statements
+                            if (comments.any { statementString.startsWith(it) })
+                                return@forEach
+                            // to retrieve method assertions (hopefully none)
+                            if (statementString.contains("assert"))
+                                assertionLines.add(statementString)
+                            // to retrieve method commands on locators
+                            if (SELENIUM_COMMANDS.any { statementString.contains(it) })
+                                seleniumCommands.add(statementString)
                         }
                     }
-
                     methods.add(
                         MethodInfo(
                             name = methodName,
@@ -104,11 +111,10 @@ class PageObjectExtractor {
         }
 
         // to retrieve non canonical locators from all locators associated with pageobject
-        // i.e., having no name (e.g., driver.findElement(...).action)
-        // i.e., having no method name being annotations (e.g., @FindBy(...))
-        nonCanonicalLocators = methods
-            .flatMap { it.locators }
-            .filter { it.methodName.isEmpty() || it.locatorName == null }.toMutableList()
+        // i.e., having empty method name as they are annotations (e.g., @FindBy(...))
+        // i.e., having null name within methods (e.g., driver.findElement(...).action)
+        val nonCanonicalLocators: MutableList<Locator> = locators
+            .filter { it.className == className && (it.methodName.isEmpty() || it.locatorName == null) }.toMutableList()
 
         return PageObject(
             name = className,

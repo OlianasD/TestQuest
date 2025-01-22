@@ -16,7 +16,7 @@ import extractor.locator.Locator
 import extractor.locator.LocatorsExtractor
 import locator.LocatorsFragilityCalculator
 import extractor.pageobject.PageObjectExtractor
-import extractor.test.TestInfoExtractor
+import extractor.test.PageObjectCallExtractor
 import testquest.TestQuestAction
 import ui.GUIManager
 import utils.TestFilesExtractor
@@ -91,13 +91,13 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                         .filter { it.fileName.toString().endsWith("Page.java") }
                         .map { po -> poExtractor.parsePageObject(po, TestQuestAction.locatorsNewStatic) }
 
-                    //extract Test Info about PO usages in Tests (if any, from classes named as _Test.java)
-                    val testExtractor = TestInfoExtractor()
-                    TestQuestAction.TestInfoOld = TestQuestAction.TestInfoNew
-                    TestQuestAction.TestInfoNew = testFilePaths
+                    //extract PageObject calls from Tests (if any, from classes named as _Test.java)
+                    val poCallsExtractor = PageObjectCallExtractor()
+                    TestQuestAction.POCallsOld = TestQuestAction.POCallsNew
+                    TestQuestAction.POCallsNew = testFilePaths
                         .filter { it.fileName.toString().endsWith("Test.java") }
                         .flatMap { fp ->
-                            testExtractor.parseTestInfo(fp.toFile()).entries
+                            poCallsExtractor.parsePOCalls(fp.toFile()).entries
                         }
                         .associate { it.key to it.value }
 
