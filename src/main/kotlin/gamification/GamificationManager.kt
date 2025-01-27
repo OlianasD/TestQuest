@@ -37,7 +37,7 @@ class GamificationManager() {
         const val MAX_LEVEL = 5
         const val MAX_POS_PRED = 3
         val GOOD_PREDS = setOf(
-            "@id", "@name", "@class", "@title", "@alt", "@value")
+            "@id", "@name", "@class", "@title", "@alt", "@value") //TODO: just a subset
         val BAD_PREDS = setOf(
             "src", "href", "height", "width")
         val BAD_JS = setOf("onclick", "onload",

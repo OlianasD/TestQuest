@@ -178,7 +178,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
     // extractFailInfoFromStacktrace() returns a error info,
     // i.e., a structure that captures info of test failed as well as PageObject failed methods
     // errorInfo.first = List(<PO class name, PO method name, error line>), errorInfo.second = <Test class name, Test method name, error line>
-    private fun extractFailInfoFromStacktrace(stackTrace: String?): Pair<List<Triple<String, String, Int>>, Triple<String, String, Int>?>? {
+    private fun extractErrorInfoFromStacktrace(stackTrace: String?): Pair<List<Triple<String, String, Int>>, Triple<String, String, Int>?>? {
         if (stackTrace == null)
             return null
         val pageRegex = Regex("""(\w+Page)\.(\w+)\((\w+Page\.java):(\d+)\)""")
@@ -188,25 +188,25 @@ class TestExecutionListener : SMTRunnerEventsListener {
                 at com.example.po.LoginPage.doLogin(LoginPage.java:55)
                 ...
         */
-        val pageObjects = pageRegex.findAll(stackTrace).map { match ->
-            val (poName, poMethodName, poLineNumber) = match.destructured
+        val failedPageObjects = pageRegex.findAll(stackTrace).map { match ->
+            val (poName, poMethodName, _, poLineNumber) = match.destructured
             Triple(poName, poMethodName, poLineNumber.toInt())
         }.toList()
         //trace failure about test (always one)
         //e.g., at com.example.tests.LoginTest.testLogin(LoginTest.java:49)
         val failedTest = testRegex.find(stackTrace)?.let { match ->
-            val (testClassName, testMethodName, testLineNumber) = match.destructured
+            val (testClassName, testMethodName, _, testLineNumber) = match.destructured
             Triple(testClassName, testMethodName, testLineNumber.toInt())
         }
-        return Pair(pageObjects, failedTest)
+        return Pair(failedPageObjects, failedTest)
     }
 
     //collect locators from test
     private fun collectLocators(test: SMTestProxy): Pair<MutableList<Locator>, MutableList<Locator>> {
-        // TODO: currently, no PO method calling other PO methods is currently managed
+        // TODO: currently, no PO method calling other PO methods is managed
         //first, get locators from test only
         val locationUrl = test.locationUrl
-        val testClassName = locationUrl!!.removePrefix("java:test://")
+        val testClassName = locationUrl!!.removePrefix("java:test://").substringAfterLast('.').substringBefore('/')
         val oldLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsOldDynamic
             .filter { it.methodName == test.name && it.className == testClassName }
             .toMutableList()
@@ -238,7 +238,8 @@ class TestExecutionListener : SMTRunnerEventsListener {
 
     //find error line (if any), locators passed/broken (if any)/unexercised (if any)
     private fun analyzeErrorInfo(test: SMTestProxy, newLocatorsInTest: List<Locator>): ErrorAnalysisResult {
-        val errorInfo = extractFailInfoFromStacktrace(test.stacktrace)
+        val errorInfo = extractErrorInfoFromStacktrace(test.stacktrace)
+            //errorInfo is a pair: first = error info related to POs (if any), second = error info related to test
         val testErrorLineNum: Int
         val passedLocs: MutableList<Locator> = mutableListOf()
         var brokenLoc: Locator? = null
@@ -262,8 +263,8 @@ class TestExecutionListener : SMTRunnerEventsListener {
             })
             //get all passed and nonexercised locators from PO methods preceding and following test error
             for (call in poCalls) {
-                val poCall = TestQuestAction.POsNew.find { it.name == call.pageObject }
-                val methodInfo = poCall?.methods?.find { it.name == call.method }
+                val po = TestQuestAction.POsNew.find { it.name == call.pageObject }
+                val methodInfo = po?.methods?.find { it.name == call.method }
                 if (call.line < testErrorLineNum)
                     passedLocs.addAll(methodInfo?.locators ?: emptyList())
                 else if (call.line > testErrorLineNum)
@@ -280,7 +281,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
             //else, the error is inside a PO method, so additional passed/non exercised locators must be collected
             //from the involved failed PO method
             else {
-                val poErrorLineNum = errorInfo.first.last().third //get error line number in PO method (last trace)
+                val poErrorLineNum = errorInfo.first.last().third //get error line number (third value) from error in PO method (last PO is the one)
                 brokenLoc = newLocatorsInTest.firstOrNull { loc ->
                     test.stacktrace!!.contains("NoSuchElementException") && loc.line == poErrorLineNum
                 }

@@ -1,5 +1,6 @@
 package extractor.pageobject
 
+import ai.grazie.text.range
 import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.MethodDeclaration
@@ -74,12 +75,50 @@ class PageObjectExtractor {
 
                     val methodLocators = locators.filter { // to retrieve method locators from input locators
                         it.className == className && it.methodName == methodName
+                    }.toMutableList()
+
+                    // this code associates locators declared as annotations with PO methods
+                    //TODO: assumption is that no @CacheLookup is used so any reference must be saved as it is like a new findElement search
+                    val localVarMap = mutableMapOf<String?, Boolean>()
+                    locators.forEach { locator ->
+                        if (locator.methodName == "" && locator.className == className) {
+                            member.body.ifPresent { methodBody ->
+                                //comments are removed (either /**/ or //)
+                                methodBody.statements.forEach { statement ->
+                                    val lineNumber = statement.range.orElse(null)?.begin?.line ?: -1
+                                    val statementString = statement.toString().trim()
+                                    var cleanedStatement = statementString.replace(Regex("/\\*.*?\\*/", RegexOption.DOT_MATCHES_ALL), "")
+                                    cleanedStatement = cleanedStatement.replace(Regex("(?m)^\\s*//.*$"), "").trim()
+                                    //variables declarations are saved so to discriminate local vars from annotations
+                                    if (cleanedStatement.matches(Regex(".*WebElement\\s+${locator.locatorName}\\s*=.*"))) {
+                                        localVarMap[locator.locatorName] = true
+                                        return@forEach
+                                    }
+                                    //if the var is annotation (e.g., element.click(), where element is the name of an annotated field)
+                                    if (locator.locatorName != null &&
+                                        cleanedStatement.contains(locator.locatorName) &&
+                                        !localVarMap.containsKey(locator.locatorName)
+                                    ) {
+                                        val locatorWithUsage = locator.copy(
+                                            methodName = methodName,
+                                            line = lineNumber
+                                        )
+                                        methodLocators.add(locatorWithUsage)
+                                    }
+                                }
+                            }
+                        }
                     }
+                    //locator position must be adapted in order to track both classic declarations and annotations refs
+                    methodLocators.sortBy { it.line }
+                    methodLocators.forEachIndexed { index, locator ->
+                        methodLocators[index] = locator.copy(locatorPosition = index + 1)
+                    }
+
+                    //asserts and selenium commands are detected, skipping commented statements
+                    //TODO: at the moment, the whole line is extracted. in the future, we may want to implement a more precise extraction
                     val assertionLines = mutableListOf<String>()
                     val seleniumCommands = mutableListOf<String>()
-
-                    //TODO: at the moment, it extracts the whole line. in the future, we may want to implement a more precise extraction
-                    //asserts and selenium commands are detected, skipping commented statements
                     val methodBody = member.body.orElse(null)
                     if (methodBody != null) {
                         val comments = methodBody.getAllContainedComments().map { it.toString().trim() }

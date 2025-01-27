@@ -10,17 +10,6 @@ import java.nio.file.Path
 object TestFilesExtractor {
 
 
-
-    /*fun findTestFilePaths(project: Project): List<Path> {
-        val module = ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: return emptyList()
-        val testSrcDirectory = File(module.path).resolve("src/test/java")
-        val testFilePaths = mutableListOf<Path>()
-        if (testSrcDirectory.exists() && testSrcDirectory.isDirectory) {
-            exploreDirectory(testSrcDirectory, testFilePaths)
-        }
-        return testFilePaths
-    }*/
-
     fun findTestFilePaths(project: Project): List<Path> {
         val module = ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: return emptyList()
         val srcDirectory = File(module.path, "src")
@@ -28,8 +17,6 @@ object TestFilesExtractor {
         exploreDirectory(srcDirectory, testFilePaths)
         return testFilePaths
     }
-
-
 
 
     private fun exploreDirectory(directory: File, testFilePaths: MutableList<Path>) {

@@ -40,6 +40,7 @@ class TestQuestAction : AnAction() {
             POsNew = testFilePaths
                 .filter { it.fileName.toString().endsWith("Page.java") }
                 .map { filePath -> poExtractor.parsePageObject(filePath, locatorsNewStatic) }
+            POsOld = POsNew //initially old and new are the same
 
             //extract PageObjects calls about PO usages in Tests (if any, from classes named as _Test.java)
             val poCallsExtractor = PageObjectCallExtractor()
@@ -49,6 +50,7 @@ class TestQuestAction : AnAction() {
                     poCallsExtractor.parsePOCalls(filePath.toFile()).entries
                 }
                 .associate { it.key to it.value }
+            POCallsOld = POCallsNew //initially old and new are the same
 
             //setup gamification profile
             val gamificationManager = GamificationManager()
