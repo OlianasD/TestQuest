@@ -5,11 +5,13 @@ import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
-import com.github.javaparser.ast.expr.MethodCallExpr
-import com.github.javaparser.ast.expr.NormalAnnotationExpr
-import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr
+import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
 import java.nio.file.Path
+import com.github.javaparser.ast.comments.LineComment
+import com.github.javaparser.ast.comments.BlockComment
+import com.github.javaparser.ast.expr.*
+
 
 data class Locator(
     val locatorType: String,
@@ -25,7 +27,7 @@ data class Locator(
     //hashcode for uniqueness of locators
     override fun hashCode(): Int {
         if (locatorName != null)
-            return 31 * locatorName.hashCode() + methodName.hashCode() + className.hashCode()
+            return 31 * locatorPosition + locatorName.hashCode() + methodName.hashCode() + className.hashCode()
         else
            return 31 * locatorPosition + methodName.hashCode() + className.hashCode()
     }
@@ -61,7 +63,9 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
     fun parseLocators(filePath: Path): List<Locator> {
         this.filePath = filePath.toString() //to keep track of current file
         val parser = JavaParser()
-        val cu: CompilationUnit? = parser.parse(filePath).result.orElse(null)
+        //clean test files from comments
+        val fileContent = filePath.toFile().readText()
+        val cu: CompilationUnit? = parser.parse(fileContent).result.orElse(null)
         val locators = mutableListOf<Locator>()
         visit(cu, locators)
         return locators.map { it.copy(filePath = filePath.toString()) }
@@ -127,6 +131,15 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
         }
     }
 
+    override fun visit(lineComment: LineComment, locators: MutableList<Locator>) {
+        //skip in case of comment
+    }
+
+    override fun visit(blockComment: BlockComment, locators: MutableList<Locator>) {
+        //skip in case of comment
+    }
+
+
     //helper method to extract locator type and value
     private fun extractLocator(locatorString: String): Pair<String, String> {
         if (locatorString.contains("By.linkText(")) {
@@ -147,20 +160,24 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
         }
     }
 
-    //helper method to find the variable name if available
+    //helper method to find the variable name from statements about locators, if available
     private fun findVariableName(mce: MethodCallExpr): String? {
-        val parentNode = mce.parentNode.orElse(null)
-        // Check if the parent is an assignment (VariableDeclarationExpr)
-        if (parentNode != null && parentNode.toString().contains("= driver.findElement")) {
-            val parentText = parentNode.toString()
-            val variableRegex = """(\w+)\s*=\s*driver\.findElement""".toRegex()
-            val matchResult = variableRegex.find(parentText)
-            if (matchResult != null) {
-                return matchResult.groupValues[1]  // Return the variable name
+        val parent = mce.parentNode.orElse(null) ?: return null
+        return when (parent) {
+            is AssignExpr -> {
+                //case element = driver.findElement(...)
+                if (parent.value == mce) parent.target.toString() else null
             }
+            is VariableDeclarator -> {
+                //case WebElement element = driver.findElement(...)
+                if (parent.initializer.isPresent && parent.initializer.get() == mce) parent.nameAsString else null
+            }
+            else -> null //case driver.findElement(...)
         }
-        return null
     }
+
+
+
 
     //helper method to build annotation as locator
     //two types of annotations: without or with locator type made explicit (e.g., @FindBy("//div[2]") vs @FindBy(xpath="//div[2]"))

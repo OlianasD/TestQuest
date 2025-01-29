@@ -1,13 +1,12 @@
 package extractor.pageobject
 
-import ai.grazie.text.range
 import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.MethodDeclaration
-import com.github.javaparser.ast.body.FieldDeclaration
+import com.github.javaparser.ast.stmt.Statement
+import com.github.javaparser.ast.stmt.TryStmt
 import com.github.javaparser.ast.type.Type
 import extractor.locator.Locator
-import extractor.locator.LocatorsExtractor
 import java.nio.file.Path
 
 data class PageObject(
@@ -29,6 +28,7 @@ data class MethodInfo(
 
 class PageObjectExtractor {
 
+    //list of actions over webelements used to determine which statements within PO methods must be saved
     companion object {
         // TODO: extend the list with further commands, if needed (e.g., via Action or JavascriptExecutor)
         val SELENIUM_COMMANDS = listOf(
@@ -52,59 +52,37 @@ class PageObjectExtractor {
 
     fun parsePageObject(filePath: Path, locators: List<Locator>): PageObject {
         val parser = JavaParser()
-        val cu: CompilationUnit = parser.parse(filePath).result.orElse(null)
+        val fileContent = filePath.toFile().readText()
+        val cu: CompilationUnit = parser.parse(fileContent).result.orElse(null)
             ?: throw IllegalArgumentException("Unable to parse the file at: $filePath")
-
         val className = cu.types[0].nameAsString // to retrieve PO name
-
         // to retrieve PO ancestors
         val ancestors = cu.types[0]
             .asClassOrInterfaceDeclaration()
             .extendedTypes.map { it.nameAsString }
-
         //for each part of the PageObject
         val methods = mutableListOf<MethodInfo>()
         cu.types[0].members.forEach { member ->
             when (member) {
-
                 //check for method body
                 is MethodDeclaration -> {
                     val methodName = member.nameAsString // to retrieve method name
                     val returnType = member.type // to retrieve method return type
                     val parameterTypes = member.parameters.map { it.type }  // to retrieve parameter types
-
-                    val methodLocators = locators.filter { // to retrieve method locators from input locators
+                    val methodLocators = locators.filter { // to retrieve canonical PO method locators
                         it.className == className && it.methodName == methodName
                     }.toMutableList()
-
-                    // this code associates locators declared as annotations with PO methods
+                    //to retrieve locators associated with annotations within PO methods (e.g., element.click() when element is the name of an annotation)
                     //TODO: assumption is that no @CacheLookup is used so any reference must be saved as it is like a new findElement search
                     val localVarMap = mutableMapOf<String?, Boolean>()
                     locators.forEach { locator ->
                         if (locator.methodName == "" && locator.className == className) {
                             member.body.ifPresent { methodBody ->
-                                //comments are removed (either /**/ or //)
+                                //remove comments
+                                methodBody.allContainedComments.forEach { it.remove() }
+                                //collect locators that refer to annotations via processStatement()
                                 methodBody.statements.forEach { statement ->
-                                    val lineNumber = statement.range.orElse(null)?.begin?.line ?: -1
-                                    val statementString = statement.toString().trim()
-                                    var cleanedStatement = statementString.replace(Regex("/\\*.*?\\*/", RegexOption.DOT_MATCHES_ALL), "")
-                                    cleanedStatement = cleanedStatement.replace(Regex("(?m)^\\s*//.*$"), "").trim()
-                                    //variables declarations are saved so to discriminate local vars from annotations
-                                    if (cleanedStatement.matches(Regex(".*WebElement\\s+${locator.locatorName}\\s*=.*"))) {
-                                        localVarMap[locator.locatorName] = true
-                                        return@forEach
-                                    }
-                                    //if the var is annotation (e.g., element.click(), where element is the name of an annotated field)
-                                    if (locator.locatorName != null &&
-                                        cleanedStatement.contains(locator.locatorName) &&
-                                        !localVarMap.containsKey(locator.locatorName)
-                                    ) {
-                                        val locatorWithUsage = locator.copy(
-                                            methodName = methodName,
-                                            line = lineNumber
-                                        )
-                                        methodLocators.add(locatorWithUsage)
-                                    }
+                                    processStatement(statement, methodLocators, methodName, localVarMap, locator)
                                 }
                             }
                         }
@@ -114,7 +92,6 @@ class PageObjectExtractor {
                     methodLocators.forEachIndexed { index, locator ->
                         methodLocators[index] = locator.copy(locatorPosition = index + 1)
                     }
-
                     //asserts and selenium commands are detected, skipping commented statements
                     //TODO: at the moment, the whole line is extracted. in the future, we may want to implement a more precise extraction
                     val assertionLines = mutableListOf<String>()
@@ -127,10 +104,10 @@ class PageObjectExtractor {
                             //to skip commented statements
                             if (comments.any { statementString.startsWith(it) })
                                 return@forEach
-                            // to retrieve method assertions (hopefully none)
+                            //to retrieve method assertions (hopefully none)
                             if (statementString.contains("assert"))
                                 assertionLines.add(statementString)
-                            // to retrieve method commands on locators
+                            //to retrieve method commands on locators
                             if (SELENIUM_COMMANDS.any { statementString.contains(it) })
                                 seleniumCommands.add(statementString)
                         }
@@ -148,13 +125,11 @@ class PageObjectExtractor {
                 }
             }
         }
-
         // to retrieve non canonical locators from all locators associated with pageobject
         // i.e., having empty method name as they are annotations (e.g., @FindBy(...))
         // i.e., having null name within methods (e.g., driver.findElement(...).action)
         val nonCanonicalLocators: MutableList<Locator> = locators
             .filter { it.className == className && (it.methodName.isEmpty() || it.locatorName == null) }.toMutableList()
-
         return PageObject(
             name = className,
             methods = methods,
@@ -162,4 +137,36 @@ class PageObjectExtractor {
             nonCanonicalLocators = nonCanonicalLocators
         )
     }
+
+
+
+    private fun processStatement(statement: Statement, methodLocators: MutableList<Locator>, methodName: String, localVarMap: MutableMap<String?, Boolean>, locator: Locator) {
+        val lineNumber = statement.range.orElse(null)?.begin?.line ?: -1
+        val statementString = statement.toString().trim()
+        //check try/catch statement recursively
+        if (statement is TryStmt) {
+            statement.tryBlock.statements.forEach { innerStatement ->
+                processStatement(innerStatement, methodLocators, methodName, localVarMap, locator)
+            }
+            return
+        }
+        //skip locators declarations as not annotations and save them to detect local use
+        if (locator.locatorName != null &&
+            statementString.contains("WebElement ${locator.locatorName} =")) {
+            localVarMap[locator.locatorName] = true
+            return
+        }
+        //skip unnamed locators as not annotations
+        if (statementString.contains("driver.findElement"))
+            return
+        //save locator referencing annotation
+        if (locator.locatorName != null &&
+            statementString.contains(locator.locatorName) &&
+            !localVarMap.containsKey(locator.locatorName)) {
+            methodLocators.add(locator.copy(methodName = methodName, line = lineNumber))
+        }
+    }
+
+
+
 }

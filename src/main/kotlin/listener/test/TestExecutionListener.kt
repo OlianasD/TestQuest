@@ -238,8 +238,8 @@ class TestExecutionListener : SMTRunnerEventsListener {
 
     //find error line (if any), locators passed/broken (if any)/unexercised (if any)
     private fun analyzeErrorInfo(test: SMTestProxy, newLocatorsInTest: List<Locator>): ErrorAnalysisResult {
-        val errorInfo = extractErrorInfoFromStacktrace(test.stacktrace)
-            //errorInfo is a pair: first = error info related to POs (if any), second = error info related to test
+        val errorInfo = extractErrorInfoFromStacktrace(test.stacktrace)  //errorInfo is a pair: first = error info related to POs (if any)
+                                                                        // second = error info related to test
         val testErrorLineNum: Int
         val passedLocs: MutableList<Locator> = mutableListOf()
         var brokenLoc: Locator? = null

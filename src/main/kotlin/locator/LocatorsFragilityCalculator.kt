@@ -17,10 +17,10 @@ class LocatorsFragilityCalculator {
     fun calculateFragility(locator: Locator): Double {
         return when (locator.locatorType) {
             "id" -> 0.1
-            "name"-> calculateNameRobustness(locator.locatorValue)
-            "linkText"-> calculateLinkTextRobustness(locator.locatorValue)
+            "name"-> calculateNameFragility(locator.locatorValue)
+            "linkText"-> calculateLinkTextFragility(locator.locatorValue)
             "cssSelector" -> calculateCssFragility(locator.locatorValue)
-            "className" -> calculateClassNameRobustness(locator.locatorValue)
+            "className" -> calculateClassNameFragility(locator.locatorValue)
             "xpath"-> calculateXpathFragility(locator.locatorValue)
             else -> {0.5}//e.g., tagName
         }
@@ -28,7 +28,7 @@ class LocatorsFragilityCalculator {
 
     //weights and factors affecting the robustness are: long names, names with many words,
     // names with keywords which are likely unstable (e.g., input), and names with numbers
-    private fun calculateNameRobustness(value: String): Double {
+    private fun calculateNameFragility(value: String): Double {
         val lengthWeight = 1.0
         val wordsWeight = 1.0
         val meaningWeight = 1.0
@@ -53,22 +53,22 @@ class LocatorsFragilityCalculator {
                 (wordsWeight * wordFactor) +
                 (meaningWeight * meaningFactor) +
                 (numberWeight * numberFactor)
-        return totalScore / (lengthWeight + wordsWeight + meaningWeight + numberWeight)
+        return (totalScore / (lengthWeight + wordsWeight + meaningWeight + numberWeight)).coerceIn(0.1, 1.0)
     }
 
-    private fun calculateClassNameRobustness(value: String): Double{
-        return calculateNameRobustness(value)
+    private fun calculateClassNameFragility(value: String): Double{
+        return calculateNameFragility(value)
     }
 
     //weights and factors affecting the robustness are: length, presence of numbers which may change
-    private fun calculateLinkTextRobustness(value: String): Double {
+    private fun calculateLinkTextFragility(value: String): Double {
         val lengthWeight = 1.0
         val lengthFactor = value.length.toDouble() / GamificationManager.MAX_LENGTH
         val dateNumWeight = 1.0
         val numbersInText = value.count { it.isDigit() }
         val numberFactor = numbersInText * 0.2
         val totalScore = (lengthWeight * lengthFactor) + (dateNumWeight * numberFactor)
-        return totalScore / (lengthWeight + dateNumWeight)
+        return (totalScore / (lengthWeight + dateNumWeight)).coerceIn(0.1, 1.0)
     }
 
     private fun calculateCssFragility(cssSelector: String): Double {
@@ -104,7 +104,7 @@ class LocatorsFragilityCalculator {
                 (lengthWeight * lengthFactor)
         val totalWeights = specificityWeight + classWeight + combinatorWeight +
                 strongSelectorWeight + fragileSelectorWeight + lengthWeight
-        return (totalScore / totalWeights).coerceIn(0.0, 1.0)
+        return (totalScore / totalWeights).coerceIn(0.1, 1.0)
     }
 
     //weights and factors affecting it are: absolute, num levels, num predicates, length, presence of good/bad preds
@@ -141,7 +141,7 @@ class LocatorsFragilityCalculator {
         val totalWeights = listOf(absoluteWeight, levelsWeight, predicatesWeight, badPredicatesWeight, lengthWeight)
             .filter { it > 0 }
             .sum()
-        return (totalScore / totalWeights).coerceIn(0.0, 1.0)
+        return (totalScore / totalWeights).coerceIn(0.1, 1.0)
     }
 
 

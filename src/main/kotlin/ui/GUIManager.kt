@@ -513,8 +513,9 @@ object GUIManager {
 
                         // show targeted locators for the current daily
                         dailyProgress.daily.targetedLocators.forEach { locator ->
+                            val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
                             val locatorInfo = "${locator.locatorName ?: "N/A"} " +
-                                    "[${locator.className}.${locator.methodName}, line ${locator.line}]"
+                                    "[${locator.className}$methodPart, ${locator.line}]"
                             val locatorLabel = JLabel(locatorInfo).apply {
                                 this.font = smallFont
                                 foreground = JBColor.DARK_GRAY
@@ -532,8 +533,9 @@ object GUIManager {
                         // show info of potentially fixed locators to verify
                         val locatorsFromMap = locatorsToVerifyMap[dailyProgress.daily.name]
                         locatorsFromMap?.forEach { locator ->
+                            val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
                             val locatorInfo = "${locator.locatorName ?: "N/A"} " +
-                                    "[${locator.className}.${locator.methodName}, ${locator.line}]"
+                                    "[${locator.className}$methodPart, ${locator.line}]"
                             val locatorLabel = JLabel(locatorInfo).apply {
                                 this.font = smallFont
                                 foreground = JBColor.DARK_GRAY
