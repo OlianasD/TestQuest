@@ -90,7 +90,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
             //check how events affected tasks
             GamificationManager.analyzeEvents(testOutcomes)
             testOutcomes.forEach { testOutcome ->
-                LocatorsAnalyzer.removeConfirmedFixedLocatorsFromMap(testOutcome.locatorsPassed)
+                LocatorsAnalyzer.removePendingFixedLocators(testOutcome.locatorsPassed)
             }
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened

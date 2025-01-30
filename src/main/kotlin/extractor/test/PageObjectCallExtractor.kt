@@ -6,8 +6,14 @@ import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.body.VariableDeclarator
 import java.io.File
+import java.io.Serializable
 
-data class PageObjectCall(val pageObject: String, val method: String, val line: Int, val parameters: List<String> = emptyList())
+data class PageObjectCall(
+    val pageObject: String,
+    val method: String,
+    val line: Int,
+    val parameters: List<String> = emptyList()
+): Serializable
 
 class PageObjectCallExtractor {
 

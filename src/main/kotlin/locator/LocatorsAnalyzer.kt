@@ -9,6 +9,8 @@ import testquest.TestQuestAction
 class LocatorsAnalyzer {
 
     companion object {
+        //Global map storing all locators issues detected BEFORE any new change (to compare and check what was fixed from last change)
+        private var previousTargetedIssuedLocators = emptyMap<String, List<Locator>>()
         //Global map storing all locators issues detected
         private val targetedIssuedLocators = mutableMapOf<String, List<Locator>>()
         //Global map storing locators issues detected and fixed, to be verified once tests are executed
@@ -18,8 +20,8 @@ class LocatorsAnalyzer {
             return targetedFixedAndPendingLocators
         }
 
-        //this method is called to remove the list of fixed locators from pending, in order to provide reward
-        fun removeConfirmedFixedLocatorsFromMap(locatorsToRemove: List<Locator>) {
+        //this method is called to remove the list of fixed locators from pending, once they are exercised in a test
+        fun removePendingFixedLocators(locatorsToRemove: List<Locator>) {
             //remove fixed and confirmed locators (i.e., locators fixed, following a test execution to confirm)
             targetedFixedAndPendingLocators.keys.forEach { key ->
                 val existingLocators = targetedFixedAndPendingLocators[key]?.toMutableList() ?: return@forEach
@@ -43,7 +45,7 @@ class LocatorsAnalyzer {
     private var locators = TestQuestAction.locatorsNewStatic
 
     fun findTargetedIssuedLocators(): MutableMap<String, List<Locator>> {
-        val initialAnalysisMap = targetedIssuedLocators.toMap() //copy map to keep track of problems fixed BEFORE any new problem found
+        previousTargetedIssuedLocators = targetedIssuedLocators.toMap() //copy map to keep track of problems fixed BEFORE any new problem found
         targetedIssuedLocators.keys.retainAll(listOf("broken"))//remove broken locators as they are dynamically computed during test execution
         calculateAbsoluteLocators()
         calculateLongLocators()
@@ -55,8 +57,8 @@ class LocatorsAnalyzer {
             calculateBrokenLocators()
         //compute differences between initial map and map after evaluation
         //so to retrieve fixed problems to be later confirmed via test execution
-        if(initialAnalysisMap.isNotEmpty())
-            calculateFixedAndPendingLocators(initialAnalysisMap)
+        if(previousTargetedIssuedLocators.isNotEmpty())
+            calculateFixedAndPendingLocators()
         return targetedIssuedLocators
     }
 
@@ -156,9 +158,9 @@ class LocatorsAnalyzer {
 
     //the logic is that a potentially fixed locator is present in initialAnalysisMap and no more present in analysisMap
     //i.e., the map before and after analyzing the test suite
-    private fun calculateFixedAndPendingLocators(initialAnalysisMap: Map<String, List<Locator>>) {
+    private fun calculateFixedAndPendingLocators() {
 
-        initialAnalysisMap.forEach { (key, initialLocators) ->
+        previousTargetedIssuedLocators.forEach { (key, initialLocators) ->
 
             // Get existing issued locators (if any)
             val issuedLocators = targetedIssuedLocators[key] ?: emptyList()
@@ -176,7 +178,7 @@ class LocatorsAnalyzer {
             // Get existing fixed and pending locators list (if any)
             val fixedAndPendingLocators = targetedFixedAndPendingLocators[key]?.toMutableList() ?: mutableListOf()
 
-            // Add newly fixed and pending locators and overwrite old ones (e.g., if they change line position)
+            // Add newly fixed and pending locators and overwrite old ones (e.g., if they change line position or they were fixed multiple times)
             fixedLocatorsMap.values.forEach { newLocator ->
                 val existingIndex = fixedAndPendingLocators.indexOfFirst { it.hashCode() == newLocator.hashCode() }
                 if (existingIndex != -1)
@@ -192,7 +194,7 @@ class LocatorsAnalyzer {
             }
 
             // Remove fixed and pending locators that actually do not exist anymore and keep info updated
-            // (e.g., in case a fixed locator is moved from a line to another)
+            // (e.g., in case a fixed locator is moved from a line to another or changed multiple time but never becoming issued)
             val finalFixedAndPendingLocators = locators.filter { locator ->
                 filteredFixedAndPendingLocators.any { it.hashCode() == locator.hashCode() }
             }

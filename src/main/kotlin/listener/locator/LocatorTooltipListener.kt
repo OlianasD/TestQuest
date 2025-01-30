@@ -52,4 +52,12 @@ class LocatorTooltipListener(
     fun updateLocatorScores(newScores: Map<Locator, Double>) {
         locatorScores = newScores
     }
+
+    fun dispose() {
+        hoverTimer?.stop()
+        hoverTimer = null
+        currentBalloon?.hide()
+        currentBalloon = null
+        editor.contentComponent.removeMouseMotionListener(this)
+    }
 }

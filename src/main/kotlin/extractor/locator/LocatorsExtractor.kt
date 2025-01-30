@@ -11,6 +11,7 @@ import java.nio.file.Path
 import com.github.javaparser.ast.comments.LineComment
 import com.github.javaparser.ast.comments.BlockComment
 import com.github.javaparser.ast.expr.*
+import java.io.Serializable
 
 
 data class Locator(
@@ -22,7 +23,7 @@ data class Locator(
     val locatorName: String?,
     val locatorPosition: Int,
     val filePath: String
-)
+): Serializable
 {
     //hashcode for uniqueness of locators
     override fun hashCode(): Int {

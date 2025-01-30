@@ -17,13 +17,16 @@ import gamification.DailyProgress
 import gamification.GamificationManager
 import gamification.UserProfile
 import extractor.locator.Locator
+import listener.changes.CodeChangeListener
 import locator.LocatorsAnalyzer
+import utils.UserProgressFileHandler
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
+import java.io.IOException
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -35,6 +38,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.table.DefaultTableCellRenderer
 import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellRenderer
+import kotlin.system.exitProcess
 
 object GUIManager {
 
@@ -395,7 +399,7 @@ object GUIManager {
     }
 
 
-    //main panel creation
+    //main panel creation and management in case of plugin closed
     fun showGUI() {
         val frame = JFrame("Test Quest - A quest to improve locators robustness").apply {
             defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
@@ -407,15 +411,25 @@ object GUIManager {
             setLocationRelativeTo(null)
             isVisible = true
         }
-        //hide the window about locators score once Test Quest is closed, and show it again once reopened
         frame.addWindowListener(object : WindowAdapter() {
             override fun windowOpened(e: WindowEvent?) {
-                LocsScoreWindow?.isVisible = true
+                UserProgressFileHandler.readProgress()
+                //LocsScoreWindow?.isVisible = true
             }
             override fun windowClosing(e: WindowEvent?) {
-                LocsScoreWindow?.isVisible = false
+                UserProgressFileHandler.writeProgress()//to store user progress that needs to be tested next time
+                //LocsScoreWindow?.isVisible = false
+                LocsScoreWindow?.dispose()
+                CodeChangeListener.instance.dispose()
+                //exitProcess(0)
             }
         })
+
+
+
+
+
+
     }
 
 

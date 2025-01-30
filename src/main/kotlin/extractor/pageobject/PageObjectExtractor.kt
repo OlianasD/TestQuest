@@ -7,6 +7,7 @@ import com.github.javaparser.ast.stmt.Statement
 import com.github.javaparser.ast.stmt.TryStmt
 import com.github.javaparser.ast.type.Type
 import extractor.locator.Locator
+import java.io.Serializable
 import java.nio.file.Path
 
 data class PageObject(
@@ -14,17 +15,17 @@ data class PageObject(
     val methods: List<MethodInfo>, // PO methods
     val ancestors: List<String>, // PO ancestors names
     val nonCanonicalLocators: List<Locator> // locators defined with no names or as annotations
-)
+): Serializable
 
 //method info for the methods within each PO
 data class MethodInfo(
     val name: String,
-    val returnType: Type,
-    val paramTypes: List<Type>,
+    val returnType: String,
+    val paramTypes: List<String>,
     val locators: List<Locator>, // list of locators within method
     val assertionLines: List<String>, // list of assertions associated with method info (hopefully, none)
     val seleniumCommands: List<String> // list of selenium commands associated with method info
-)
+): java.io.Serializable
 
 class PageObjectExtractor {
 
@@ -67,8 +68,8 @@ class PageObjectExtractor {
                 //check for method body
                 is MethodDeclaration -> {
                     val methodName = member.nameAsString // to retrieve method name
-                    val returnType = member.type // to retrieve method return type
-                    val parameterTypes = member.parameters.map { it.type }  // to retrieve parameter types
+                    val returnType = member.type.asString() // to retrieve method return type
+                    val parameterTypes = member.parameters.map { it.type.asString() }  // to retrieve parameter types
                     val methodLocators = locators.filter { // to retrieve canonical PO method locators
                         it.className == className && it.methodName == methodName
                     }.toMutableList()

@@ -25,16 +25,18 @@ import utils.TestFilesExtractor
 class CodeChangeListener private constructor() : EditorFactoryListener, Disposable {
 
     companion object {
-        private val instance = CodeChangeListener()
+        val instance = CodeChangeListener()
 
         fun registerListener(project: Project) {
             instance.registerListenerInternal(project)
         }
+
     }
 
     private val locatorTooltipListeners = mutableMapOf<Editor, LocatorTooltipListener>()
     private lateinit var proj: Project
     private var isRegistered = false
+    private var fileListener: VirtualFileListener? = null
 
     fun registerListenerInternal(project: Project) {
         proj = project
@@ -63,12 +65,11 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
         testFile.contentComponent.addMouseMotionListener(listener)
     }
 
-
-
     //this to update all locator scores, and retrieve updated locators/PO info, once code changes occur
     private fun manageChanges() {
         //extract new locs and POs, update scores, and update target dailies on changes over test files
-        VirtualFileManager.getInstance().addVirtualFileListener(object : VirtualFileListener {
+        //VirtualFileManager.getInstance().addVirtualFileListener(object : VirtualFileListener {
+        fileListener = object : VirtualFileListener {
             override fun contentsChanged(event: VirtualFileEvent) {
                 val filePath = event.file.path
 
@@ -86,14 +87,14 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
 
                     //extract PageObjects (i.e., from classes named as _Page.java)
                     val poExtractor = PageObjectExtractor()
-                    TestQuestAction.POsOld = TestQuestAction.POsNew
+                    TestQuestAction.POsOld = TestQuestAction.POsNew//TODO: same as above
                     TestQuestAction.POsNew = testFilePaths
                         .filter { it.fileName.toString().endsWith("Page.java") }
                         .map { po -> poExtractor.parsePageObject(po, TestQuestAction.locatorsNewStatic) }
 
                     //extract PageObject calls from Tests (if any, from classes named as _Test.java)
                     val poCallsExtractor = PageObjectCallExtractor()
-                    TestQuestAction.POCallsOld = TestQuestAction.POCallsNew
+                    TestQuestAction.POCallsOld = TestQuestAction.POCallsNew//TODO: same as above
                     TestQuestAction.POCallsNew = testFilePaths
                         .filter { it.fileName.toString().endsWith("Test.java") }
                         .flatMap { fp ->
@@ -107,14 +108,9 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                     }
                 }
             }
-        }, this)
+        }
+        VirtualFileManager.getInstance().addVirtualFileListener(fileListener!!, this)
     }
-
-
-
-
-
-
 
 
     //only changes over test cases and page objects are considered
@@ -137,9 +133,12 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
 
     override fun dispose() {
         locatorTooltipListeners.forEach { (editor, listener) ->
+            listener.dispose()
             editor.contentComponent.removeMouseMotionListener(listener)
         }
         locatorTooltipListeners.clear()
+        fileListener?.let { VirtualFileManager.getInstance().removeVirtualFileListener(it) }
+        fileListener = null
         isRegistered = false
     }
 }
