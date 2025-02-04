@@ -23,7 +23,7 @@ class DailyExpirationListener {
 
     private fun scheduleNextRun() {
         scheduler.schedule({
-            if (PluginData.userProfileId.isNotEmpty()) { //TODO: verificare che userProfile sia settato
+            if (PluginData.userProfileId.isNotEmpty()) {
                 removeExpiredDailiesFromXML()
             }
             scheduleNextRun()

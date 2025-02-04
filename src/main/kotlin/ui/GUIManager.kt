@@ -18,6 +18,8 @@ import gamification.GamificationManager
 import gamification.UserProfile
 import extractor.locator.Locator
 import listener.changes.CodeChangeListener
+import listener.daily.DailyExpirationListener
+import listener.test.TestExecutionListener
 import locator.LocatorsAnalyzer
 import utils.UserProgressFileHandler
 import java.awt.*
@@ -412,13 +414,10 @@ object GUIManager {
             isVisible = true
         }
         frame.addWindowListener(object : WindowAdapter() {
-            /*override fun windowOpened(e: WindowEvent?) {
-                //LocsScoreWindow?.isVisible = true
-            }*/
             override fun windowClosing(e: WindowEvent?) {
-                //LocsScoreWindow?.isVisible = false
                 LocsScoreWindow?.dispose()
                 CodeChangeListener.instance.dispose()
+                TestExecutionListener.instance.dispose()
                 //exitProcess(0)
             }
         })
@@ -644,7 +643,11 @@ object GUIManager {
 
     // to show balloon on top of each locator once mouse is over
     fun showBalloon(event: MouseEvent, name: String?, score: Double): Balloon {
-        val tooltipText = "Fragility Score for $name: ${String.format("%.2f", score)}"
+        var tooltipText = ""
+        if (name == null)
+            tooltipText = "Fragility Score for this locator: ${String.format("%.2f", score)}"
+        else
+            tooltipText = "Fragility Score for $name: ${String.format("%.2f", score)}"
 
         // create new balloon
         val balloon = JBPopupFactory.getInstance()
@@ -717,10 +720,6 @@ object GUIManager {
             }
         })
         LocsScoreWindow!!.add(JScrollPane(table), BorderLayout.CENTER)
-        /*val closeButton = JButton("Close").apply {
-            addActionListener { locScoresframe!!.dispose() }
-        }
-        locScoresframe!!.add(closeButton, BorderLayout.SOUTH)*/
         LocsScoreWindow!!.isVisible = true
     }
 
@@ -730,6 +729,11 @@ object GUIManager {
         return JBColor(Color(red.coerceIn(0, 255), green.coerceIn(0, 255), 0),
             Color(red.coerceIn(0, 255), green.coerceIn(0, 255), 0))
     }
+
+
+
+
+
 
     //TODO: refactor to move it away
     fun openFileAtLine(project: Project, filePath: String, line: Int) {

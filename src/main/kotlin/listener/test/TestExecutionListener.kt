@@ -2,11 +2,20 @@ package listener.test
 
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.io.ReadOnlyAttributeUtil
+import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
+import listener.changes.CodeChangeListener
 import locator.LocatorsAnalyzer
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
+import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -63,26 +72,39 @@ data class TestOutcome(
 
 
 
-class TestExecutionListener : SMTRunnerEventsListener {
+class TestExecutionListener private constructor() : SMTRunnerEventsListener {
 
     private lateinit var server: Server
     private val testOutcomes = mutableListOf<TestOutcome>() //to collect the outcome of each test
 
+    companion object {
+
+
+        val instance = TestExecutionListener()
+        private var connection: MessageBusConnection? = null
+
+
+        fun registerListener(project: Project) {
+            connection = project.messageBus.connect()
+            connection?.subscribe(SMTRunnerEventsListener.TEST_STATUS, instance)
+        }
+
+    }
+
+
+
+
+
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
-        testOutcomes.clear() //TODO: the testOutcomes is reset at the beginning of each new run. we may want to save it for future achievements
+        testOutcomes.clear()
         try {
-            //old static = previous code change
-            //new static = latest code change
-            //old dynamic = previous code change BEFORE test execution (used to check dailies)
-            //new dynamic = latest code change BEFORE test execution (used to check dailies)
-            //if(TestQuestAction.locatorsOldStatic.isNotEmpty()) //this to manage the case when tests are run with no locs changed
-            //    TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
-            //TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic
             server = Server()
             server.start()
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }
+
+
 
     //this is called at the end of the whole testing process
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
@@ -94,7 +116,7 @@ class TestExecutionListener : SMTRunnerEventsListener {
                 LocatorsAnalyzer.removePendingFixedLocators(testOutcome.locatorsPassed)
             }
             //TODO: currently we update all OLD to NEW once tests are executed, but we might execute only few tests so we may need to update only exercised code in the future
-            //locatorsOld are updated with new versions of old locators that passed tests, new locators that passed test, and old locators
+            //locatorsOld are updated with new versions of old locators that passed tests, new locators that passed test, and old yet unexercised locators
             val locatorsPassed = testOutcomes.flatMap { it.locatorsPassed }.distinct()
             TestQuestAction.locatorsOld = TestQuestAction.locatorsOld.map { old ->
                 locatorsPassed.find { it == old } ?: old
@@ -105,6 +127,10 @@ class TestExecutionListener : SMTRunnerEventsListener {
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }
+
+
+
+
 
     override fun onTestFinished(test: SMTestProxy) {
         try {
@@ -170,7 +196,11 @@ class TestExecutionListener : SMTRunnerEventsListener {
 
 
 
-
+    fun dispose() {
+        if (::server.isInitialized)
+            instance.server.stop()
+        connection?.disconnect()
+    }
 
 
 

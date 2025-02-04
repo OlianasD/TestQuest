@@ -3,6 +3,7 @@ package testquest
 import listener.changes.CodeChangeListener
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import gamification.GamificationManager
 import extractor.locator.Locator
@@ -12,9 +13,12 @@ import extractor.pageobject.PageObject
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCall
 import extractor.test.PageObjectCallExtractor
+import listener.daily.DailyExpirationListener
+import listener.test.TestExecutionListener
 import ui.GUIManager
 import utils.TestFilesExtractor
 import utils.UserProgressFileHandler
+import java.lang.ref.WeakReference
 
 object PluginData {
     var userProfileId: String = ""
@@ -23,12 +27,16 @@ object PluginData {
 class TestQuestAction : AnAction() {
 
 
+
+
+
     override fun actionPerformed(e: AnActionEvent) {
 
         //get Test.java and Page.java files from project
         val project = e.project ?: return
         val testFilePaths = TestFilesExtractor.findTestFilePaths(project)
 
+        //if test files exist
         if (testFilePaths.isNotEmpty()) {
 
             //extract locators (i.e., from classes named as _Test.java or _Page.java)
@@ -80,13 +88,15 @@ class TestQuestAction : AnAction() {
             UserProgressFileHandler.saveOldData()
 
 
-
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
-            //val estimation = locEstimator.calculateOverallFragility(locatorsNewStatic)
             val estimation = locEstimator.calculateOverallFragility(locatorsNew)
-            CodeChangeListener.registerListener(project)
             GUIManager.showOverallLocsFragilityScore(estimation)
+
+
+            //register listeners
+            CodeChangeListener.registerListener(project)
+            TestExecutionListener.registerListener(project)
         }
 
         else {
@@ -99,18 +109,15 @@ class TestQuestAction : AnAction() {
     }
 
     companion object {
-        //this to store changes that may affect fragility computation (computed statically)
+        //this to store locators info before-after changes
         var locatorsOld: List<Locator> = listOf()
         var locatorsNew: List<Locator> = listOf()
-        //this to store changes used for most tasks before-after test execution (computed dynamically)
-        //var locatorsOldDynamic1: List<Locator> = listOf()
-        //var locatorsNewDynamic1: List<Locator> = listOf()
-        //this to store changes on PageObjects before-after test execution (computed dynamically)
-        var POsNew: List<PageObject> = listOf()
+        //this to store PO info before-after changes
         var POsOld: List<PageObject> = listOf()
+        var POsNew: List<PageObject> = listOf()
         //this to store PO calls in tests before-after changes
-        var POCallsNew: Map<String, List<PageObjectCall>> = emptyMap()
         var POCallsOld: Map<String, List<PageObjectCall>> = emptyMap()
+        var POCallsNew: Map<String, List<PageObjectCall>> = emptyMap()
 
 
 

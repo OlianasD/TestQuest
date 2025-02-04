@@ -20,10 +20,6 @@
         </group>
     </actions>
 
-    <projectListeners>
-        <listener class="listener.test.TestExecutionListener"
-                  topic="com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener"/>
-    </projectListeners>
 
     <project-components>
         <component>
