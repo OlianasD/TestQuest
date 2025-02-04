@@ -36,7 +36,8 @@ class LocatorTooltipListener(
 
         //if mouse position is a locator (identified by mouse position and class), show the score and balloon
         //TODO: beware of multiple test class files with same name
-        val locator = TestQuestAction.locatorsNewStatic.find { it.line == currentLine && it.className == className }
+        //val locator = TestQuestAction.locatorsNewStatic.find { it.line == currentLine && it.className == className }
+        val locator = TestQuestAction.locatorsNew.find { it.line == currentLine && it.className == className }
         if (locatorScores.containsKey(locator)) {
             val score = locatorScores[locator]!!
             hoverTimer = Timer(500) {

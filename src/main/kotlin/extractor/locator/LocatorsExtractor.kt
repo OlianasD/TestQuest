@@ -22,7 +22,8 @@ data class Locator(
     val className: String,
     val locatorName: String?,
     val locatorPosition: Int,
-    val filePath: String
+    val filePath: String,
+    val isAnnotation: Boolean = false
 ): Serializable
 {
     //hashcode for uniqueness of locators
@@ -102,7 +103,8 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
                         className = currentClassName,
                         locatorName = fd.variables.firstOrNull()?.nameAsString,
                         locatorPosition = locatorCounter,
-                        filePath = filePath
+                        filePath = filePath,
+                        isAnnotation = true
                     )
                 )
             }

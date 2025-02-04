@@ -401,7 +401,7 @@ object GUIManager {
 
     //main panel creation and management in case of plugin closed
     fun showGUI() {
-        val frame = JFrame("Test Quest - A quest to improve locators robustness").apply {
+        val frame = JFrame("TestQuest").apply {
             defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
             layout = BorderLayout()
             TestQuestWindow = JTextArea().apply { isEditable = false }
@@ -412,12 +412,10 @@ object GUIManager {
             isVisible = true
         }
         frame.addWindowListener(object : WindowAdapter() {
-            override fun windowOpened(e: WindowEvent?) {
-                UserProgressFileHandler.readProgress()
+            /*override fun windowOpened(e: WindowEvent?) {
                 //LocsScoreWindow?.isVisible = true
-            }
+            }*/
             override fun windowClosing(e: WindowEvent?) {
-                UserProgressFileHandler.writeProgress()//to store user progress that needs to be tested next time
                 //LocsScoreWindow?.isVisible = false
                 LocsScoreWindow?.dispose()
                 CodeChangeListener.instance.dispose()
@@ -747,6 +745,28 @@ object GUIManager {
     }
 
 
+
+
+
+
+
+    fun showWindowStoredDataChoice(oldDataTime: String): Boolean {
+        if(oldDataTime != "") {
+            val panel = JPanel()
+            panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
+            panel.add(JLabel("<html>Data previously saved about original test suite found [$oldDataTime]" +
+                    "<br>Would you like to set it as original test suite state?</html>"))
+            val result = JOptionPane.showConfirmDialog(
+                null,
+                panel,
+                "Saved Data Found",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            )
+            return result == JOptionPane.YES_OPTION
+        }
+        return false
+    }
 
 
 

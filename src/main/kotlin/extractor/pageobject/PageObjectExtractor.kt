@@ -5,7 +5,6 @@ import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.stmt.Statement
 import com.github.javaparser.ast.stmt.TryStmt
-import com.github.javaparser.ast.type.Type
 import extractor.locator.Locator
 import java.io.Serializable
 import java.nio.file.Path
@@ -83,7 +82,7 @@ class PageObjectExtractor {
                                 methodBody.allContainedComments.forEach { it.remove() }
                                 //collect locators that refer to annotations via processStatement()
                                 methodBody.statements.forEach { statement ->
-                                    processStatement(statement, methodLocators, methodName, localVarMap, locator)
+                                    extractAnnotationLocators(statement, methodLocators, methodName, localVarMap, locator)
                                 }
                             }
                         }
@@ -141,13 +140,13 @@ class PageObjectExtractor {
 
 
 
-    private fun processStatement(statement: Statement, methodLocators: MutableList<Locator>, methodName: String, localVarMap: MutableMap<String?, Boolean>, locator: Locator) {
+    private fun extractAnnotationLocators(statement: Statement, methodLocators: MutableList<Locator>, methodName: String, localVarMap: MutableMap<String?, Boolean>, locator: Locator) {
         val lineNumber = statement.range.orElse(null)?.begin?.line ?: -1
         val statementString = statement.toString().trim()
         //check try/catch statement recursively
         if (statement is TryStmt) {
             statement.tryBlock.statements.forEach { innerStatement ->
-                processStatement(innerStatement, methodLocators, methodName, localVarMap, locator)
+                extractAnnotationLocators(innerStatement, methodLocators, methodName, localVarMap, locator)
             }
             return
         }
@@ -164,7 +163,7 @@ class PageObjectExtractor {
         if (locator.locatorName != null &&
             statementString.contains(locator.locatorName) &&
             !localVarMap.containsKey(locator.locatorName)) {
-            methodLocators.add(locator.copy(methodName = methodName, line = lineNumber))
+            methodLocators.add(locator.copy(methodName = methodName, line = lineNumber, isAnnotation = true))
         }
     }
 

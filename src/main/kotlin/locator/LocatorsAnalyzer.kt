@@ -3,6 +3,7 @@ package locator
 import extractor.locator.Locator
 import gamification.GamificationManager
 import testquest.TestQuestAction
+import utils.UserProgressFileHandler
 
 
 //this class is used to find problematic locators to fix with targeted dailies
@@ -14,26 +15,33 @@ class LocatorsAnalyzer {
         //Global map storing all locators issues detected
         private val targetedIssuedLocators = mutableMapOf<String, List<Locator>>()
         //Global map storing locators issues detected and fixed, to be verified once tests are executed
-        private val targetedFixedAndPendingLocators = mutableMapOf<String, MutableList<Locator>>()
+        private var targetedFixedAndPendingLocators = mutableMapOf<String, MutableList<Locator>>()
 
         fun getFixedAndPendingLocatorsMap(): MutableMap<String, MutableList<Locator>>{
             return targetedFixedAndPendingLocators
         }
 
         //this method is called to remove the list of fixed locators from pending, once they are exercised in a test
-        fun removePendingFixedLocators(locatorsToRemove: List<Locator>) {
+        fun removePendingFixedLocators(passedLocs: List<Locator>) {
             //remove fixed and confirmed locators (i.e., locators fixed, following a test execution to confirm)
             targetedFixedAndPendingLocators.keys.forEach { key ->
-                val existingLocators = targetedFixedAndPendingLocators[key]?.toMutableList() ?: return@forEach
-                val updatedLocators = existingLocators.filterNot { existingLocator ->
-                    locatorsToRemove.any { it.hashCode() == existingLocator.hashCode() }
+                val fixedAndPendingLocs = targetedFixedAndPendingLocators[key]?.toMutableList() ?: return@forEach
+                val stillFixedAndPendingLocs = fixedAndPendingLocs.filterNot { fixedPendingLoc ->
+                    passedLocs.any { it.hashCode() == fixedPendingLoc.hashCode()
+                            //the following is to track passed locators that are actually related to annotations
+                            // (i.e., same name and class name and marked as annotation)
+                            || (it.isAnnotation && it.locatorName == fixedPendingLoc.locatorName &&
+                                    it.className == fixedPendingLoc.className)
+                    }
                 }
-                if (updatedLocators.isEmpty()) {
+                if (stillFixedAndPendingLocs.isEmpty()) {
                     targetedFixedAndPendingLocators[key] = emptyList<Locator>().toMutableList()
                 } else {
-                    targetedFixedAndPendingLocators[key] = updatedLocators.toMutableList()
+                    targetedFixedAndPendingLocators[key] = stillFixedAndPendingLocs.toMutableList()
                 }
             }
+            //fixed and pending locs are saved for future reuse
+            UserProgressFileHandler.saveFixedAndPendingLocators(targetedFixedAndPendingLocators)
         }
 
     }
@@ -42,8 +50,11 @@ class LocatorsAnalyzer {
 
 
 
-    private var locators = TestQuestAction.locatorsNewStatic
+    //private var locators = TestQuestAction.locatorsNewStatic
+    private var locators = TestQuestAction.locatorsNew
 
+
+    //find locators that present issues in the test suite (i.e., targeted as they target the actual issues)
     fun findTargetedIssuedLocators(): MutableMap<String, List<Locator>> {
         previousTargetedIssuedLocators = targetedIssuedLocators.toMap() //copy map to keep track of problems fixed BEFORE any new problem found
         targetedIssuedLocators.keys.retainAll(listOf("broken"))//remove broken locators as they are dynamically computed during test execution
@@ -54,11 +65,32 @@ class LocatorsAnalyzer {
         calculateBadPredicateLocators()
         calculateNonIDOrXPathLocators()
         if(!targetedIssuedLocators.containsKey("broken"))//if map is new, create an empty list of broken locators
-            calculateBrokenLocators()
-        //compute differences between initial map and map after evaluation
-        //so to retrieve fixed problems to be later confirmed via test execution
+            calculateInitialBrokenLocators()
+
+        //load fixedAndPending from file, if exist
+        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingLocators()
+        //keep only fixed and pending related to existing locators
+        var cleanedSavedFixedAndPending: Map<String, List<Locator>>? = null
+        if(savedFixedAndPending!=null) {
+            cleanedSavedFixedAndPending = savedFixedAndPending.mapValues { (_, savedList) ->
+                savedList.filter { savedLocator ->
+                    locators.any { it.hashCode() == savedLocator.hashCode() }
+                }
+            }.filterValues { it.isNotEmpty() }
+        }
+        //if some new issued have been observed in the session, retrieve new fixed and pending from analysis and add saved ones
         if(previousTargetedIssuedLocators.isNotEmpty())
-            calculateFixedAndPendingLocators()
+            calculateFixedAndPendingLocators(cleanedSavedFixedAndPending)
+        //else, populate fixed and pending only with saved data
+        else {
+            targetedFixedAndPendingLocators =
+                cleanedSavedFixedAndPending?.mapValues { it.value.toMutableList() }?.toMutableMap() ?: mutableMapOf()
+            targetedIssuedLocators.keys.forEach { key ->
+                if (!targetedFixedAndPendingLocators.containsKey(key)) {
+                    targetedFixedAndPendingLocators[key] = mutableListOf()
+                }
+            }
+        }
         return targetedIssuedLocators
     }
 
@@ -116,8 +148,8 @@ class LocatorsAnalyzer {
         targetedIssuedLocators["noIDOrXPath"] = nonIDOrXPathLocators
     }
 
-    private fun calculateBrokenLocators() {
-        targetedIssuedLocators["broken"] = emptyList()
+    private fun calculateInitialBrokenLocators() {
+        targetedIssuedLocators["broken"] = emptyList()//initially all locators are not broken
     }
 
     //this value is updated once targeted dailies are present and tests are executed
@@ -133,9 +165,6 @@ class LocatorsAnalyzer {
             targetedIssuedLocators["broken"] = updatedList
         }
     }
-
-
-
 
     fun getBrokenLocs(): List<Locator>? {
         return targetedIssuedLocators["broken"]
@@ -156,10 +185,11 @@ class LocatorsAnalyzer {
 
 
 
+
+
     //the logic is that a potentially fixed locator is present in initialAnalysisMap and no more present in analysisMap
     //i.e., the map before and after analyzing the test suite
-    private fun calculateFixedAndPendingLocators() {
-
+    private fun calculateFixedAndPendingLocators(savedFixedAndPending: Map<String, List<Locator>>?) {
         previousTargetedIssuedLocators.forEach { (key, initialLocators) ->
 
             // Get existing issued locators (if any)
@@ -199,8 +229,18 @@ class LocatorsAnalyzer {
                 filteredFixedAndPendingLocators.any { it.hashCode() == locator.hashCode() }
             }
 
+            // Add to list the fixed and pending locators, previously saved from file, as long as they are unique
+            savedFixedAndPending?.get(key)?.forEach { savedLocator ->
+                if (fixedAndPendingLocators.none { it.hashCode() == savedLocator.hashCode() }) {
+                    fixedAndPendingLocators.add(savedLocator)
+                }
+            }
+
             // Update the map with the filtered locators
             targetedFixedAndPendingLocators[key] = finalFixedAndPendingLocators.toMutableList()
+
+            // Save fixed and pending locs on file for future reuse
+            UserProgressFileHandler.saveFixedAndPendingLocators(targetedFixedAndPendingLocators)
         }
 
 

@@ -6,6 +6,7 @@ import gamification.GamificationManager
 import extractor.locator.Locator
 import locator.LocatorsAnalyzer
 import testquest.TestQuestAction
+import utils.UserProgressFileHandler
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -74,9 +75,9 @@ class TestExecutionListener : SMTRunnerEventsListener {
             //new static = latest code change
             //old dynamic = previous code change BEFORE test execution (used to check dailies)
             //new dynamic = latest code change BEFORE test execution (used to check dailies)
-            if(TestQuestAction.locatorsOldStatic.isNotEmpty()) //this to manage the case when tests are run with no locs changed
-                TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
-            TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic
+            //if(TestQuestAction.locatorsOldStatic.isNotEmpty()) //this to manage the case when tests are run with no locs changed
+            //    TestQuestAction.locatorsOldDynamic = TestQuestAction.locatorsOldStatic
+            //TestQuestAction.locatorsNewDynamic = TestQuestAction.locatorsNewStatic
             server = Server()
             server.start()
         }
@@ -92,6 +93,15 @@ class TestExecutionListener : SMTRunnerEventsListener {
             testOutcomes.forEach { testOutcome ->
                 LocatorsAnalyzer.removePendingFixedLocators(testOutcome.locatorsPassed)
             }
+            //TODO: currently we update all OLD to NEW once tests are executed, but we might execute only few tests so we may need to update only exercised code in the future
+            //locatorsOld are updated with new versions of old locators that passed tests, new locators that passed test, and old locators
+            val locatorsPassed = testOutcomes.flatMap { it.locatorsPassed }.distinct()
+            TestQuestAction.locatorsOld = TestQuestAction.locatorsOld.map { old ->
+                locatorsPassed.find { it == old } ?: old
+            }.toMutableSet().apply { addAll(locatorsPassed) }.toList()
+            TestQuestAction.POsOld = TestQuestAction.POsNew
+            TestQuestAction.POCallsOld = TestQuestAction.POCallsNew
+            UserProgressFileHandler.saveOldData()//to store user progress that needs to be tested next time
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }
@@ -207,10 +217,12 @@ class TestExecutionListener : SMTRunnerEventsListener {
         //first, get locators from test only
         val locationUrl = test.locationUrl
         val testClassName = locationUrl!!.removePrefix("java:test://").substringAfterLast('.').substringBefore('/')
-        val oldLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsOldDynamic
+        //val oldLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsOldDynamic
+        val oldLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsOld
             .filter { it.methodName == test.name && it.className == testClassName }
             .toMutableList()
-        val newLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsNewDynamic
+        //val newLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsNewDynamic
+        val newLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsNew
             .filter { it.methodName == test.name && it.className == testClassName }
             .toMutableList()
         //then, retrieve locators from PO method calls

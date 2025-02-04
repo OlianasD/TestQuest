@@ -14,6 +14,7 @@ import extractor.test.PageObjectCall
 import extractor.test.PageObjectCallExtractor
 import ui.GUIManager
 import utils.TestFilesExtractor
+import utils.UserProgressFileHandler
 
 object PluginData {
     var userProfileId: String = ""
@@ -32,15 +33,14 @@ class TestQuestAction : AnAction() {
 
             //extract locators (i.e., from classes named as _Test.java or _Page.java)
             val locExtractor = LocatorsExtractor()
-            locatorsNewStatic = testFilePaths.flatMap { locExtractor.parseLocators(it) }
-            locatorsOldDynamic = locatorsNewStatic //old dynamic locators store original info before test execution
+            locatorsNew = testFilePaths.flatMap { locExtractor.parseLocators(it) }
 
             //extract PageObjects (i.e., from classes named as _Page.java)
             val poExtractor = PageObjectExtractor()
             POsNew = testFilePaths
                 .filter { it.fileName.toString().endsWith("Page.java") }
-                .map { filePath -> poExtractor.parsePageObject(filePath, locatorsNewStatic) }
-            POsOld = POsNew //initially old and new are the same
+                //.map { filePath -> poExtractor.parsePageObject(filePath, locatorsNewStatic) }
+                .map { filePath -> poExtractor.parsePageObject(filePath, locatorsNew) }
 
             //extract PageObjects calls about PO usages in Tests (if any, from classes named as _Test.java)
             val poCallsExtractor = PageObjectCallExtractor()
@@ -50,7 +50,6 @@ class TestQuestAction : AnAction() {
                     poCallsExtractor.parsePOCalls(filePath.toFile()).entries
                 }
                 .associate { it.key to it.value }
-            POCallsOld = POCallsNew //initially old and new are the same
 
             //setup gamification profile
             val gamificationManager = GamificationManager()
@@ -58,9 +57,34 @@ class TestQuestAction : AnAction() {
             PluginData.userProfileId = "003" //TODO: change as a login
             gamificationManager.setupUserProfile(PluginData.userProfileId)
 
+
+            //previous untested progress is loaded from file, if exists and the user wants to.
+            // if not, old is set to new
+            val savedDataTime = UserProgressFileHandler.getMostRecentSavedDataTime()
+            val useSavedData = GUIManager.showWindowStoredDataChoice(savedDataTime)
+            if(useSavedData) {
+                UserProgressFileHandler.loadOldData()
+                if (locatorsOld.isEmpty())
+                    locatorsOld = locatorsNew
+                if (POsOld.isEmpty())
+                    POsOld = POsNew
+                if (POCallsOld.isEmpty())
+                    POCallsOld = POCallsNew
+            }
+            else {
+                UserProgressFileHandler.destroyOldData()
+                locatorsOld = locatorsNew
+                POsOld = POsNew
+                POCallsOld = POCallsNew
+            }
+            UserProgressFileHandler.saveOldData()
+
+
+
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
-            val estimation = locEstimator.calculateOverallFragility(locatorsNewStatic)
+            //val estimation = locEstimator.calculateOverallFragility(locatorsNewStatic)
+            val estimation = locEstimator.calculateOverallFragility(locatorsNew)
             CodeChangeListener.registerListener(project)
             GUIManager.showOverallLocsFragilityScore(estimation)
         }
@@ -76,11 +100,11 @@ class TestQuestAction : AnAction() {
 
     companion object {
         //this to store changes that may affect fragility computation (computed statically)
-        var locatorsOldStatic: List<Locator> = listOf()
-        var locatorsNewStatic: List<Locator> = listOf()
+        var locatorsOld: List<Locator> = listOf()
+        var locatorsNew: List<Locator> = listOf()
         //this to store changes used for most tasks before-after test execution (computed dynamically)
-        var locatorsOldDynamic: List<Locator> = listOf()
-        var locatorsNewDynamic: List<Locator> = listOf()
+        //var locatorsOldDynamic1: List<Locator> = listOf()
+        //var locatorsNewDynamic1: List<Locator> = listOf()
         //this to store changes on PageObjects before-after test execution (computed dynamically)
         var POsNew: List<PageObject> = listOf()
         var POsOld: List<PageObject> = listOf()

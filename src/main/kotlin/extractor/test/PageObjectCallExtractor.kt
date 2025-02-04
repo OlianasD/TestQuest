@@ -25,7 +25,8 @@ class PageObjectCallExtractor {
 
         //analyze test methods
         cu.findAll(MethodDeclaration::class.java).forEach { method ->
-            if (method.isPublic && method.typeAsString == "void" && method.nameAsString.startsWith("test")) {
+            //if (method.isPublic && method.typeAsString == "void" && method.nameAsString.startsWith("test")) {
+            if (method.annotations.any { it.nameAsString == "Test" }) {
                 val currentTestMethod = method.nameAsString
                 results[currentTestMethod] = mutableListOf()
                 val pageObjectVars = mutableMapOf<String, String>()
