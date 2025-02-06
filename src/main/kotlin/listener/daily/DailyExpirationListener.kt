@@ -4,6 +4,7 @@ import testquest.PluginData
 import com.intellij.openapi.components.Service
 import gamification.DailyManager
 import gamification.GamificationManager
+import utils.FilePathSolver
 import utils.XMLReader
 import java.io.File
 import java.util.concurrent.Executors
@@ -35,9 +36,7 @@ class DailyExpirationListener {
     }
 
     private fun removeExpiredDailiesFromXML() {
-        //val pluginPath = File(this::class.java.protectionDomain.codeSource.location.toURI()).parentFile
-        //val xmlFile = File(pluginPath, "users.xml")//todo: it seems it cannot find the path
-        val xmlFile = File("C:\\Users\\User\\Desktop\\demo\\users.xml")
+        val xmlFile = FilePathSolver.getUserDataFile()
         if (!xmlFile.exists()) {
             println("File not found: ${xmlFile.absolutePath}")
             return

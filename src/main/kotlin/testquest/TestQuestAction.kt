@@ -3,7 +3,6 @@ package testquest
 import listener.changes.CodeChangeListener
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import gamification.GamificationManager
 import extractor.locator.Locator
@@ -13,12 +12,11 @@ import extractor.pageobject.PageObject
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCall
 import extractor.test.PageObjectCallExtractor
-import listener.daily.DailyExpirationListener
 import listener.test.TestExecutionListener
 import ui.GUIManager
+import utils.FilePathSolver
 import utils.TestFilesExtractor
 import utils.UserProgressFileHandler
-import java.lang.ref.WeakReference
 
 object PluginData {
     var userProfileId: String = ""
@@ -62,16 +60,16 @@ class TestQuestAction : AnAction() {
             //setup gamification profile
             val gamificationManager = GamificationManager()
             gamificationManager.showGUI()
-            PluginData.userProfileId = "003" //TODO: change as a login
+            PluginData.userProfileId = "001" //TODO: change as a login
             gamificationManager.setupUserProfile(PluginData.userProfileId)
 
 
             //previous untested progress is loaded from file, if exists and the user wants to.
             // if not, old is set to new
-            val savedDataTime = UserProgressFileHandler.getMostRecentSavedDataTime()
+            val savedDataTime = UserProgressFileHandler.getMostRecentSavedData()
             val useSavedData = GUIManager.showWindowStoredDataChoice(savedDataTime)
             if(useSavedData) {
-                UserProgressFileHandler.loadOldData()
+                UserProgressFileHandler.loadProgressData()
                 if (locatorsOld.isEmpty())
                     locatorsOld = locatorsNew
                 if (POsOld.isEmpty())
@@ -80,12 +78,12 @@ class TestQuestAction : AnAction() {
                     POCallsOld = POCallsNew
             }
             else {
-                UserProgressFileHandler.destroyOldData()
+                UserProgressFileHandler.destroySavedData()
                 locatorsOld = locatorsNew
                 POsOld = POsNew
                 POCallsOld = POCallsNew
             }
-            UserProgressFileHandler.saveOldData()
+            UserProgressFileHandler.saveProgressData()
 
 
             //estimate overall fragility and show it on GUI

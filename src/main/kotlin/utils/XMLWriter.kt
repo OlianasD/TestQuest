@@ -9,6 +9,8 @@ import javax.xml.transform.stream.StreamResult
 
 import org.w3c.dom.Element
 import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -16,8 +18,20 @@ import javax.xml.transform.OutputKeys
 
 class XMLWriter {
 
-    fun saveUserProfileToXML(xmlFilePath: String, userProfile: UserProfile) {
-        val xmlFile = File(xmlFilePath)
+
+    fun createUsersFile(file: File){
+        try {
+            val writer = FileWriter(file, false)
+            writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n")
+            writer.write("<userProfiles>\n")
+            writer.write("</userProfiles>\n")
+            writer.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun saveUserProfileToXML(xmlFile: File, userProfile: UserProfile) {
         val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val doc = docBuilder.parse(xmlFile)
         val userProfilesNode = doc.documentElement
@@ -105,8 +119,7 @@ class XMLWriter {
         return element
     }
 
-    fun addNewUserProfileToXML(xmlFilePath: String, userProfile: UserProfile) {
-        val xmlFile = File(xmlFilePath)
+    fun addNewUserProfileToXML(xmlFile: File, userProfile: UserProfile) {
         val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val doc = docBuilder.parse(xmlFile)
         val userProfilesNode = doc.documentElement
@@ -180,21 +193,6 @@ class XMLWriter {
             dailiesNode.appendChild(dailyNode)
         }
         userProfileNode.appendChild(dailiesNode)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         // Append the new userProfile to the root element

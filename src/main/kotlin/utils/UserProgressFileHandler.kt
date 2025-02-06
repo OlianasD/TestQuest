@@ -17,14 +17,13 @@ import java.time.format.DateTimeFormatter
 
 object UserProgressFileHandler {
 
-    private const val OLD_DATA_PATH = "C:\\Users\\User\\Desktop\\demo\\progress" //TODO: check path
-    private const val FIXED_PENDING_PATH = "C:\\Users\\User\\Desktop\\demo\\pending" //TODO: check path
 
 
-    fun saveOldData() {
+
+    fun saveProgressData() {
         try {
-            ObjectOutputStream(FileOutputStream(OLD_DATA_PATH + PluginData.userProfileId + ".txt")).use { oos ->
-                //oos.writeObject(TestQuestAction.locatorsOldStatic)
+            val file = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
+            ObjectOutputStream(FileOutputStream(file)).use { oos ->
                 oos.writeObject(TestQuestAction.locatorsOld)
                 oos.writeObject(TestQuestAction.POsOld)
                 oos.writeObject(TestQuestAction.POCallsOld)
@@ -34,9 +33,9 @@ object UserProgressFileHandler {
         }
     }
 
-    fun loadOldData() {
+    fun loadProgressData() {
         try {
-            val file = File(OLD_DATA_PATH + PluginData.userProfileId + ".txt")
+            val file = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
             ObjectInputStream(FileInputStream(file)).use { ois ->
                 val locatorsOld = ois.readObject() as List<Locator>
                 val POsOld = ois.readObject() as List<PageObject>
@@ -51,20 +50,21 @@ object UserProgressFileHandler {
         }
     }
 
-    fun destroyOldData() {
-        var file = File(FIXED_PENDING_PATH + PluginData.userProfileId + ".txt")
+    fun destroySavedData() {
+        var file = FilePathSolver.getSavedPendingsFile(PluginData.userProfileId)
         if (file.exists())
             file.delete()
-        file = File(OLD_DATA_PATH + PluginData.userProfileId + ".txt")
+        file = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
         if (file.exists())
             file.delete()
     }
 
 
 
-    fun saveFixedAndPendingLocators(targetedFixedAndPendingLocators:  MutableMap<String, MutableList<Locator>>) {
+    fun saveFixedAndPendingData(targetedFixedAndPendingLocators:  MutableMap<String, MutableList<Locator>>) {
         try {
-            ObjectOutputStream(FileOutputStream(FIXED_PENDING_PATH + PluginData.userProfileId + ".txt")).use { oos ->
+            val file = FilePathSolver.getSavedPendingsFile(PluginData.userProfileId)
+            ObjectOutputStream(FileOutputStream(file)).use { oos ->
                 oos.writeObject(targetedFixedAndPendingLocators)
             }
         } catch (e: IOException) {
@@ -72,10 +72,10 @@ object UserProgressFileHandler {
         }
     }
 
-    fun loadFixedAndPendingLocators(): MutableMap<String, MutableList<Locator>>? {
+    fun loadFixedAndPendingData(): MutableMap<String, MutableList<Locator>>? {
         var loadedData: MutableMap<String, MutableList<Locator>>? = null
         try {
-            val file = File(FIXED_PENDING_PATH + PluginData.userProfileId + ".txt")
+            val file = FilePathSolver.getSavedPendingsFile(PluginData.userProfileId)
             ObjectInputStream(FileInputStream(file)).use { ois ->
                 loadedData = ois.readObject() as? MutableMap<String, MutableList<Locator>>
             }
@@ -89,31 +89,32 @@ object UserProgressFileHandler {
 
 
 
-    fun getMostRecentSavedDataTime(): String {
-        val oldDataPath = Paths.get(OLD_DATA_PATH + PluginData.userProfileId + ".txt")
-        val fixedPendingPath = Paths.get(FIXED_PENDING_PATH + PluginData.userProfileId + ".txt")
-        val oldDataCreationTime = getFileCreationTime(oldDataPath)
-        val fixedPendingCreationTime = getFileCreationTime(fixedPendingPath)
-        if (oldDataCreationTime != null) {
+    fun getMostRecentSavedData(): String {
+        val progressFile = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
+        val pendingsFile = FilePathSolver.getSavedPendingsFile(PluginData.userProfileId)
+        val progressCreationTime = getFileCreationTime(progressFile)
+        val fixedPendingCreationTime = getFileCreationTime(pendingsFile)
+        if (progressCreationTime != null) {
             if (fixedPendingCreationTime != null) {
-                if (oldDataCreationTime.isAfter(fixedPendingCreationTime)) {
-                    return formatDate(oldDataCreationTime)
-                } else if (oldDataCreationTime.isBefore(fixedPendingCreationTime)) {
+                if (progressCreationTime.isAfter(fixedPendingCreationTime)) {
+                    return formatDate(progressCreationTime)
+                } else if (progressCreationTime.isBefore(fixedPendingCreationTime)) {
                     return formatDate(fixedPendingCreationTime)
                 } else {
-                    return formatDate(oldDataCreationTime)
+                    return formatDate(progressCreationTime)
                 }
             }
             else
-                return formatDate(oldDataCreationTime)
+                return formatDate(progressCreationTime)
         }
         else if (fixedPendingCreationTime!=null)
             return formatDate(fixedPendingCreationTime)
         return ""
     }
 
-    private fun getFileCreationTime(path: java.nio.file.Path): Instant? {
+    private fun getFileCreationTime(file: File): Instant? {
         return try {
+            val path = file.toPath()
             if (Files.exists(path)) {
                 val attrs = Files.readAttributes(path, BasicFileAttributes::class.java)
                 attrs.creationTime().toInstant()

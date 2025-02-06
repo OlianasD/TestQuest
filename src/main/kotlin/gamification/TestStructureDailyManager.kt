@@ -1,6 +1,7 @@
 package gamification
 
 import listener.test.TestOutcome
+import utils.FilePathSolver
 
 class TestStructureDailyManager {
 
@@ -38,7 +39,7 @@ class TestStructureDailyManager {
                 "Run ${DailyManager.DAILY_GOAL} test cases successfully",
                 DailyManager.RANDOM_DAILY_XP,
                 DailyManager.DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -46,7 +47,7 @@ class TestStructureDailyManager {
                 "Run a test suite successfully",
                 DailyManager.RANDOM_DAILY_XP,
                 DailyManager.DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -54,7 +55,7 @@ class TestStructureDailyManager {
                 "Add an assert to a test case",
                 DailyManager.RANDOM_DAILY_XP,
                 DailyManager.DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             //TODO: this checks if test has not too many interactions/locs and too many assertions
@@ -63,7 +64,7 @@ class TestStructureDailyManager {
                 "Refactor a long test into two tests",
                 DailyManager.RANDOM_DAILY_XP,
                 DailyManager.DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
 

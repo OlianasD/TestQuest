@@ -2,8 +2,10 @@ package gamification
 
 import listener.test.TestOutcome
 import ui.GUIManager
+import utils.FilePathSolver
 import utils.XMLReader
 import utils.XMLWriter
+import java.io.File
 import java.util.*
 
 class GamificationManager() {
@@ -26,8 +28,7 @@ class GamificationManager() {
             }
         }
 
-        var usersDataFile: String = "C:\\Users\\User\\Desktop\\demo\\users.xml" //TODO: path
-        var unknownUserPic : String = "C:\\Users\\User\\Desktop\\demo\\pics\\user\\default-user.png" //TODO: path
+        var usersDataFile: File = FilePathSolver.getUserDataFile()
         lateinit var userProfile: UserProfile //the current user
         var mode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
 
@@ -167,7 +168,7 @@ class GamificationManager() {
                 achievementProgresses = mutableListOf(),
                 dailyProgresses = mutableListOf(),
                 completedAchievements = mutableListOf(),
-                propic = unknownUserPic
+                propic = FilePathSolver.USER_PROPIC_PATH
             )
             DailyManager.setupRandomDailies(userProfile)
             AchievementManager.setupAchievements(userProfile)

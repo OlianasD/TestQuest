@@ -2,20 +2,13 @@ package listener.test
 
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener
 import com.intellij.execution.testframework.sm.runner.SMTestProxy
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.io.ReadOnlyAttributeUtil
 import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
-import listener.changes.CodeChangeListener
 import locator.LocatorsAnalyzer
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
-import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -123,7 +116,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             }.toMutableSet().apply { addAll(locatorsPassed) }.toList()
             TestQuestAction.POsOld = TestQuestAction.POsNew
             TestQuestAction.POCallsOld = TestQuestAction.POCallsNew
-            UserProgressFileHandler.saveOldData()//to store user progress that needs to be tested next time
+            UserProgressFileHandler.saveProgressData()//to store user progress that needs to be tested next time
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }

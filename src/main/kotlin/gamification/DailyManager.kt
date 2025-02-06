@@ -4,7 +4,9 @@ import listener.test.TestOutcome
 import extractor.locator.Locator
 import locator.LocatorsAnalyzer
 import locator.LocatorsFragilityCalculator
+import testquest.TestQuestAction
 import ui.GUIManager
+import utils.FilePathSolver
 
 class DailyManager {
 
@@ -12,7 +14,7 @@ class DailyManager {
 
         const val DAILY_GOAL: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
         const val RANDOM_DAILY_XP: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
-        const val TARGETED_DAILY_XP: Int = 25 //xp for each point fixed from targeted TODO
+        private const val TARGETED_DAILY_XP: Int = 25 //xp for each point fixed from targeted TODO
         private const val DAILIES_PER_USER: Int = 5
 
 
@@ -71,7 +73,7 @@ class DailyManager {
                 "Replace $DAILY_GOAL existing absolute XPath locators with $DAILY_GOAL relative ones",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -79,7 +81,7 @@ class DailyManager {
                 "Reduce the length of $DAILY_GOAL existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -87,7 +89,7 @@ class DailyManager {
                 "Reduce the level of $DAILY_GOAL existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -95,7 +97,7 @@ class DailyManager {
                 "Convert $DAILY_GOAL existing non-XPath locators to $DAILY_GOAL XPath ones",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -103,7 +105,7 @@ class DailyManager {
                 "Convert $DAILY_GOAL existing non-ID locators to $DAILY_GOAL ID ones",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -111,7 +113,7 @@ class DailyManager {
                 "Run 20 locators successfully",
                 RANDOM_DAILY_XP,
                 20,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -119,7 +121,7 @@ class DailyManager {
                 "Improve the robustness of $DAILY_GOAL existing locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -127,7 +129,7 @@ class DailyManager {
                 "Shorten the length of $DAILY_GOAL existing XPath locators below " + GamificationManager.MAX_LENGTH + " characters",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -135,7 +137,7 @@ class DailyManager {
                 "Add $DAILY_GOAL references to robust attributes to existing XPaths locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -143,7 +145,7 @@ class DailyManager {
                 "Remove $DAILY_GOAL references to fragile attributes from existing XPaths locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -151,7 +153,7 @@ class DailyManager {
                 "Remove $DAILY_GOAL references to Javascript code from existing XPaths locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -159,7 +161,7 @@ class DailyManager {
                 "Modify 5 different existing locators",
                 RANDOM_DAILY_XP,
                 5,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -167,7 +169,7 @@ class DailyManager {
                 "Lower the level of $DAILY_GOAL existing locators below " + GamificationManager.MAX_LEVEL + " tags",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -175,7 +177,7 @@ class DailyManager {
                 "Repair $DAILY_GOAL existing broken locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -183,7 +185,7 @@ class DailyManager {
                 "Reduce the number of predicates from $DAILY_GOAL existing locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -191,7 +193,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -199,7 +201,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new ID locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -207,7 +209,7 @@ class DailyManager {
                 "Implement a newly locator value and use it more than once in a test suite",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -215,7 +217,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators with length below " + GamificationManager.MAX_LENGTH+ " characters",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -223,7 +225,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators with level below " + GamificationManager.MAX_LEVEL+ " tags",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -231,7 +233,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new robust locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -239,7 +241,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators with references to robust attributes",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -247,7 +249,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators with no references to fragile attributes",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -255,7 +257,7 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators with no references to Javascript code",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -263,32 +265,32 @@ class DailyManager {
                 "Implement $DAILY_GOAL new XPath locators with " + GamificationManager.MAX_POS_PRED + " or less positional predicates",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             /************ DAILIES ABOUT POS ************/
             Daily(
                 RANDOM_DAILY_NAMES[25],
-                "Create a PageObject within the test suite",
+                "Add a new PageObject to the test suite",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
                 RANDOM_DAILY_NAMES[26],
-                "Add a method to any PageObject",
+                "Add a new method to a PageObject",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
                 RANDOM_DAILY_NAMES[27],
-                "Implement $DAILY_GOAL new locators to any PageObject method",
+                "Add new $DAILY_GOAL locators to any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -296,7 +298,7 @@ class DailyManager {
                 "Move $DAILY_GOAL locators from tests to any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -304,7 +306,7 @@ class DailyManager {
                 "Define a PageObject as return type for any PageObject method that does not",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -312,7 +314,7 @@ class DailyManager {
                 "Move $DAILY_GOAL asserts existing in any PageObject method to a test",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -320,7 +322,7 @@ class DailyManager {
                 "Adapts $DAILY_GOAL locators retrieval from any PageObject method to the canonical form",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -328,7 +330,7 @@ class DailyManager {
                 "Add $DAILY_GOAL interactions with locators in any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -336,7 +338,7 @@ class DailyManager {
                 "Assign an ancestor PageObject to any PageObject",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -344,7 +346,7 @@ class DailyManager {
                 "Move a duplicated method from multiple PageObjects to a common ancestor",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -352,7 +354,7 @@ class DailyManager {
                 "Instantiate a PageObject within any test",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -360,7 +362,7 @@ class DailyManager {
                 "Call a PageObject method from any test",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
@@ -368,7 +370,7 @@ class DailyManager {
                 "Call an unused PageObject method from any test",
                 RANDOM_DAILY_XP,
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
         )
@@ -445,7 +447,7 @@ class DailyManager {
                 "Turns the following absolute XPath locators into relative ones",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
@@ -453,7 +455,7 @@ class DailyManager {
                 "Reduce the length of the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
@@ -461,7 +463,7 @@ class DailyManager {
                 "Reduce the levels of the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
@@ -469,7 +471,7 @@ class DailyManager {
                 "Remove/Replace the positional predicates from the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
@@ -477,7 +479,7 @@ class DailyManager {
                 "Remove/Replace the weak predicates from the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
@@ -485,7 +487,7 @@ class DailyManager {
                 "Replace the following non-ID/XPath locators into ID/XPath ones",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
@@ -493,7 +495,7 @@ class DailyManager {
                 "Repair the following broken locators",
                 TARGETED_DAILY_XP,
                 null,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\daily\\default-daily.png",
+                FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
         )
@@ -1277,16 +1279,26 @@ class DailyManager {
 
         /******* RANDOM DAILY CHECKS ABOUT PAGE OBJECTS *******/
         private fun checkNewPO(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            val oldPONames = TestQuestAction.POsOld.map { it.name }.toSet()
+            return if (TestQuestAction.POsNew.any { it.name !in oldPONames }) 1 else 0
         }
 
         private fun checkNewPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            val oldPOMethods = TestQuestAction.POsOld.associateBy({ it.name }, { it.methods.map { m -> m.name }.toSet() })
+            return if (TestQuestAction.POsNew.any { newPO ->
+                    val oldMethods = oldPOMethods[newPO.name] ?: emptySet()
+                    newPO.methods.any { it.name !in oldMethods }
+                }) 1 else 0
         }
 
         private fun checkAddedLocsToPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            val oldPOLocators = TestQuestAction.POsOld.associateBy({ it.name }, { it.methods.flatMap { m -> m.locators }.toSet() })
+            return TestQuestAction.POsNew.sumOf { newPO ->
+                val oldLocators = oldPOLocators[newPO.name] ?: emptySet()
+                newPO.methods.flatMap { it.locators }.count { it !in oldLocators }
+            }
         }
+
 
         private fun checkReturnedPOInPOMethod(testOutcomes: List<TestOutcome>): Int {
             return 0;

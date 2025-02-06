@@ -41,7 +41,7 @@ class LocatorsAnalyzer {
                 }
             }
             //fixed and pending locs are saved for future reuse
-            UserProgressFileHandler.saveFixedAndPendingLocators(targetedFixedAndPendingLocators)
+            UserProgressFileHandler.saveFixedAndPendingData(targetedFixedAndPendingLocators)
         }
 
     }
@@ -68,7 +68,7 @@ class LocatorsAnalyzer {
             calculateInitialBrokenLocators()
 
         //load fixedAndPending from file, if exist
-        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingLocators()
+        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingData()
         //keep only fixed and pending related to existing locators
         var cleanedSavedFixedAndPending: Map<String, List<Locator>>? = null
         if(savedFixedAndPending!=null) {
@@ -240,7 +240,7 @@ class LocatorsAnalyzer {
             targetedFixedAndPendingLocators[key] = finalFixedAndPendingLocators.toMutableList()
 
             // Save fixed and pending locs on file for future reuse
-            UserProgressFileHandler.saveFixedAndPendingLocators(targetedFixedAndPendingLocators)
+            UserProgressFileHandler.saveFixedAndPendingData(targetedFixedAndPendingLocators)
         }
 
 

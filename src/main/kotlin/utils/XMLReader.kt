@@ -10,8 +10,8 @@ import javax.xml.parsers.DocumentBuilderFactory
 class XMLReader {
 
 
-    fun loadUserProfileFromXML(xmlFilePath: String, id: String): UserProfile? {
-        val userProfileNode = findUserProfileNodeByID(xmlFilePath, id)
+    fun loadUserProfileFromXML(xmlFile: File, id: String): UserProfile? {
+        val userProfileNode = findUserProfileNodeByID(xmlFile, id)
         if (userProfileNode != null) {
             val userProfile = UserProfile(
                 id = userProfileNode.getElementsByTagName("id").item(0).textContent,
@@ -33,8 +33,7 @@ class XMLReader {
         return null
     }
 
-    private fun findUserProfileNodeByID(xmlFilePath: String, ID: String): Element? {
-        val xmlFile = File(xmlFilePath)
+    private fun findUserProfileNodeByID(xmlFile: File, ID: String): Element? {
         val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val doc = docBuilder.parse(xmlFile)
         val nodeList = doc.getElementsByTagName("userProfile")

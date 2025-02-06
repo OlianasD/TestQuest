@@ -3,6 +3,7 @@ package gamification
 import listener.test.TestOutcome
 import extractor.locator.Locator
 import locator.LocatorsFragilityCalculator
+import utils.FilePathSolver
 import java.io.File
 
 class AchievementManager {
@@ -15,175 +16,175 @@ class AchievementManager {
                 "I did it!",
                 "Implement your first locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
-            ),
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
+                ),
             Achievement(
                 "Kill them all",
                 "Transform 100 absolute XPath locators into relative ones",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Keep it short",
                 "Reduce the length of 100 XPath locators",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "The higher they are, the louder they fall",
                 "Reduce the level of 100 XPath locators",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Stillness",
                 "Do not change any locator for 24 hours",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Ops... I made a mistake!",
                 "Worsen the quality of a locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "I'm starting to learn things",
                 "Improve the robustness of 1 locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Perfectionism",
                 "Improve locators robustness 100 times",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Immortality",
                 "Build a locator that survives 100 runs",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "An inside job",
                 "Build a locator that fails immediately",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "I feel so lonely",
                 "Use a locator type different from any other type currently used",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "The gift of synthesis",
                 "Build the shortest locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "The bigger the better",
                 "Build the longest locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Strength lies in differences",
                 "Use every locator types",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "The cake is a lie",
                 "Rename a locator as 'cake'",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "The clone war",
                 "Use the same locator in 10 different test cases",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Expand the colony",
                 "Add 100 new locators from any test suite",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "You are not welcome anymore",
                 "Remove 100 locators from any test suite",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "What's the difference?",
                 "Add a locator that has same name, type and value of another one",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Is this a test?",
                 "Execute your first test successfully",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "I joined the Test Marathon",
                 "Execute 1000 tests successfully",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "The Beginner's Luck",
                 "Run your first working locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "That's no luck anymore",
                 "Run 1000 working locators",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "First aid",
                 "Repair your first locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "ER Medical Drama",
             "Repair 1000 locators",
                  1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "I didn't touch it!",
                 "Break a locator",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Flawless Victory",
                 "Implement the perfect locator", //FC<=0.1
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Frankenstein",
                 "Implement the worst locator", //FC>=1
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
             Achievement(
                 "Locatorwarts School of Robustness and Testing",
                 "Improve the robustness of 1000 different locators",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                FilePathSolver.ACHIEVEMENT_PICS_PATH,
             ),
 
 
@@ -193,67 +194,67 @@ class AchievementManager {
                 "Kill them all",
                 "Implement 100 robust locators",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "Kill them all",
                 "Implement 100 ID locators",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "Kill them all",
                 "Implement 100 relative XPath locators",
                 100,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "Is this a locator?",
                 "Open the plugin for the first time",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "I am a bit confused",
                 "Change a locator 3 times in 24 hours",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "What am I doing?",
                 "Change a test case 3 times in 24 hours",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "Domino Effect",
                 "Add a locator which makes another locator to break", //non x forza nosuch
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "You are a wizard, Harry",
                 "Reach level 5",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "Look To My Coming, At First Light On The Fifth Day",
                 "Reach level 10",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "Ho there wanderer, stay thy course a while and indulge an old man",
                 "Reach level 15",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),
             Achievement(
                 "A wizard does not make mistakes",
                 "Reach level 20",
                 1,
-                "C:\\Users\\User\\Desktop\\demo\\pics\\achievement\\default-achievement.png"
+                PathConfig.getResourcePath(FilePathSolver.ACHIEVEMENT_PICS_PATH),
             ),*/
 
         )

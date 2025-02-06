@@ -21,6 +21,7 @@ import listener.changes.CodeChangeListener
 import listener.daily.DailyExpirationListener
 import listener.test.TestExecutionListener
 import locator.LocatorsAnalyzer
+import utils.FilePathSolver
 import utils.UserProgressFileHandler
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -28,11 +29,13 @@ import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
+import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.Timer
 import javax.swing.border.TitledBorder
@@ -89,6 +92,7 @@ object GUIManager {
     //to update the gui based on user progression
     fun updateGUI(userProfile: UserProfile, notifyChange: Boolean, msg: String = "") {
         SwingUtilities.invokeLater {
+
             // Main panel
             val mainPanel = JPanel(GridBagLayout())
             mainPanel.background = JBColor.LIGHT_GRAY
@@ -117,6 +121,7 @@ object GUIManager {
             val gbcInner = GridBagConstraints()
             gbcInner.insets = JBUI.insets(5)
             gbcInner.anchor = GridBagConstraints.WEST
+
             // Name
             val namePanel = JPanel(FlowLayout(FlowLayout.LEFT))
             namePanel.background = JBColor.LIGHT_GRAY
@@ -141,6 +146,7 @@ object GUIManager {
             gbcInner.fill = GridBagConstraints.HORIZONTAL
             gbcInner.insets = JBUI.insetsLeft(10)
             userInfoInnerPanel.add(namePanel, gbcInner)
+
             // Title
             val titleLabel = JLabel("Title: ${userProfile.title}")
             titleLabel.font = font
@@ -148,12 +154,14 @@ object GUIManager {
             gbcInner.gridy = 1
             gbcInner.insets = JBUI.insets(15)
             userInfoInnerPanel.add(titleLabel, gbcInner)
+
             // Level
             val levelLabel = JLabel("Level: ${userProfile.level}")
             levelLabel.font = font
             levelLabel.foreground = JBColor.BLACK
             gbcInner.gridy = 2
             userInfoInnerPanel.add(levelLabel, gbcInner)
+
             // XP
             val currentXP = userProfile.currentXP
             val nextXP = userProfile.nextXP
@@ -166,6 +174,7 @@ object GUIManager {
             xpLabel.foreground = JBColor.BLACK
             gbcInner.gridy = 3
             userInfoInnerPanel.add(xpLabel, gbcInner)
+
             // XP Progress Bar
             val percentComplete = if (nextXP == Int.MAX_VALUE) 100 else (currentXP.toDouble() / nextXP * 100).toInt()
             val xpProgressBar = JProgressBar(0, 100)
@@ -179,16 +188,29 @@ object GUIManager {
             gbcInner.gridy = 4
             gbcInner.gridwidth = 2
             userInfoInnerPanel.add(xpProgressBar, gbcInner)
+
             // Profile picture
             val imageBox = JPanel()
             imageBox.border = BorderFactory.createLineBorder(JBColor.DARK_GRAY)
             imageBox.preferredSize = Dimension(100, 100)
             imageBox.maximumSize = Dimension(100, 100)
             imageBox.background = JBColor.LIGHT_GRAY
-            var imageIcon = ImageIcon(userProfile.propic)
-            var scaledIcon = ImageIcon(imageIcon.image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
+            var imageStream = this::class.java.classLoader.getResourceAsStream(userProfile.propic)
+            if (imageStream == null) {
+                val file = File(userProfile.propic)
+                if (file.exists())
+                    imageStream = FileInputStream(file)
+                else {
+                    userProfile.propic = FilePathSolver.USER_PROPIC_PATH
+                    imageStream = this::class.java.classLoader.getResourceAsStream(FilePathSolver.USER_PROPIC_PATH)
+                }
+            }
+            var image = ImageIO.read(imageStream)
+            var scaledIcon = ImageIcon(image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
             var imageLabel = JLabel(scaledIcon)
             imageBox.add(imageLabel)
+
+            //in case of propic change
             val editImageButton = JButton("Edit")
             editImageButton.addActionListener {
                 val fileChooser = JFileChooser()
@@ -196,13 +218,17 @@ object GUIManager {
                 val result = fileChooser.showOpenDialog(null)
                 if (result == JFileChooser.APPROVE_OPTION) {
                     val selectedFile: File = fileChooser.selectedFile
-                    userProfile.propic = selectedFile.absolutePath
+                    userProfile.propic = selectedFile.absolutePath //TODO: check if we want the user to select propics from any place
                     GamificationManager.updateUserProfile(userProfile)
-                    //changed = true
                     imageBox.removeAll()
-                    imageIcon = ImageIcon(selectedFile.absolutePath)
-                    scaledIcon = ImageIcon(imageIcon.image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
+                    imageStream = if (File(userProfile.propic).exists())
+                        FileInputStream(userProfile.propic)
+                     else
+                        this::class.java.classLoader.getResourceAsStream(userProfile.propic)
+                    image = ImageIO.read(imageStream)
+                    scaledIcon = ImageIcon(image.getScaledInstance(100, 100, Image.SCALE_SMOOTH))
                     imageLabel = JLabel(scaledIcon)
+                    imageBox.add(imageLabel)
                     imageBox.add(imageLabel)
                     imageBox.revalidate()
                     imageBox.repaint()
@@ -253,12 +279,14 @@ object GUIManager {
             achievementsPanel.border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
             achievementsPanel.background = JBColor.LIGHT_GRAY
             val tabbedPane = JTabbedPane()
+
             // Unlocked achievements Panel
             val unlockedAchievementsPanel = JPanel()
             unlockedAchievementsPanel.layout = BoxLayout(unlockedAchievementsPanel, BoxLayout.Y_AXIS)
             unlockedAchievementsPanel.background = JBColor.LIGHT_GRAY
             val unlockedScrollPane = JScrollPane(unlockedAchievementsPanel)
             tabbedPane.addTab("Unlocked", unlockedScrollPane)
+
             // Ongoing achievements Panel
             val ongoingAchievementsPanel = JPanel()
             ongoingAchievementsPanel.layout = BoxLayout(ongoingAchievementsPanel, BoxLayout.Y_AXIS
@@ -267,6 +295,7 @@ object GUIManager {
             val ongoingScrollPane = JScrollPane(ongoingAchievementsPanel)
             tabbedPane.addTab("Ongoing", ongoingScrollPane)
             achievementsPanel.add(tabbedPane, BorderLayout.CENTER)
+
             // Populate Unlocked achievements panel
             for (achievement in userProfile.completedAchievements) {
                 val achievementPanel = JPanel()
@@ -274,9 +303,10 @@ object GUIManager {
                 achievementPanel.alignmentX = Component.LEFT_ALIGNMENT
                 achievementPanel.background = JBColor.LIGHT_GRAY
                 // Icon
+                imageStream = this::class.java.classLoader.getResourceAsStream(achievement.icon)
+                val icon = ImageIO.read(imageStream)
                 val iconLabel = JLabel()
-                val icon = ImageIcon(achievement.icon)
-                iconLabel.icon = ImageIcon(icon.image.getScaledInstance(50, 50, Image.SCALE_SMOOTH))
+                iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
                 achievementPanel.add(iconLabel)
                 achievementPanel.background = JBColor.LIGHT_GRAY
                 // Achievement Name
@@ -294,6 +324,7 @@ object GUIManager {
                 // Add achievement panel to unlockedAchievementsPanel
                 unlockedAchievementsPanel.add(achievementPanel)
             }
+
             // Populate Ongoing achievements panel
             for (progress in userProfile.achievementProgresses) {
                 val achievement = progress.achievement
@@ -302,9 +333,10 @@ object GUIManager {
                 progressPanel.alignmentX = Component.LEFT_ALIGNMENT
                 progressPanel.background = JBColor.LIGHT_GRAY
                 // Icon
+                imageStream = this::class.java.classLoader.getResourceAsStream(achievement.icon)
+                val icon = ImageIO.read(imageStream)
                 val iconLabel = JLabel()
-                val icon = ImageIcon(achievement.icon)
-                iconLabel.icon = ImageIcon(icon.image.getScaledInstance(50, 50, Image.SCALE_SMOOTH))
+                iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
                 progressPanel.add(iconLabel)
                 progressPanel.background = JBColor.LIGHT_GRAY
                 // Achievement Name
@@ -421,18 +453,7 @@ object GUIManager {
                 //exitProcess(0)
             }
         })
-
-
-
-
-
-
     }
-
-
-
-
-
 
 
 
@@ -481,11 +502,14 @@ object GUIManager {
 
     private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font) {
         dailyPanel.removeAll() // Remove old elements
-
         val locatorsToVerifyMap = LocatorsAnalyzer.getFixedAndPendingLocatorsMap() //retrieve map of fixed locators still to verify
-
         // Create daily label on mouse over for random dailies
         if (dailyProgress.daily.type.equals("random", ignoreCase = true)) {
+            val imageStream = this::class.java.classLoader.getResourceAsStream(dailyProgress.daily.icon)
+            val icon = ImageIO.read(imageStream)
+            val iconLabel = JLabel()
+            iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
+            dailyPanel.add(iconLabel)
             val progressPerc = (dailyProgress.progress * 100 / dailyProgress.daily.target!!)
             val dailyMessage = "Progress: ${progressPerc}%"
             val dailyLabel = JLabel(dailyProgress.daily.description).apply {
@@ -501,6 +525,11 @@ object GUIManager {
             if (dailyProgress.daily.targetedLocators.isEmpty() &&
                 (locatorsToVerifyMap.isEmpty() || locatorsToVerifyMap[dailyProgress.daily.name]!!.isEmpty()))
                 return
+            val imageStream = this::class.java.classLoader.getResourceAsStream(dailyProgress.daily.icon)
+            val icon = ImageIO.read(imageStream)
+            val iconLabel = JLabel()
+            iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
+            dailyPanel.add(iconLabel)
             val dailyMessage = "${dailyProgress.daily.xp} XP for each listed issue fixed"
             val dailyLabel = JLabel(dailyProgress.daily.description).apply {
                 this.font = font
@@ -565,7 +594,7 @@ object GUIManager {
                         isVisible = true
 
                         // Update button text if window is closed
-                        addWindowListener(object : java.awt.event.WindowAdapter() {
+                        addWindowListener(object : WindowAdapter() {
                             override fun windowClosing(e: WindowEvent) {
                                 toggleButton.text = "Show"
                                 detailsFrame = null
