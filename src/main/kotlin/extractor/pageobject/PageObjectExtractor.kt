@@ -24,7 +24,7 @@ data class MethodInfo(
     val locators: List<Locator>, // list of locators within method
     val assertionLines: List<String>, // list of assertions associated with method info (hopefully, none)
     val seleniumCommands: List<String> // list of selenium commands associated with method info
-): java.io.Serializable
+): Serializable
 
 class PageObjectExtractor {
 

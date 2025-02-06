@@ -303,7 +303,7 @@ class DailyManager {
             ),
             Daily(
                 RANDOM_DAILY_NAMES[29],
-                "Define a PageObject as return type for any PageObject method that does not",
+                "Set a PageObject return type for a PageObject method that originally did not",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -319,7 +319,7 @@ class DailyManager {
             ),
             Daily(
                 RANDOM_DAILY_NAMES[31],
-                "Adapts $DAILY_GOAL locators retrieval from any PageObject method to the canonical form",
+                "Adapts $DAILY_GOAL locators retrieval from any PageObject to the canonical form",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -414,16 +414,17 @@ class DailyManager {
             RANDOM_DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithFewPosPredicates(testOutcomes) },
             RANDOM_DAILY_NAMES[25] to { testOutcomes -> checkNewPO(testOutcomes) },
             RANDOM_DAILY_NAMES[26] to { testOutcomes -> checkNewPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkAddedLocsToPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[28] to { testOutcomes -> checkReturnedPOInPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[29] to { testOutcomes -> checkMovedAssertsFromPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[30] to { testOutcomes -> checkAdaptedLocsFormatInPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[31] to { testOutcomes -> checkInteractionsWithLocsInPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkNewAncestorPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[33] to { testOutcomes -> checkMovedCommonMethodToAncestoPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkInstantiationPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkNewLocsInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[28] to { testOutcomes -> checkMovedLocsFromTestToPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[29] to { testOutcomes -> checkReturnedPOInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[30] to { testOutcomes -> checkMovedAssertsFromPOMethodToTests(testOutcomes) },
+            RANDOM_DAILY_NAMES[31] to { testOutcomes -> checkAdaptedLocsFormatInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkInteractionsWithLocsInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[33] to { testOutcomes -> checkNewAncestorPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkMovedCommonMethodToAncestorPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkInstantiationPO(testOutcomes) },
+            RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[37] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
             )
 
 
@@ -636,7 +637,7 @@ class DailyManager {
             else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
                 gainedXP = daily.xp * progress
 
-                //TODO: remove the following just for testing
+                //TODO: remove the following, used just for testing
                 //gainedXP = 50000000
 
 
@@ -1278,12 +1279,14 @@ class DailyManager {
 
 
         /******* RANDOM DAILY CHECKS ABOUT PAGE OBJECTS *******/
+        //TODO: we may want to check this info by considering actually passed POs
         private fun checkNewPO(testOutcomes: List<TestOutcome>): Int {
             val oldPONames = TestQuestAction.POsOld.map { it.name }.toSet()
             return if (TestQuestAction.POsNew.any { it.name !in oldPONames }) 1 else 0
         }
 
         private fun checkNewPOMethod(testOutcomes: List<TestOutcome>): Int {
+            //TODO: we may want to check this info by considering actually passed POs
             val oldPOMethods = TestQuestAction.POsOld.associateBy({ it.name }, { it.methods.map { m -> m.name }.toSet() })
             return if (TestQuestAction.POsNew.any { newPO ->
                     val oldMethods = oldPOMethods[newPO.name] ?: emptySet()
@@ -1291,36 +1294,98 @@ class DailyManager {
                 }) 1 else 0
         }
 
-        private fun checkAddedLocsToPOMethod(testOutcomes: List<TestOutcome>): Int {
-            val oldPOLocators = TestQuestAction.POsOld.associateBy({ it.name }, { it.methods.flatMap { m -> m.locators }.toSet() })
-            return TestQuestAction.POsNew.sumOf { newPO ->
-                val oldLocators = oldPOLocators[newPO.name] ?: emptySet()
-                newPO.methods.flatMap { it.locators }.count { it !in oldLocators }
-            }
+        private fun checkNewLocsInPOMethod(testOutcomes: List<TestOutcome>): Int {
+            return testOutcomes
+                .filter { it.className.endsWith("Page.java") }
+                .sumOf { outcome ->
+                    outcome.locatorsPassed.count { it !in outcome.locatorsOld }
+                }
+        }
+
+        private fun checkMovedLocsFromTestToPOMethod(testOutcomes: List<TestOutcome>): Int {
+            //TODO: comparison here is tricky as moving locs from Test to Page means that we are basically
+            //removing locators and adding new ones, so as locators change class and method name, they can't be directly compared
+            val newLocatorsInPOs = testOutcomes
+                .filter { it.className.endsWith("Page.java") }
+                .sumOf { it.locatorsNew.size }
+            val oldLocatorsInTests = testOutcomes
+                .filter { it.className.endsWith("Test.java") }
+                .sumOf { it.locatorsOld.size }
+            return newLocatorsInPOs - oldLocatorsInTests
         }
 
 
         private fun checkReturnedPOInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            //TODO: we may want to check this info by considering actually passed POs
+            val oldPOMethods = TestQuestAction.POsOld.associateBy(
+                { po -> po.name },
+                { po -> po.methods.associateBy({ method -> method.name }, { method -> method.returnType }) }
+            )
+            return if (TestQuestAction.POsNew.any { newPO ->
+                    newPO.methods.any { newMethod ->
+                        newMethod.returnType.endsWith("Page") &&
+                                oldPOMethods[newPO.name]?.get(newMethod.name)?.endsWith("Page") == false
+                    }
+                }) 1 else 0
         }
 
-        private fun checkMovedAssertsFromPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+        private fun checkMovedAssertsFromPOMethodToTests(testOutcomes: List<TestOutcome>): Int {
+            //TODO: we may want to check this info by considering actually passed POs
+            val oldAsserts = TestQuestAction.POsOld.sumOf { po ->
+                po.methods.sumOf { method ->
+                    method.assertionLines.size
+                }
+            }
+            val newAsserts = TestQuestAction.POsNew.sumOf { po ->
+                po.methods.sumOf { method ->
+                    method.assertionLines.size
+                }
+            }
+            return oldAsserts - newAsserts
         }
 
         private fun checkAdaptedLocsFormatInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            //TODO: a problem is that when changing a locator from noncanonical to canonical we are changing
+            //basic info to recognize it (e.g., adding name), so it is actually treated as a locator was removed and then added
+            //so we cannot use locatorsPassed and check whether they exist both as old and new but with changed info
+            val oldLocators = TestQuestAction.POsOld.sumOf { po ->
+                po.nonCanonicalLocators.size
+            }
+            val newLocators = TestQuestAction.POsNew.sumOf { po ->
+                po.nonCanonicalLocators.size
+            }
+            return oldLocators - newLocators
         }
 
         private fun checkInteractionsWithLocsInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            //TODO: we may want to check this info by considering actually passed POs
+            val oldInteractions = TestQuestAction.POsOld.sumOf { po ->
+                po.methods.sumOf { method ->
+                    method.locators.size
+                }
+            }
+            val newInteractions = TestQuestAction.POsNew.sumOf { po ->
+                po.methods.sumOf { method ->
+                    method.locators.size
+                }
+            }
+            return newInteractions - oldInteractions
         }
 
         private fun checkNewAncestorPO(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            //TODO: we may want to check this info by considering actually passed POs
+            return if (TestQuestAction.POsNew.any { newPO ->
+                    val oldPO = TestQuestAction.POsOld.find { it.name == newPO.name }
+                    oldPO != null && oldPO.ancestors.size < newPO.ancestors.size
+                }) {
+                1
+            } else {
+                0
+            }
         }
 
-        private fun checkMovedCommonMethodToAncestoPO(testOutcomes: List<TestOutcome>): Int {
+        //TODO
+        private fun checkMovedCommonMethodToAncestorPO(testOutcomes: List<TestOutcome>): Int {
             return 0;
         }
 
