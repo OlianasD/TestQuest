@@ -14,7 +14,18 @@ data class PageObject(
     val methods: List<MethodInfo>, // PO methods
     val ancestors: List<String>, // PO ancestors names
     val nonCanonicalLocators: List<Locator> // locators defined with no names or as annotations
-): Serializable
+): Serializable{
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as PageObject
+        return name == other.name
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+}
 
 //method info for the methods within each PO
 data class MethodInfo(
@@ -24,7 +35,32 @@ data class MethodInfo(
     val locators: List<Locator>, // list of locators within method
     val assertionLines: List<String>, // list of assertions associated with method info (hopefully, none)
     val seleniumCommands: List<String> // list of selenium commands associated with method info
-): Serializable
+): Serializable{
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as MethodInfo
+        return name == other.name &&
+                returnType == other.returnType &&
+                paramTypes == other.paramTypes &&
+                locators == other.locators &&
+                assertionLines == other.assertionLines &&
+                seleniumCommands == other.seleniumCommands
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + returnType.hashCode()
+        result = 31 * result + paramTypes.hashCode()
+        result = 31 * result + locators.hashCode()
+        result = 31 * result + assertionLines.hashCode()
+        result = 31 * result + seleniumCommands.hashCode()
+        return result
+    }
+}
+
+
 
 class PageObjectExtractor {
 

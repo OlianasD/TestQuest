@@ -1,6 +1,7 @@
 package locator
 
 import extractor.locator.Locator
+import extractor.pageobject.PageObject
 import gamification.GamificationManager
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
@@ -44,14 +45,21 @@ class LocatorsAnalyzer {
             UserProgressFileHandler.saveFixedAndPendingData(targetedFixedAndPendingLocators)
         }
 
+
+
+        private val targetedIssuesInPOs= mutableMapOf<String, List<Any>>()
+
+
     }
 
 
 
 
 
-    //private var locators = TestQuestAction.locatorsNewStatic
-    private var locators = TestQuestAction.locatorsNew
+    private var LOCATORS = TestQuestAction.locatorsNew
+    private var POs = TestQuestAction.POsNew
+
+
 
 
     //find locators that present issues in the test suite (i.e., targeted as they target the actual issues)
@@ -74,7 +82,7 @@ class LocatorsAnalyzer {
         if(savedFixedAndPending!=null) {
             cleanedSavedFixedAndPending = savedFixedAndPending.mapValues { (_, savedList) ->
                 savedList.filter { savedLocator ->
-                    locators.any { it.hashCode() == savedLocator.hashCode() }
+                    LOCATORS.any { it.hashCode() == savedLocator.hashCode() }
                 }
             }.filterValues { it.isNotEmpty() }
         }
@@ -96,7 +104,7 @@ class LocatorsAnalyzer {
 
     //save absolute xpath locators
     private fun calculateAbsoluteLocators() {
-        val absoluteLocators = locators.filter {
+        val absoluteLocators = LOCATORS.filter {
             it.locatorType.equals("xpath", ignoreCase = true) && it.locatorValue.startsWith("/html")
         }
         targetedIssuedLocators["absolute"] = absoluteLocators
@@ -104,13 +112,13 @@ class LocatorsAnalyzer {
 
     //save xpath locators with length more than MAX_LENGTH chars
     private fun calculateLongLocators() {
-        val longLocators = locators.filter { it.locatorValue.length > GamificationManager.MAX_LENGTH }
+        val longLocators = LOCATORS.filter { it.locatorValue.length > GamificationManager.MAX_LENGTH }
         targetedIssuedLocators["length"] = longLocators
     }
 
     //save xpath locators with more than MAX_LEVEL levels
     private fun calculateDeepLocators() {
-        val deepLocators = locators.filter {
+        val deepLocators = LOCATORS.filter {
             it.locatorType.equals("xpath", ignoreCase = true) &&
                     it.locatorValue.split("/").count { node -> node.isNotEmpty() } > GamificationManager.MAX_LEVEL
         }
@@ -119,7 +127,7 @@ class LocatorsAnalyzer {
 
     //save xpath locators with more than MAX_POS_PRED positional predicates
     private fun calculatePositionalPredicateLocators() {
-        val positionalPredicateLocators = locators.filter {
+        val positionalPredicateLocators = LOCATORS.filter {
             it.locatorType.equals("xpath", ignoreCase = true) &&
                     Regex("\\[\\d+]").findAll(it.locatorValue).count() > GamificationManager.MAX_POS_PRED
         }
@@ -128,7 +136,7 @@ class LocatorsAnalyzer {
 
     //save xpath locators with bad predicates
     private fun calculateBadPredicateLocators() {
-        val badPredicateLocators = locators.filter { locator ->
+        val badPredicateLocators = LOCATORS.filter { locator ->
             locator.locatorType.equals("xpath", ignoreCase = true) &&
                     (GamificationManager.BAD_PREDS.any { attribute ->
                         locator.locatorValue.contains("@$attribute", ignoreCase = true)
@@ -141,7 +149,7 @@ class LocatorsAnalyzer {
 
     //save locators that are neither ID or Xpath
     private fun calculateNonIDOrXPathLocators() {
-        val nonIDOrXPathLocators = locators.filter {
+        val nonIDOrXPathLocators = LOCATORS.filter {
             !it.locatorType.equals("id", ignoreCase = true) &&
                     !it.locatorType.equals("xpath", ignoreCase = true)
         }
@@ -166,9 +174,121 @@ class LocatorsAnalyzer {
         }
     }
 
-    fun getBrokenLocs(): List<Locator>? {
-        return targetedIssuedLocators["broken"]
+
+
+
+
+
+
+
+
+
+
+
+
+    private fun calculateMissingPOs() {
+        if (POs.isEmpty())
+            targetedIssuesInPOs["missingPOs"] = emptyList()
     }
+
+    private fun calculateEmptyPOs() {
+        val emptyPOs = POs.filter { it.methods.isEmpty() }.map { it }
+        if (emptyPOs.isNotEmpty())
+            targetedIssuesInPOs["emptyPOs"] = emptyPOs
+    }
+
+    private fun calculateEmptyPOMethods() {
+        val emptyPOMethods = POs.flatMap { po ->
+            po.methods.filter { it.seleniumCommands.isEmpty() }.map { it }
+        }
+        if (emptyPOMethods.isNotEmpty())
+            targetedIssuesInPOs["emptyPOMethods"] = emptyPOMethods
+    }
+
+    private fun calculateMissingReturnedPOs() {
+        val voidReturnMethods = POs.flatMap { po ->
+            po.methods.filter { it.returnType.equals("void", ignoreCase = true) }.map { it }
+        }
+        if (voidReturnMethods.isNotEmpty())
+            targetedIssuesInPOs["missingRetPOs"] = voidReturnMethods
+    }
+
+    private fun calculateAssertionsInPOs() {
+        val includingAssertionsMethods = POs.flatMap { po ->
+            po.methods.filter { it.assertionLines.isNotEmpty() }.map { it }
+        }
+        if (includingAssertionsMethods.isNotEmpty()) {
+            targetedIssuesInPOs["assertsInPOs"] = includingAssertionsMethods
+        }
+    }
+
+    private fun calculateNonCanonicalLocators() {
+        val nonCanonicalLocators = POs.flatMap { it.nonCanonicalLocators }
+        if (nonCanonicalLocators.isNotEmpty()) {
+            targetedIssuesInPOs["nonCanonicalLocs"] = nonCanonicalLocators
+        }
+    }
+
+    private fun calculateUnusedPOMethods() {
+        val usedMethods = TestQuestAction.POCallsNew.values
+            .flatten()
+            .map { it.pageObject to it.method }
+            .toSet()
+        val unusedMethods = POs.flatMap { po ->
+            po.methods.filter { method -> (po.name to method.name) !in usedMethods }
+        }
+        if (unusedMethods.isNotEmpty()) {
+            targetedIssuesInPOs["unusedPOMethods"] = unusedMethods
+        }
+    }
+
+    private fun calculateLocsOutPOs() {
+        val invalidClassLocators = LOCATORS.filter { !it.className.endsWith("_Page") }
+        if (invalidClassLocators.isNotEmpty())
+            targetedIssuesInPOs["locsOutPOs"] = invalidClassLocators
+    }
+
+    //compute POs with same methods but no common ancestors to store the same methods
+    private fun calculateMissingCommonAncestors() {
+        val POsWithMissingCommonAncestors = POs.filter { po1 ->
+            POs.any { po2 ->
+                po1 != po2 &&
+                        po1.methods.any { method1 ->
+                            po2.methods.any { method2 ->
+                                method1 == method2
+                            }
+                        } && po1.ancestors.none { it in po2.ancestors }
+            }
+        }
+        if (POsWithMissingCommonAncestors.isNotEmpty())
+            targetedIssuesInPOs["POsWithMissingCommonAncestors"] = POsWithMissingCommonAncestors
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     fun updateBrokenLocs(repairedLocs: List<Locator>) {
         val currentList = targetedIssuedLocators["broken"] ?: emptyList()
@@ -181,6 +301,7 @@ class LocatorsAnalyzer {
         }
         targetedIssuedLocators["broken"] = updatedList
     }
+
 
 
 
@@ -225,7 +346,7 @@ class LocatorsAnalyzer {
 
             // Remove fixed and pending locators that actually do not exist anymore and keep info updated
             // (e.g., in case a fixed locator is moved from a line to another or changed multiple time but never becoming issued)
-            val finalFixedAndPendingLocators = locators.filter { locator ->
+            val finalFixedAndPendingLocators = LOCATORS.filter { locator ->
                 filteredFixedAndPendingLocators.any { it.hashCode() == locator.hashCode() }
             }
 

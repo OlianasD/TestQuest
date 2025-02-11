@@ -2,6 +2,7 @@ package gamification
 
 import listener.test.TestOutcome
 import extractor.locator.Locator
+import extractor.test.PageObjectCall
 import locator.LocatorsAnalyzer
 import locator.LocatorsFragilityCalculator
 import testquest.TestQuestAction
@@ -12,8 +13,8 @@ class DailyManager {
 
     companion object {
 
-        const val DAILY_GOAL: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
-        const val RANDOM_DAILY_XP: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
+        private const val DAILY_GOAL: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
+        private const val RANDOM_DAILY_XP: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
         private const val TARGETED_DAILY_XP: Int = 25 //xp for each point fixed from targeted TODO
         private const val DAILIES_PER_USER: Int = 5
 
@@ -51,18 +52,35 @@ class DailyManager {
             /************ DAILIES ABOUT POS ************/
             "addPO", //create a PO within test suite (i.e., basically just a class named _Page is ok)
             "addMethodToPO", //add a method to a PO (i.e., basically just an empty method is ok)
-            "addLocsToMethod", //add locs to a method
-            "moveLocs2Method", //move locs from test to a method
+            "addLocsToMethod", //add locs to a PO method
+            "moveLocs2Method", //move locs from test to a PO method
             "returnPOInMethod", //add a PO as return type for a method
             "moveAssertsToTest", //move asserts from method to test
             "adaptLocs2Format", //adapt locs to have format: WebElement e = driver.findElement(By...)
             "interactWithLocsInMethod", //add Selenium instructions in method to interact with locators
-            "addAncestorPO", //add an 'extend' between POs
-            "moveCommonMethodToAncestorPO", //move a method shared among POs to an ancestor
-            "instantiatePO", //instantiate a PO within a test
+            "addAncestorPO", //add an ancestor PO
+            "moveCommonMethodToAncestorPO", //move a method shared among POs to a common ancestor
             "callMethod", // call a method from a PO within a test
             "callUnusedMethod", //call an unused method from a PO within a test
+            /************ DAILIES ABOUT TESTS ************/
+            //TODO: most are still to be implemented and might require additional extractions mechanics (e.g., to extract test structure)
+            "runtc",
+            "runts",
+            "addAssert2Test",
+            "shortenTestWorkFlow",//test workflow must be simple (i.e., checks if test has not too many interactions/locs and too many assertions)
+            "makeTestWorkFlowIndependent", //test workflow must be independent from any other test
+            "adaptTestName2Format", //test name must have 3 sections: what is being tested, circumnstances, exp result
+            "shortenMethodName",
+            "shortenVarName",
+            "addSetup",
+            "addTearDown",
+            "removeGlobVar",
+            "removeExpSleep",
         )
+
+
+
+
 
 
         //TODO: change icons, xp, target accordingly
@@ -334,7 +352,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[32],
+                RANDOM_DAILY_NAMES[33],
                 "Assign an ancestor PageObject to any PageObject",
                 RANDOM_DAILY_XP,
                 1,
@@ -342,16 +360,8 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[33],
-                "Move a duplicated method from multiple PageObjects to a common ancestor",
-                RANDOM_DAILY_XP,
-                1,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
-            ),
-            Daily(
                 RANDOM_DAILY_NAMES[34],
-                "Instantiate a PageObject within any test",
+                "Move a duplicated method from multiple PageObjects to a common ancestor",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -373,7 +383,108 @@ class DailyManager {
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
+            /************ DAILIES ABOUT TESTS ************/
+            Daily(
+                RANDOM_DAILY_NAMES[37],
+                "Run ${DAILY_GOAL} test cases successfully",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[38],
+                "Run a test suite successfully",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[39],
+                "Add an assert to a test case",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[40],
+                "Refactor a long test into two tests",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[41],
+                "Make a test independent from other tests",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[42],
+                "Adapt test name to canonical name",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[43],
+                "Shorten a method name",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[44],
+                "Shorten a variable name",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[45],
+                "Add a setup method to a test class",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[46],
+                "Add a tearDown method to a test class",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[47],
+                "Remove a global variable from a test class",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
+            Daily(
+                RANDOM_DAILY_NAMES[48],
+                "Remove an explicit time sleep",
+                RANDOM_DAILY_XP,
+                DAILY_GOAL,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.RANDOM.name
+            ),
         )
+
+
+
+
 
 
 
@@ -422,11 +533,21 @@ class DailyManager {
             RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkInteractionsWithLocsInPOMethod(testOutcomes) },
             RANDOM_DAILY_NAMES[33] to { testOutcomes -> checkNewAncestorPO(testOutcomes) },
             RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkMovedCommonMethodToAncestorPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkInstantiationPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[37] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
-            )
-
+            RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[37] to { testOutcomes -> checkRunTC(testOutcomes) },
+            RANDOM_DAILY_NAMES[38] to { testOutcomes -> checkRunTS(testOutcomes) },
+            RANDOM_DAILY_NAMES[39] to { testOutcomes -> checkAssertAddedToTest(testOutcomes) },
+            RANDOM_DAILY_NAMES[40] to { testOutcomes -> checkTestShortened(testOutcomes) },
+            RANDOM_DAILY_NAMES[41] to { testOutcomes -> checkTestIndependent(testOutcomes) },
+            RANDOM_DAILY_NAMES[42] to { testOutcomes -> checkTestNameAdapted(testOutcomes) },
+            RANDOM_DAILY_NAMES[43] to { testOutcomes -> checkMethodNameShortened(testOutcomes) },
+            RANDOM_DAILY_NAMES[44] to { testOutcomes -> checkVarNameShortened(testOutcomes) },
+            RANDOM_DAILY_NAMES[45] to { testOutcomes -> checkSetupAdded(testOutcomes) },
+            RANDOM_DAILY_NAMES[46] to { testOutcomes -> checkTearDownAdded(testOutcomes) },
+            RANDOM_DAILY_NAMES[47] to { testOutcomes -> checkGlobalVarRemoved(testOutcomes) },
+            RANDOM_DAILY_NAMES[48] to { testOutcomes -> checkExpSleepRemoved(testOutcomes) },
+        )
 
 
 
@@ -1361,12 +1482,12 @@ class DailyManager {
             //TODO: we may want to check this info by considering actually passed POs
             val oldInteractions = TestQuestAction.POsOld.sumOf { po ->
                 po.methods.sumOf { method ->
-                    method.locators.size
+                    method.seleniumCommands.size
                 }
             }
             val newInteractions = TestQuestAction.POsNew.sumOf { po ->
                 po.methods.sumOf { method ->
-                    method.locators.size
+                    method.seleniumCommands.size
                 }
             }
             return newInteractions - oldInteractions
@@ -1383,22 +1504,69 @@ class DailyManager {
                 0
             }
         }
-
-        //TODO
         private fun checkMovedCommonMethodToAncestorPO(testOutcomes: List<TestOutcome>): Int {
-            return 0;
-        }
-
-        private fun checkInstantiationPO(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            //TODO: we may want to check this info by considering actually passed POs
+            for (i in 0 until TestQuestAction.POsOld.size) {
+                for (j in i + 1 until TestQuestAction.POsOld.size) {
+                    val poOld1 = TestQuestAction.POsOld[i]
+                    val poOld2 = TestQuestAction.POsOld[j]
+                    //find common ancestors OLD
+                    val commonAncestorsOldNames = poOld1.ancestors.intersect(poOld2.ancestors.toSet())
+                    val commonAncestorsOld = TestQuestAction.POsOld.filter { it.name in commonAncestorsOldNames }
+                    //find common methods
+                    val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
+                    for (method in commonMethods)
+                        //check no common ancestors had that method
+                        if (commonAncestorsOld.none { it.methods.contains(method) }) {
+                            //find new versions of the compared POs
+                            val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
+                            val poNew2 = TestQuestAction.POsNew.find { it.name == poOld2.name }
+                            if (poNew1 != null && poNew2 != null)
+                                //check that method is no more present in POs
+                                if (!poNew1.methods.contains(method) && !poNew2.methods.contains(method)) {
+                                    //find common ancestors
+                                    val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
+                                    val commonAncestorsNew = TestQuestAction.POsOld.filter { it.name in commonAncestorsNewNames }
+                                    //check a common ancestor now has that method
+                                    if (commonAncestorsNew.any { it.methods.contains(method) })
+                                        return 1
+                                }
+                        }
+                }
+            }
+            return 0
         }
 
         private fun checkCalledPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            //TODO: we may want to check this info by considering actually passed POs and tests
+            for (outcome in testOutcomes) {
+                //count PO method calls for each test. if new calls are more in any test (i.e., a method call was added), 1 is returned
+                var oldCalledMethods = 0
+                var newCalledMethods = 0
+                if (TestQuestAction.POCallsOld.containsKey(outcome.testName))
+                    oldCalledMethods = (TestQuestAction.POCallsOld[outcome.testName] ?: emptyList<String>()).size
+                if (TestQuestAction.POCallsNew.containsKey(outcome.testName))
+                    newCalledMethods = (TestQuestAction.POCallsNew[outcome.testName] ?: emptyList<String>()).size
+                if(newCalledMethods > oldCalledMethods)
+                    return 1
+            }
+            return 0
         }
 
         private fun checkCalledUnusedPOMethod(testOutcomes: List<TestOutcome>): Int {
-            return 0;
+            val oldCalledMethods = mutableSetOf<PageObjectCall>()
+            val newCalledMethods = mutableSetOf<PageObjectCall>()
+            //get all old and new PO calls
+            for (outcome in testOutcomes) {
+                if (TestQuestAction.POCallsOld.containsKey(outcome.testName))
+                    oldCalledMethods.addAll(TestQuestAction.POCallsOld[outcome.testName] ?: emptyList())
+                if (TestQuestAction.POCallsNew.containsKey(outcome.testName))
+                    newCalledMethods.addAll(TestQuestAction.POCallsNew[outcome.testName] ?: emptyList())
+            }
+            //check if there exist new PO method calls that did not exist before
+            if (newCalledMethods.any { it !in oldCalledMethods })
+                return 1
+            return 0
         }
 
 
@@ -1406,6 +1574,66 @@ class DailyManager {
 
 
 
+
+        /******* RANDOM DAILY CHECKS ABOUT TESTS *******/
+
+        private fun checkRunTC(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for(testOutcome in testOutcomes) {
+                if(!testOutcome.isPassed)
+                    continue
+                count++
+            }
+            return count
+        }
+
+        private fun checkRunTS(testOutcomes: List<TestOutcome>): Int {
+            for(testOutcome in testOutcomes){
+                if(!testOutcome.isPassed)
+                    return 0
+            }
+            return 1
+        }
+
+        private fun checkAssertAddedToTest(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkTestShortened(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkTestIndependent(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkTestNameAdapted(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkMethodNameShortened(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkVarNameShortened(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkSetupAdded(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkTearDownAdded(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkGlobalVarRemoved(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
+
+        private fun checkExpSleepRemoved(testOutcomes: List<TestOutcome>): Int {
+            return 1
+        }
 
 
 
