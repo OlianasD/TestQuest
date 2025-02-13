@@ -2,7 +2,7 @@ package gamification
 
 import listener.test.TestOutcome
 import extractor.locator.Locator
-import locator.LocatorsFragilityCalculator
+import analyzer.locator.LocatorsFragilityCalculator
 import utils.FilePathSolver
 import java.io.File
 

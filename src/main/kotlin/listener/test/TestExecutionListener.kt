@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
-import locator.LocatorsAnalyzer
+import analyzer.locator.LocatorsAnalyzer
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
 import java.util.regex.Matcher

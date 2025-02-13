@@ -14,7 +14,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import gamification.GamificationManager
 import extractor.locator.Locator
 import extractor.locator.LocatorsExtractor
-import locator.LocatorsFragilityCalculator
+import analyzer.locator.LocatorsFragilityCalculator
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCallExtractor
 import testquest.TestQuestAction

@@ -98,7 +98,7 @@ class XMLReader {
             if (dailyType == "targeted") {
                 val locatorsNode = dailyNode.getElementsByTagName("locators")
                 if (locatorsNode.length > 0) {
-                    val locatorNodes = (locatorsNode.item(0) as Element).getElementsByTagName("locator")
+                    val locatorNodes = (locatorsNode.item(0) as Element).getElementsByTagName("analyzer")
                     for (j in 0 until locatorNodes.length) {
                         val locatorNode = locatorNodes.item(j) as Element
                         val locator = Locator(

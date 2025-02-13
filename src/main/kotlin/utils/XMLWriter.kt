@@ -62,7 +62,7 @@ class XMLWriter {
                     if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
                         val locatorsNode = doc.createElement("locators")
                         dailyProgress.daily.targetedLocators.forEach { locator ->
-                            val locatorNode = doc.createElement("locator")
+                            val locatorNode = doc.createElement("analyzer")
                             locatorNode.setAttribute("locatorName", locator.locatorName ?: "")
                             locatorNode.setAttribute("locatorType", locator.locatorType)
                             locatorNode.setAttribute("locatorValue", locator.locatorValue)
@@ -168,7 +168,7 @@ class XMLWriter {
             if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
                 val locatorsNode = doc.createElement("locators")
                 dailyProgress.daily.targetedLocators.forEach { locator ->
-                    val locatorNode = doc.createElement("locator")
+                    val locatorNode = doc.createElement("analyzer")
                     locatorNode.setAttribute("locatorName", locator.locatorName ?: "")
                     locatorNode.setAttribute("locatorType", locator.locatorType)
                     locatorNode.setAttribute("locatorValue", locator.locatorValue)

@@ -18,11 +18,9 @@ import gamification.GamificationManager
 import gamification.UserProfile
 import extractor.locator.Locator
 import listener.changes.CodeChangeListener
-import listener.daily.DailyExpirationListener
 import listener.test.TestExecutionListener
-import locator.LocatorsAnalyzer
+import analyzer.locator.LocatorsAnalyzer
 import utils.FilePathSolver
-import utils.UserProgressFileHandler
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -30,7 +28,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
 import java.io.FileInputStream
-import java.io.IOException
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -43,7 +40,6 @@ import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.table.DefaultTableCellRenderer
 import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellRenderer
-import kotlin.system.exitProcess
 
 object GUIManager {
 

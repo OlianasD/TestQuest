@@ -184,7 +184,7 @@ class LocatorsExtractor : VoidVisitorAdapter<MutableList<Locator>>() {
 
     //helper method to build annotation as locator
     //two types of annotations: without or with locator type made explicit (e.g., @FindBy("//div[2]") vs @FindBy(xpath="//div[2]"))
-    private fun extractFindByAnnotation(annotation: com.github.javaparser.ast.expr.AnnotationExpr): Pair<String, String>? {
+    private fun extractFindByAnnotation(annotation: AnnotationExpr): Pair<String, String>? {
         val supportedLocatorTypes = listOf(
             "id", "name", "css", "xpath", "className", "tagName", "linkText", "partialLinkText"
         )

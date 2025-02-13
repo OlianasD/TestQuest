@@ -7,14 +7,13 @@ import com.intellij.openapi.ui.Messages
 import gamification.GamificationManager
 import extractor.locator.Locator
 import extractor.locator.LocatorsExtractor
-import locator.LocatorsFragilityCalculator
+import analyzer.locator.LocatorsFragilityCalculator
 import extractor.pageobject.PageObject
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCall
 import extractor.test.PageObjectCallExtractor
 import listener.test.TestExecutionListener
 import ui.GUIManager
-import utils.FilePathSolver
 import utils.TestFilesExtractor
 import utils.UserProgressFileHandler
 
@@ -63,8 +62,7 @@ class TestQuestAction : AnAction() {
             PluginData.userProfileId = "001" //TODO: change as a login
             gamificationManager.setupUserProfile(PluginData.userProfileId)
 
-
-            //previous untested progress is loaded from file, if exists and the user wants to.
+            //previous untested progress is loaded from file and considered as "old" state to compare changes with, if exists and the user wants to.
             // if not, old is set to new
             val savedDataTime = UserProgressFileHandler.getMostRecentSavedData()
             val useSavedData = GUIManager.showWindowStoredDataChoice(savedDataTime)
@@ -85,12 +83,10 @@ class TestQuestAction : AnAction() {
             }
             UserProgressFileHandler.saveProgressData()
 
-
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
             val estimation = locEstimator.calculateOverallFragility(locatorsNew)
             GUIManager.showOverallLocsFragilityScore(estimation)
-
 
             //register listeners
             CodeChangeListener.registerListener(project)

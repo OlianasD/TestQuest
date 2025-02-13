@@ -1,7 +1,6 @@
-package locator
+package analyzer.locator
 
 import extractor.locator.Locator
-import extractor.pageobject.PageObject
 import gamification.GamificationManager
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
@@ -42,14 +41,8 @@ class LocatorsAnalyzer {
                 }
             }
             //fixed and pending locs are saved for future reuse
-            UserProgressFileHandler.saveFixedAndPendingData(targetedFixedAndPendingLocators)
+            UserProgressFileHandler.saveFixedAndPendingLocsData(targetedFixedAndPendingLocators)
         }
-
-
-
-        private val targetedIssuesInPOs= mutableMapOf<String, List<Any>>()
-
-
     }
 
 
@@ -57,13 +50,12 @@ class LocatorsAnalyzer {
 
 
     private var LOCATORS = TestQuestAction.locatorsNew
-    private var POs = TestQuestAction.POsNew
 
 
 
 
     //find locators that present issues in the test suite (i.e., targeted as they target the actual issues)
-    fun findTargetedIssuedLocators(): MutableMap<String, List<Locator>> {
+    fun findIssuesInLocators(): MutableMap<String, List<Locator>> {
         previousTargetedIssuedLocators = targetedIssuedLocators.toMap() //copy map to keep track of problems fixed BEFORE any new problem found
         targetedIssuedLocators.keys.retainAll(listOf("broken"))//remove broken locators as they are dynamically computed during test execution
         calculateAbsoluteLocators()
@@ -76,7 +68,7 @@ class LocatorsAnalyzer {
             calculateInitialBrokenLocators()
 
         //load fixedAndPending from file, if exist
-        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingData()
+        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingLocsData()
         //keep only fixed and pending related to existing locators
         var cleanedSavedFixedAndPending: Map<String, List<Locator>>? = null
         if(savedFixedAndPending!=null) {
@@ -86,7 +78,7 @@ class LocatorsAnalyzer {
                 }
             }.filterValues { it.isNotEmpty() }
         }
-        //if some new issued have been observed in the session, retrieve new fixed and pending from analysis and add saved ones
+        //if some new issue have been observed in the session, retrieve new fixed and pending from analysis and add saved ones
         if(previousTargetedIssuedLocators.isNotEmpty())
             calculateFixedAndPendingLocators(cleanedSavedFixedAndPending)
         //else, populate fixed and pending only with saved data
@@ -174,122 +166,6 @@ class LocatorsAnalyzer {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    private fun calculateMissingPOs() {
-        if (POs.isEmpty())
-            targetedIssuesInPOs["missingPOs"] = emptyList()
-    }
-
-    private fun calculateEmptyPOs() {
-        val emptyPOs = POs.filter { it.methods.isEmpty() }.map { it }
-        if (emptyPOs.isNotEmpty())
-            targetedIssuesInPOs["emptyPOs"] = emptyPOs
-    }
-
-    private fun calculateEmptyPOMethods() {
-        val emptyPOMethods = POs.flatMap { po ->
-            po.methods.filter { it.seleniumCommands.isEmpty() }.map { it }
-        }
-        if (emptyPOMethods.isNotEmpty())
-            targetedIssuesInPOs["emptyPOMethods"] = emptyPOMethods
-    }
-
-    private fun calculateMissingReturnedPOs() {
-        val voidReturnMethods = POs.flatMap { po ->
-            po.methods.filter { it.returnType.equals("void", ignoreCase = true) }.map { it }
-        }
-        if (voidReturnMethods.isNotEmpty())
-            targetedIssuesInPOs["missingRetPOs"] = voidReturnMethods
-    }
-
-    private fun calculateAssertionsInPOs() {
-        val includingAssertionsMethods = POs.flatMap { po ->
-            po.methods.filter { it.assertionLines.isNotEmpty() }.map { it }
-        }
-        if (includingAssertionsMethods.isNotEmpty()) {
-            targetedIssuesInPOs["assertsInPOs"] = includingAssertionsMethods
-        }
-    }
-
-    private fun calculateNonCanonicalLocators() {
-        val nonCanonicalLocators = POs.flatMap { it.nonCanonicalLocators }
-        if (nonCanonicalLocators.isNotEmpty()) {
-            targetedIssuesInPOs["nonCanonicalLocs"] = nonCanonicalLocators
-        }
-    }
-
-    private fun calculateUnusedPOMethods() {
-        val usedMethods = TestQuestAction.POCallsNew.values
-            .flatten()
-            .map { it.pageObject to it.method }
-            .toSet()
-        val unusedMethods = POs.flatMap { po ->
-            po.methods.filter { method -> (po.name to method.name) !in usedMethods }
-        }
-        if (unusedMethods.isNotEmpty()) {
-            targetedIssuesInPOs["unusedPOMethods"] = unusedMethods
-        }
-    }
-
-    private fun calculateLocsOutPOs() {
-        val invalidClassLocators = LOCATORS.filter { !it.className.endsWith("_Page") }
-        if (invalidClassLocators.isNotEmpty())
-            targetedIssuesInPOs["locsOutPOs"] = invalidClassLocators
-    }
-
-    //compute POs with same methods but no common ancestors to store the same methods
-    private fun calculateMissingCommonAncestors() {
-        val POsWithMissingCommonAncestors = POs.filter { po1 ->
-            POs.any { po2 ->
-                po1 != po2 &&
-                        po1.methods.any { method1 ->
-                            po2.methods.any { method2 ->
-                                method1 == method2
-                            }
-                        } && po1.ancestors.none { it in po2.ancestors }
-            }
-        }
-        if (POsWithMissingCommonAncestors.isNotEmpty())
-            targetedIssuesInPOs["POsWithMissingCommonAncestors"] = POsWithMissingCommonAncestors
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     fun updateBrokenLocs(repairedLocs: List<Locator>) {
         val currentList = targetedIssuedLocators["broken"] ?: emptyList()
         val updatedList = currentList.filterNot { loc ->
@@ -302,14 +178,8 @@ class LocatorsAnalyzer {
         targetedIssuedLocators["broken"] = updatedList
     }
 
-
-
-
-
-
-
     //the logic is that a potentially fixed locator is present in initialAnalysisMap and no more present in analysisMap
-    //i.e., the map before and after analyzing the test suite
+    //i.e., the maps before and after analyzing the test suite
     private fun calculateFixedAndPendingLocators(savedFixedAndPending: Map<String, List<Locator>>?) {
         previousTargetedIssuedLocators.forEach { (key, initialLocators) ->
 
@@ -361,17 +231,10 @@ class LocatorsAnalyzer {
             targetedFixedAndPendingLocators[key] = finalFixedAndPendingLocators.toMutableList()
 
             // Save fixed and pending locs on file for future reuse
-            UserProgressFileHandler.saveFixedAndPendingData(targetedFixedAndPendingLocators)
+            UserProgressFileHandler.saveFixedAndPendingLocsData(targetedFixedAndPendingLocators)
         }
 
-
     }
-
-
-
-
-
-
 
 
 

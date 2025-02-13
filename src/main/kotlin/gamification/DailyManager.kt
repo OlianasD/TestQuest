@@ -3,8 +3,9 @@ package gamification
 import listener.test.TestOutcome
 import extractor.locator.Locator
 import extractor.test.PageObjectCall
-import locator.LocatorsAnalyzer
-import locator.LocatorsFragilityCalculator
+import analyzer.locator.LocatorsAnalyzer
+import analyzer.locator.LocatorsFragilityCalculator
+import analyzer.pageobject.PageObjectsAnalyzer
 import testquest.TestQuestAction
 import ui.GUIManager
 import utils.FilePathSolver
@@ -482,22 +483,13 @@ class DailyManager {
             ),
         )
 
-
-
-
-
-
-
-
-
-
-
         private val DAILY_NAME_TO_DESCRIPTION = ALL_RANDOM_DAILIES.associate { it.name to it.description }
         private val DAILY_NAME_TO_TARGET = ALL_RANDOM_DAILIES.associate { it.name to it.target }
         private val DAILY_NAME_TO_ICON = ALL_RANDOM_DAILIES.associate { it.name to it.icon }
         private val DAILY_NAME_TO_XP = ALL_RANDOM_DAILIES.associate { it.name to it.xp }
 
         private val RANDOM_DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
+            /************ DAILIES ABOUT LOCS ************/
             RANDOM_DAILY_NAMES[0] to { testOutcomes -> checkAbsXPathRemoved(testOutcomes) },
             RANDOM_DAILY_NAMES[1] to { testOutcomes -> checkXPathLengthReduced(testOutcomes) },
             RANDOM_DAILY_NAMES[2] to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
@@ -523,6 +515,7 @@ class DailyManager {
             RANDOM_DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
             RANDOM_DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
             RANDOM_DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithFewPosPredicates(testOutcomes) },
+            /************ DAILIES ABOUT POS ************/
             RANDOM_DAILY_NAMES[25] to { testOutcomes -> checkNewPO(testOutcomes) },
             RANDOM_DAILY_NAMES[26] to { testOutcomes -> checkNewPOMethod(testOutcomes) },
             RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkNewLocsInPOMethod(testOutcomes) },
@@ -535,6 +528,7 @@ class DailyManager {
             RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkMovedCommonMethodToAncestorPO(testOutcomes) },
             RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
             RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
+            /************ DAILIES ABOUT TESTS ************/
             RANDOM_DAILY_NAMES[37] to { testOutcomes -> checkRunTC(testOutcomes) },
             RANDOM_DAILY_NAMES[38] to { testOutcomes -> checkRunTS(testOutcomes) },
             RANDOM_DAILY_NAMES[39] to { testOutcomes -> checkAssertAddedToTest(testOutcomes) },
@@ -560,10 +554,27 @@ class DailyManager {
         /**********************************TARGETED DAILIES**********************************/
 
         private val TARGETED_DAILY_NAMES = listOf(
-            "absolute", "length", "level", "posPredicate", "badPredicate", "noIDOrXPath", "broken"
+            /************ DAILIES ABOUT LOCATORS ************/
+            "absolute",
+            "length",
+            "level",
+            "posPredicate",
+            "badPredicate",
+            "noIDOrXPath",
+            "broken",
+            /************ DAILIES ABOUT POS ************/
+            "missingCommandMethods",
+            "missingRetPOMethods",
+            "assertInPOMethods",
+            "nonCanonicalLocs",
+            "unusedPOMethods",
+            "outPOLocs",
+            "missingAncestorPOs"
+            /************ DAILIES ABOUT TESTS ************/ //TODO
         )
 
         private val ALL_TARGETED_DAILIES = mutableListOf(
+            /************ DAILIES ABOUT LOCATORS ************/
             Daily(
                 TARGETED_DAILY_NAMES[0],
                 "Turns the following absolute XPath locators into relative ones",
@@ -620,16 +631,87 @@ class DailyManager {
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
+            /************ DAILIES ABOUT POs ************/
+            Daily(
+                TARGETED_DAILY_NAMES[7],
+                "Add commands to interact with Web elements in the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[8],
+                "Add a Page Object as return type in the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[9],
+                "Move to test methods the assertions in the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[10],
+                "Transforms into canonical form the following locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[11],
+                "Make use of the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[12],
+                "Move to Page Object methods the following locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                TARGETED_DAILY_NAMES[13],
+                "Add an ancestor and move cloned methods to the following Page Objects",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            /************ DAILIES ABOUT TESTS ************/ //TODO
         )
 
+
+
+
         private val TARGETED_DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
+            /************ DAILIES ABOUT LOCATORS ************/
             TARGETED_DAILY_NAMES[0] to { testOutcomes -> checkTargetedAbsoluteRemoved(testOutcomes) },
             TARGETED_DAILY_NAMES[1] to { testOutcomes -> checkTargetedLengthReduced(testOutcomes) },
             TARGETED_DAILY_NAMES[2] to { testOutcomes -> checkTargetedLevelReduced(testOutcomes) },
             TARGETED_DAILY_NAMES[3] to { testOutcomes -> checkTargetedPosPredicateRemoved(testOutcomes) },
             TARGETED_DAILY_NAMES[4] to { testOutcomes -> checkTargetedBadPredicateRemoved(testOutcomes) },
             TARGETED_DAILY_NAMES[5] to { testOutcomes -> checkTargetedNoIDNoXpathChanged(testOutcomes) },
-            TARGETED_DAILY_NAMES[6] to { testOutcomes -> checkTargetedBrokenLocsRepaired(testOutcomes) }
+            TARGETED_DAILY_NAMES[6] to { testOutcomes -> checkTargetedBrokenLocsRepaired(testOutcomes) },
+            /************ DAILIES ABOUT POs ************/
+            TARGETED_DAILY_NAMES[7] to { testOutcomes -> checkCommandsAdded(testOutcomes) },
+            TARGETED_DAILY_NAMES[8] to { testOutcomes -> checkPOTypeReturned(testOutcomes) },
+            TARGETED_DAILY_NAMES[9] to { testOutcomes -> checkAssertsRemoved(testOutcomes) },
+            TARGETED_DAILY_NAMES[10] to { testOutcomes -> checkNonCanonicalLocsNowCanonical(testOutcomes) },
+            TARGETED_DAILY_NAMES[11] to { testOutcomes -> checkUnusedMethodsNowUsed(testOutcomes) },
+            TARGETED_DAILY_NAMES[12] to { testOutcomes -> checkLocsOutsidePOsRemoved(testOutcomes) },
+            //TARGETED_DAILY_NAMES[13] to { testOutcomes -> checkCommonAncestorsAdded(testOutcomes) }
+            /************ DAILIES ABOUT TESTS ************/ //TODO
         )
 
 
@@ -644,9 +726,12 @@ class DailyManager {
 
         fun assignTargetedDailies(userProfile: UserProfile) {
             val locAnalyzer = LocatorsAnalyzer()
-            val analysisMap = locAnalyzer.findTargetedIssuedLocators()
+            val issuedLocatorsMap = locAnalyzer.findIssuesInLocators()
+            val poAnalyzer = PageObjectsAnalyzer()
+            val issuedPOsMap = poAnalyzer.findIssuesInPOs()
             val currentTargetDailies = ALL_TARGETED_DAILIES.map { daily ->
-                val locatorsForDaily = analysisMap[daily.name] ?: emptyList()
+                val locatorsForDaily = issuedLocatorsMap[daily.name] ?: emptyList()
+                val posForDaily = issuedPOsMap[daily.name] ?: emptyList()//TODO: forse qui esplode perché non c'è la key
                 Daily(
                     name = daily.name,
                     description = daily.description,
@@ -654,7 +739,8 @@ class DailyManager {
                     target = daily.target,
                     icon = daily.icon,
                     type = daily.type,
-                    targetedLocators = locatorsForDaily
+                    targetedLocators = locatorsForDaily,
+                    issuesInPOs = posForDaily
                 )
             }
             //remove all old targeted dailies as they will be updated by new check
@@ -765,7 +851,9 @@ class DailyManager {
                 involvedDaily = daily
                 userProfile.currentXP += gainedXP
             }
-            //TODO: INCLUSIVE
+            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.INCLUSIVE) {
+                //TODO
+            }
             return Pair(gainedXP, involvedDaily)
         }
 
@@ -919,6 +1007,152 @@ class DailyManager {
             locsAnalizer.updateBrokenLocs(repairedLocators)
             return count
         }
+
+
+        /******* TARGETED DAILY CHECKS ABOUT POs *******/
+
+        //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
+        //that were once (POsOld) without Selenium commands and now have them (POsNew)
+        private fun checkCommandsAdded(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                val errorLine = testOutcome.errorLine
+                val testName = testOutcome.testName
+                val poCallsForTest = TestQuestAction.POCallsNew[testName] ?: emptyList()
+                for (poCall in poCallsForTest) {
+                    if (poCall.line >= errorLine) continue //if PO method call was not executed, skip
+                    //get PO related to PO method call, old and new
+                    val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
+                    val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
+                    //get PO method related to PO method call, old and new
+                    val oldMethod = oldPO?.methods?.find { it.name == poCall.method }
+                    val newMethod = newPO?.methods?.find { it.name == poCall.method }
+                    //count methods that now have Selenium commands that once had not
+                    val hadNoSeleniumCommands = oldMethod?.seleniumCommands.isNullOrEmpty()
+                    val hasNewSeleniumCommands = newMethod?.seleniumCommands?.isNotEmpty() == true
+                    if (hadNoSeleniumCommands && hasNewSeleniumCommands)
+                        count++
+                }
+            }
+            return count
+        }
+
+        //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
+        //that had once (POsOld) no return type and commands and now have a PageObject as return type (POsNew)
+        private fun checkPOTypeReturned(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                val errorLine = testOutcome.errorLine
+                val testName = testOutcome.testName
+                val poCallsForTest = TestQuestAction.POCallsNew[testName] ?: emptyList()
+                for (poCall in poCallsForTest) {
+                    if (poCall.line >= errorLine) continue //if PO method call was not executed, skip
+                    //get PO related to PO method call, old and new
+                    val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
+                    val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
+                    //get PO method related to PO method call, old and new
+                    val oldMethod = oldPO?.methods?.find { it.name == poCall.method }
+                    val newMethod = newPO?.methods?.find { it.name == poCall.method }
+                    //count methods that now have PageObject return types that once had void
+                    val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
+                    val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
+                    if (wasVoid && isNowPageObject)
+                        count++
+                }
+            }
+            return count
+        }
+
+        //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
+        //that had once (POsOld) assertions and now have not (POsNew)
+        private fun checkAssertsRemoved(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            for (testOutcome in testOutcomes) {
+                val errorLine = testOutcome.errorLine
+                val testName = testOutcome.testName
+                val poCallsForTest = TestQuestAction.POCallsNew[testName] ?: emptyList()
+                for (poCall in poCallsForTest) {
+                    if (poCall.line >= errorLine) continue //if PO method call was not executed, skip
+                    //get PO related to PO method call, old and new
+                    val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
+                    val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
+                    //get PO method related to PO method call, old and new
+                    val oldMethod = oldPO?.methods?.find { it.name == poCall.method }
+                    val newMethod = newPO?.methods?.find { it.name == poCall.method }
+                    //count methods that had assertions and now have not
+                    val hadAsserts = oldMethod?.assertionLines?.isNotEmpty() == true
+                    val hasNoAsserts = newMethod?.assertionLines?.isEmpty() == true
+                    if (hadAsserts && hasNoAsserts)
+                        count++
+                }
+            }
+            return count
+        }
+
+        private fun checkNonCanonicalLocsNowCanonical(testOutcomes: List<TestOutcome>): Int {
+            //TODO: a problem is that when changing a locator from noncanonical to canonical we are changing
+            //basic info to recognize it (e.g., adding name), so it is actually treated as a locator was removed and then added
+            //so we cannot use locatorsPassed and check whether they exist both as old and new but with changed info
+            val oldLocators = TestQuestAction.POsOld.sumOf { po ->
+                po.nonCanonicalLocators.size
+            }
+            val newLocators = TestQuestAction.POsNew.sumOf { po ->
+                po.nonCanonicalLocators.size
+            }
+            return oldLocators - newLocators
+        }
+
+        //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
+        //that were not used before in any test
+        private fun checkUnusedMethodsNowUsed(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            val oldMethodCalls = TestQuestAction.POCallsOld.flatMap { it.value } //get old called PO methods
+            val countedMethods = mutableSetOf<Int>() //count unique PO method calls
+            for (testOutcome in testOutcomes) {
+                //find new PO method calls that are before any test error
+                val testName = testOutcome.testName
+                val errorLine = testOutcome.errorLine
+                val passedCalls = TestQuestAction.POCallsNew[testName]?.filter { it.line < errorLine } ?: continue
+                //count now used method calls that are unique
+                for (call in passedCalls) {
+                    val wasUsedBefore = oldMethodCalls.any { oldCall -> oldCall == call }
+                    if (!wasUsedBefore && call.hashCode() !in countedMethods) {
+                        countedMethods.add(call.hashCode())
+                        count++
+                    }
+                }
+            }
+            return count
+        }
+
+
+        private fun checkLocsOutsidePOsRemoved(testOutcomes: List<TestOutcome>): Int {
+            //TODO: comparison here is tricky as moving locs from Test to Page means that we are basically
+            //removing locators and adding new ones, so as locators change class and method name, they can't be directly compared
+            val oldLocators = TestQuestAction.locatorsOld
+            val newLocators = TestQuestAction.locatorsNew
+            //get old locators that were outside POs
+            val oldLocatorsNotInPO = oldLocators.count { locator -> !locator.className.endsWith("Page") }
+            val newLocatorsInPO = newLocators.count { locator -> locator.className.endsWith("Page") }
+            return newLocatorsInPO - oldLocatorsNotInPO
+        }
+
+
+
+        //TODO: questo seguente va implementato in modo che consideri non solo i PO ma anche il fatto di aver spostato metodi duplicati
+        //TARGETED_DAILY_NAMES[13] to { testOutcomes -> checkCommonAncestorsAdded(testOutcomes) }*/
+
+
+
+
+        /******* TARGETED DAILY CHECKS ABOUT TESTS *******/ //TODO
+
+
+
+
+
+
+
 
 
 
@@ -1595,6 +1829,7 @@ class DailyManager {
             return 1
         }
 
+        //TODO: these must be completed
         private fun checkAssertAddedToTest(testOutcomes: List<TestOutcome>): Int {
             return 1
         }

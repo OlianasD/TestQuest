@@ -1,4 +1,4 @@
-package locator
+package analyzer.locator
 
 import extractor.locator.Locator
 import gamification.GamificationManager

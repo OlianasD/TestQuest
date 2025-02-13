@@ -25,7 +25,6 @@ object FilePathSolver {
         return file
     }
 
-
     fun getSavedProgressFile(user: String): File {
         val userFolder = File(BASE_PLUGIN_PATH, user)
         if (!userFolder.exists())
@@ -33,11 +32,18 @@ object FilePathSolver {
         return File(userFolder, "progress.txt")
     }
 
-    fun getSavedPendingsFile(user: String): File {
+    fun getSavedPendingLocsFile(user: String): File {
         val userFolder = File(BASE_PLUGIN_PATH, user)
         if (!userFolder.exists())
             userFolder.mkdir()
-        return File(userFolder, "pending.txt")
+        return File(userFolder, "pendingLocs.txt")
+    }
+
+    fun getSavedPendingPOsFile(user: String): File {
+        val userFolder = File(BASE_PLUGIN_PATH, user)
+        if (!userFolder.exists())
+            userFolder.mkdir()
+        return File(userFolder, "pendingPOs.txt")
     }
 
 
