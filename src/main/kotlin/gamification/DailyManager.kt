@@ -518,12 +518,12 @@ class DailyManager {
             /************ DAILIES ABOUT POS ************/
             RANDOM_DAILY_NAMES[25] to { testOutcomes -> checkNewPO(testOutcomes) },
             RANDOM_DAILY_NAMES[26] to { testOutcomes -> checkNewPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkNewLocsInPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[28] to { testOutcomes -> checkMovedLocsFromTestToPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkNewLocsInPOMethods(testOutcomes) },
+            RANDOM_DAILY_NAMES[28] to { testOutcomes -> checkMovedLocsFromTestsToPOMethods(testOutcomes) },
             RANDOM_DAILY_NAMES[29] to { testOutcomes -> checkReturnedPOInPOMethod(testOutcomes) },
             RANDOM_DAILY_NAMES[30] to { testOutcomes -> checkMovedAssertsFromPOMethodToTests(testOutcomes) },
-            RANDOM_DAILY_NAMES[31] to { testOutcomes -> checkAdaptedLocsFormatInPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkInteractionsWithLocsInPOMethod(testOutcomes) },
+            RANDOM_DAILY_NAMES[31] to { testOutcomes -> checkNowCanonicalLocs(testOutcomes) },
+            RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkInteractionsWithLocsInPOMethods(testOutcomes) },
             RANDOM_DAILY_NAMES[33] to { testOutcomes -> checkNewAncestorPO(testOutcomes) },
             RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkMovedCommonMethodToAncestorPO(testOutcomes) },
             RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
@@ -815,8 +815,7 @@ class DailyManager {
                     }
                     if (progress!! > 0) {
                         val dailyProgress = update(userProfile, it, progress)
-                        progresses.add(dailyProgress)  //TODO:  add a more sophisticated check/return type
-                                                       // if a more sophisticated notification must be provided
+                        progresses.add(dailyProgress)  //TODO:  add a more sophisticated check/return type if a more sophisticated notification must be provided
                     }
                 }
             }
@@ -824,7 +823,6 @@ class DailyManager {
         }
 
         private fun update(userProfile: UserProfile, daily: Daily, progress: Int): Pair<Int, Daily?> {
-            //TODO: check user profile wrt xml
             var gainedXP = 0 //to track the gained xp
             var involvedDaily: Daily? = null //to track the involved daily
 
@@ -1009,6 +1007,8 @@ class DailyManager {
         }
 
 
+
+
         /******* TARGETED DAILY CHECKS ABOUT POs *******/
 
         //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
@@ -1016,17 +1016,14 @@ class DailyManager {
         private fun checkCommandsAdded(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                val errorLine = testOutcome.errorLine
-                val testName = testOutcome.testName
-                val poCallsForTest = TestQuestAction.POCallsNew[testName] ?: emptyList()
-                for (poCall in poCallsForTest) {
-                    if (poCall.line >= errorLine) continue //if PO method call was not executed, skip
+                val passedCalls = testOutcome.poMethodCallsPassed
+                for (poCall in passedCalls) {
                     //get PO related to PO method call, old and new
                     val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
                     val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
                     //get PO method related to PO method call, old and new
-                    val oldMethod = oldPO?.methods?.find { it.name == poCall.method }
-                    val newMethod = newPO?.methods?.find { it.name == poCall.method }
+                    val oldMethod = oldPO?.methods?.find { it.name == poCall.methodName }
+                    val newMethod = newPO?.methods?.find { it.name == poCall.methodName }
                     //count methods that now have Selenium commands that once had not
                     val hadNoSeleniumCommands = oldMethod?.seleniumCommands.isNullOrEmpty()
                     val hasNewSeleniumCommands = newMethod?.seleniumCommands?.isNotEmpty() == true
@@ -1042,17 +1039,14 @@ class DailyManager {
         private fun checkPOTypeReturned(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                val errorLine = testOutcome.errorLine
-                val testName = testOutcome.testName
-                val poCallsForTest = TestQuestAction.POCallsNew[testName] ?: emptyList()
-                for (poCall in poCallsForTest) {
-                    if (poCall.line >= errorLine) continue //if PO method call was not executed, skip
+                val passedCalls = testOutcome.poMethodCallsPassed
+                for (poCall in passedCalls) {
                     //get PO related to PO method call, old and new
                     val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
                     val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
                     //get PO method related to PO method call, old and new
-                    val oldMethod = oldPO?.methods?.find { it.name == poCall.method }
-                    val newMethod = newPO?.methods?.find { it.name == poCall.method }
+                    val oldMethod = oldPO?.methods?.find { it.name == poCall.methodName }
+                    val newMethod = newPO?.methods?.find { it.name == poCall.methodName }
                     //count methods that now have PageObject return types that once had void
                     val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
                     val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
@@ -1068,17 +1062,14 @@ class DailyManager {
         private fun checkAssertsRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             for (testOutcome in testOutcomes) {
-                val errorLine = testOutcome.errorLine
-                val testName = testOutcome.testName
-                val poCallsForTest = TestQuestAction.POCallsNew[testName] ?: emptyList()
-                for (poCall in poCallsForTest) {
-                    if (poCall.line >= errorLine) continue //if PO method call was not executed, skip
+                val passedCalls = testOutcome.poMethodCallsPassed
+                for (poCall in passedCalls) {
                     //get PO related to PO method call, old and new
                     val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
                     val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
                     //get PO method related to PO method call, old and new
-                    val oldMethod = oldPO?.methods?.find { it.name == poCall.method }
-                    val newMethod = newPO?.methods?.find { it.name == poCall.method }
+                    val oldMethod = oldPO?.methods?.find { it.name == poCall.methodName }
+                    val newMethod = newPO?.methods?.find { it.name == poCall.methodName }
                     //count methods that had assertions and now have not
                     val hadAsserts = oldMethod?.assertionLines?.isNotEmpty() == true
                     val hasNoAsserts = newMethod?.assertionLines?.isEmpty() == true
@@ -1090,16 +1081,18 @@ class DailyManager {
         }
 
         private fun checkNonCanonicalLocsNowCanonical(testOutcomes: List<TestOutcome>): Int {
-            //TODO: a problem is that when changing a locator from noncanonical to canonical we are changing
-            //basic info to recognize it (e.g., adding name), so it is actually treated as a locator was removed and then added
-            //so we cannot use locatorsPassed and check whether they exist both as old and new but with changed info
-            val oldLocators = TestQuestAction.POsOld.sumOf { po ->
-                po.nonCanonicalLocators.size
+            var adaptedLocatorsCount = 0
+            for (testOutcome in testOutcomes) {
+                val passedLocators = testOutcome.locatorsPassed
+                for (passedLocator in passedLocators) {
+                    val matchingOldLocator = testOutcome.locatorsOld
+                        .find { oldLocator -> passedLocator.compareThisLocWithLocInNonCanonicalForm(oldLocator) } //we compare new loc that changed class with previous version
+                                                                                                        //as some key attributes changed, basic equal cannot be used
+                    if (matchingOldLocator != null)
+                        adaptedLocatorsCount++
+                }
             }
-            val newLocators = TestQuestAction.POsNew.sumOf { po ->
-                po.nonCanonicalLocators.size
-            }
-            return oldLocators - newLocators
+            return adaptedLocatorsCount
         }
 
         //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
@@ -1109,10 +1102,7 @@ class DailyManager {
             val oldMethodCalls = TestQuestAction.POCallsOld.flatMap { it.value } //get old called PO methods
             val countedMethods = mutableSetOf<Int>() //count unique PO method calls
             for (testOutcome in testOutcomes) {
-                //find new PO method calls that are before any test error
-                val testName = testOutcome.testName
-                val errorLine = testOutcome.errorLine
-                val passedCalls = TestQuestAction.POCallsNew[testName]?.filter { it.line < errorLine } ?: continue
+                val passedCalls = testOutcome.poMethodCallsPassed
                 //count now used method calls that are unique
                 for (call in passedCalls) {
                     val wasUsedBefore = oldMethodCalls.any { oldCall -> oldCall == call }
@@ -1125,16 +1115,21 @@ class DailyManager {
             return count
         }
 
-
         private fun checkLocsOutsidePOsRemoved(testOutcomes: List<TestOutcome>): Int {
-            //TODO: comparison here is tricky as moving locs from Test to Page means that we are basically
-            //removing locators and adding new ones, so as locators change class and method name, they can't be directly compared
-            val oldLocators = TestQuestAction.locatorsOld
-            val newLocators = TestQuestAction.locatorsNew
-            //get old locators that were outside POs
-            val oldLocatorsNotInPO = oldLocators.count { locator -> !locator.className.endsWith("Page") }
-            val newLocatorsInPO = newLocators.count { locator -> locator.className.endsWith("Page") }
-            return newLocatorsInPO - oldLocatorsNotInPO
+            var movedLocatorsCount = 0
+            for (testOutcome in testOutcomes) {
+                val passedLocators = testOutcome.locatorsPassed
+                for (passedLocator in passedLocators) {
+                    val matchingOldLocator = testOutcome.locatorsOld.find { oldLocator ->
+                        passedLocator.compareThisLocInPOWithOldInTest(oldLocator) //we compare new loc that changed class with previous version
+                                                                                    //as some key attributes changed, basic equal cannot be used
+                    }
+                    if (matchingOldLocator != null)
+                        movedLocatorsCount++
+                }
+            }
+            return movedLocatorsCount
+
         }
 
 
@@ -1634,22 +1629,23 @@ class DailyManager {
 
 
         /******* RANDOM DAILY CHECKS ABOUT PAGE OBJECTS *******/
-        //TODO: we may want to check this info by considering actually passed POs
         private fun checkNewPO(testOutcomes: List<TestOutcome>): Int {
             val oldPONames = TestQuestAction.POsOld.map { it.name }.toSet()
             return if (TestQuestAction.POsNew.any { it.name !in oldPONames }) 1 else 0
         }
 
         private fun checkNewPOMethod(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs
-            val oldPOMethods = TestQuestAction.POsOld.associateBy({ it.name }, { it.methods.map { m -> m.name }.toSet() })
-            return if (TestQuestAction.POsNew.any { newPO ->
-                    val oldMethods = oldPOMethods[newPO.name] ?: emptySet()
-                    newPO.methods.any { it.name !in oldMethods }
-                }) 1 else 0
+            for (testOutcome in testOutcomes) {
+                for (poCall in testOutcome.poMethodCallsPassed) {
+                    val oldCalls = TestQuestAction.POCallsOld[testOutcome.testName]?.map { it.methodName } ?: emptyList()
+                    if (poCall.methodName !in oldCalls)
+                        return 1
+                }
+            }
+            return 0
         }
 
-        private fun checkNewLocsInPOMethod(testOutcomes: List<TestOutcome>): Int {
+        private fun checkNewLocsInPOMethods(testOutcomes: List<TestOutcome>): Int {
             return testOutcomes
                 .filter { it.className.endsWith("Page.java") }
                 .sumOf { outcome ->
@@ -1657,78 +1653,96 @@ class DailyManager {
                 }
         }
 
-        private fun checkMovedLocsFromTestToPOMethod(testOutcomes: List<TestOutcome>): Int {
-            //TODO: comparison here is tricky as moving locs from Test to Page means that we are basically
-            //removing locators and adding new ones, so as locators change class and method name, they can't be directly compared
-            val newLocatorsInPOs = testOutcomes
-                .filter { it.className.endsWith("Page.java") }
-                .sumOf { it.locatorsNew.size }
-            val oldLocatorsInTests = testOutcomes
-                .filter { it.className.endsWith("Test.java") }
-                .sumOf { it.locatorsOld.size }
-            return newLocatorsInPOs - oldLocatorsInTests
+        private fun checkMovedLocsFromTestsToPOMethods(testOutcomes: List<TestOutcome>): Int {
+            var movedLocatorsCount = 0
+            for (testOutcome in testOutcomes) {
+                val passedLocators = testOutcome.locatorsPassed
+                for (passedLocator in passedLocators) {
+                    val matchingOldLocator = testOutcome.locatorsOld.find { oldLocator ->
+                        passedLocator.compareThisLocInPOWithOldInTest(oldLocator) //we compare new loc that changed class with previous version
+                                                                        //as some key attributes changed, basic equal cannot be used
+                    }
+                    if (matchingOldLocator != null)
+                        movedLocatorsCount++
+                }
+            }
+            return movedLocatorsCount
         }
 
-
         private fun checkReturnedPOInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs
             val oldPOMethods = TestQuestAction.POsOld.associateBy(
                 { po -> po.name },
                 { po -> po.methods.associateBy({ method -> method.name }, { method -> method.returnType }) }
             )
-            return if (TestQuestAction.POsNew.any { newPO ->
-                    newPO.methods.any { newMethod ->
-                        newMethod.returnType.endsWith("Page") &&
-                                oldPOMethods[newPO.name]?.get(newMethod.name)?.endsWith("Page") == false
-                    }
-                }) 1 else 0
+            for (testOutcome in testOutcomes) {
+                for (passedMethod in testOutcome.poMethodCallsPassed) {
+                    val oldReturnType = oldPOMethods[passedMethod.pageObject]?.get(passedMethod.methodName)
+                    val newReturnType = TestQuestAction.POsNew
+                        .find { it.name == passedMethod.pageObject }
+                        ?.methods?.find { it.name == passedMethod.methodName }
+                        ?.returnType
+                    if (newReturnType?.endsWith("Page") == true && (oldReturnType == null || !oldReturnType.endsWith("Page")))
+                        return 1
+                }
+            }
+            return 0
         }
 
         private fun checkMovedAssertsFromPOMethodToTests(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs
-            val oldAsserts = TestQuestAction.POsOld.sumOf { po ->
-                po.methods.sumOf { method ->
-                    method.assertionLines.size
+            var movedAssertionsCount = 0
+            for (testOutcome in testOutcomes) {
+                for (passedMethod in testOutcome.poMethodCallsPassed) {
+                    val oldAssertions = TestQuestAction.POsOld
+                        .find { it.name == passedMethod.pageObject }
+                        ?.methods?.find { it.name == passedMethod.methodName }
+                        ?.assertionLines?.size ?: 0
+                    val newAssertions = TestQuestAction.POsNew
+                        .find { it.name == passedMethod.pageObject }
+                        ?.methods?.find { it.name == passedMethod.methodName }
+                        ?.assertionLines?.size ?: 0
+                    if (oldAssertions > newAssertions) {
+                        movedAssertionsCount += (oldAssertions - newAssertions)
+                    }
                 }
             }
-            val newAsserts = TestQuestAction.POsNew.sumOf { po ->
-                po.methods.sumOf { method ->
-                    method.assertionLines.size
-                }
-            }
-            return oldAsserts - newAsserts
+            return movedAssertionsCount
         }
 
-        private fun checkAdaptedLocsFormatInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            //TODO: a problem is that when changing a locator from noncanonical to canonical we are changing
-            //basic info to recognize it (e.g., adding name), so it is actually treated as a locator was removed and then added
-            //so we cannot use locatorsPassed and check whether they exist both as old and new but with changed info
-            val oldLocators = TestQuestAction.POsOld.sumOf { po ->
-                po.nonCanonicalLocators.size
-            }
-            val newLocators = TestQuestAction.POsNew.sumOf { po ->
-                po.nonCanonicalLocators.size
-            }
-            return oldLocators - newLocators
-        }
-
-        private fun checkInteractionsWithLocsInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs
-            val oldInteractions = TestQuestAction.POsOld.sumOf { po ->
-                po.methods.sumOf { method ->
-                    method.seleniumCommands.size
+        private fun checkNowCanonicalLocs(testOutcomes: List<TestOutcome>): Int {
+            var adaptedLocatorsCount = 0
+            for (testOutcome in testOutcomes) {
+                val passedLocators = testOutcome.locatorsPassed
+                for (passedLocator in passedLocators) {
+                    val matchingOldLocator = testOutcome.locatorsOld
+                        .find { oldLocator -> passedLocator.compareThisLocWithLocInNonCanonicalForm(oldLocator) } //we compare new loc that changed class with previous version
+                                                                                                        //as some key attributes changed, basic equal cannot be used
+                    if (matchingOldLocator != null)
+                        adaptedLocatorsCount++
                 }
             }
-            val newInteractions = TestQuestAction.POsNew.sumOf { po ->
-                po.methods.sumOf { method ->
-                    method.seleniumCommands.size
+            return adaptedLocatorsCount
+        }
+
+        private fun checkInteractionsWithLocsInPOMethods(testOutcomes: List<TestOutcome>): Int {
+            var oldInteractions = 0
+            var newInteractions = 0
+            for (testOutcome in testOutcomes) {
+                val passedMethods = testOutcome.poMethodCallsPassed
+                for (passedMethod in passedMethods) {
+                    oldInteractions += TestQuestAction.POsOld
+                        .flatMap { it.methods }
+                        .filter { it.name == passedMethod.methodName }
+                        .sumOf { it.seleniumCommands.size }
+                    newInteractions += TestQuestAction.POsNew
+                        .flatMap { it.methods }
+                        .filter { it.name == passedMethod.methodName }
+                        .sumOf { it.seleniumCommands.size }
                 }
             }
             return newInteractions - oldInteractions
         }
 
         private fun checkNewAncestorPO(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs
             return if (TestQuestAction.POsNew.any { newPO ->
                     val oldPO = TestQuestAction.POsOld.find { it.name == newPO.name }
                     oldPO != null && oldPO.ancestors.size < newPO.ancestors.size
@@ -1738,8 +1752,9 @@ class DailyManager {
                 0
             }
         }
+
         private fun checkMovedCommonMethodToAncestorPO(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs
+            val movedMethods = mutableSetOf<String>()
             for (i in 0 until TestQuestAction.POsOld.size) {
                 for (j in i + 1 until TestQuestAction.POsOld.size) {
                     val poOld1 = TestQuestAction.POsOld[i]
@@ -1749,39 +1764,46 @@ class DailyManager {
                     val commonAncestorsOld = TestQuestAction.POsOld.filter { it.name in commonAncestorsOldNames }
                     //find common methods
                     val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
-                    for (method in commonMethods)
+                    for (method in commonMethods) {
                         //check no common ancestors had that method
                         if (commonAncestorsOld.none { it.methods.contains(method) }) {
                             //find new versions of the compared POs
                             val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
                             val poNew2 = TestQuestAction.POsNew.find { it.name == poOld2.name }
-                            if (poNew1 != null && poNew2 != null)
+                            if (poNew1 != null && poNew2 != null) {
                                 //check that method is no more present in POs
                                 if (!poNew1.methods.contains(method) && !poNew2.methods.contains(method)) {
                                     //find common ancestors
                                     val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
-                                    val commonAncestorsNew = TestQuestAction.POsOld.filter { it.name in commonAncestorsNewNames }
+                                    val commonAncestorsNew = TestQuestAction.POsNew.filter { it.name in commonAncestorsNewNames }
                                     //check a common ancestor now has that method
-                                    if (commonAncestorsNew.any { it.methods.contains(method) })
-                                        return 1
+                                    if (commonAncestorsNew.any { it.methods.contains(method) }) {
+                                        movedMethods.add(method.name)
+                                    }
                                 }
+                            }
                         }
+                    }
                 }
             }
+            //check if any of these moved method is passed wrt a test
+            for (testOutcome in testOutcomes)
+                if (testOutcome.poMethodCallsPassed.any { it.methodName in movedMethods })
+                    return 1
             return 0
         }
 
         private fun checkCalledPOMethod(testOutcomes: List<TestOutcome>): Int {
-            //TODO: we may want to check this info by considering actually passed POs and tests
             for (outcome in testOutcomes) {
-                //count PO method calls for each test. if new calls are more in any test (i.e., a method call was added), 1 is returned
-                var oldCalledMethods = 0
-                var newCalledMethods = 0
-                if (TestQuestAction.POCallsOld.containsKey(outcome.testName))
-                    oldCalledMethods = (TestQuestAction.POCallsOld[outcome.testName] ?: emptyList<String>()).size
-                if (TestQuestAction.POCallsNew.containsKey(outcome.testName))
-                    newCalledMethods = (TestQuestAction.POCallsNew[outcome.testName] ?: emptyList<String>()).size
-                if(newCalledMethods > oldCalledMethods)
+                //find PO method calls for each test. if new calls are more in any test (i.e., a method call was added), 1 is returned
+                val oldCalledMethods = TestQuestAction.POCallsOld[outcome.testName]?.toSet() ?: emptySet()
+                val newCalledMethods = TestQuestAction.POCallsNew[outcome.testName]?.toSet() ?: emptySet()
+                //get diff
+                val newlyCalledMethods = newCalledMethods - oldCalledMethods
+                //check if new calls were passed
+                if (newlyCalledMethods.isNotEmpty() && newlyCalledMethods.any { methodName ->
+                        outcome.poMethodCallsPassed.any { it.methodName == methodName.methodName }
+                    })
                     return 1
             }
             return 0
@@ -1790,18 +1812,24 @@ class DailyManager {
         private fun checkCalledUnusedPOMethod(testOutcomes: List<TestOutcome>): Int {
             val oldCalledMethods = mutableSetOf<PageObjectCall>()
             val newCalledMethods = mutableSetOf<PageObjectCall>()
-            //get all old and new PO calls
+            //collect all old and new PO calls
             for (outcome in testOutcomes) {
-                if (TestQuestAction.POCallsOld.containsKey(outcome.testName))
-                    oldCalledMethods.addAll(TestQuestAction.POCallsOld[outcome.testName] ?: emptyList())
-                if (TestQuestAction.POCallsNew.containsKey(outcome.testName))
-                    newCalledMethods.addAll(TestQuestAction.POCallsNew[outcome.testName] ?: emptyList())
+                TestQuestAction.POCallsOld[outcome.testName]?.let { oldCalledMethods.addAll(it) }
+                TestQuestAction.POCallsNew[outcome.testName]?.let { newCalledMethods.addAll(it) }
             }
-            //check if there exist new PO method calls that did not exist before
-            if (newCalledMethods.any { it !in oldCalledMethods })
+            //check if there exist new PO method calls that did not exist before and that are passed
+            val newlyCalledMethods = newCalledMethods - oldCalledMethods
+            if (newlyCalledMethods.isNotEmpty() && newlyCalledMethods.any { newCall ->
+                    testOutcomes.any { outcome ->
+                        outcome.poMethodCallsPassed.any { it.methodName == newCall.methodName }
+                    }
+                })
                 return 1
             return 0
         }
+
+
+
 
 
 

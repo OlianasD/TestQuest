@@ -7,6 +7,7 @@ import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
 import analyzer.locator.LocatorsAnalyzer
+import extractor.test.PageObjectCall
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
 import java.util.regex.Matcher
@@ -26,7 +27,9 @@ data class TestOutcome(
     // TODO: assumption = all locs placed before a error line num are considered 'passed'
     // TODO: at the moment, we expect test cases to call PO methods, where PO methods should NOT call other PO methods
     val locatorBroken: Locator? = null, //the locator (if any) that brought to a test failure
-    val locatorsNotExecuted: List<Locator> = emptyList() //the list of locs after a broken loc (if any) thus not executed
+    val locatorsUnexercised: List<Locator> = emptyList(), //the list of locs after a broken loc (if any) thus not executed
+    val poMethodCallsPassed: List<PageObjectCall> = emptyList(), //the list of PO method calls passed (if any)
+    val poMethodCallsUnexercised: List<PageObjectCall> = emptyList() //the list of PO method calls not exercised due to error (if any)
 ) {
     override fun hashCode(): Int {
         return 31 * (testName.hashCode() + className.hashCode())
@@ -132,6 +135,18 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             val (oldLocatorsInTest, newLocatorsInTest) = collectLocators(test)
             // 2. FIND ERROR LINE (IF ANY), LOCATORS PASSED/BROKEN (IF ANY)/UNEXERCISED (IF ANY)
             val analysisResult = analyzeErrorInfo(test, newLocatorsInTest)
+
+            //3. FIND PO METHOD CALLS THAT ARE PASSED/UNEXERCISED DUE TO FAILURE
+            val (passedCalls, unexercisedCalls) = TestQuestAction.POCallsNew[test.name]?.let { calls ->
+                if (analysisResult.testErrorLineNum == -1) //if testErrorLineNum è -1, all calls are passed
+                    calls to emptyList()
+                else
+                    calls.filter { it.line < analysisResult.testErrorLineNum } to
+                            calls.filter { it.line >= analysisResult.testErrorLineNum }
+
+            } ?: (emptyList<PageObjectCall>() to emptyList())
+
+
             val testOutcome = TestOutcome(
                 test.name,
                 test.parent.name,
@@ -142,7 +157,9 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
                 analysisResult.testErrorLineNum,
                 analysisResult.passedLocs,
                 analysisResult.brokenLoc,
-                analysisResult.unexercisedLocs
+                analysisResult.unexercisedLocs,
+                passedCalls,
+                unexercisedCalls
             )
             testOutcomes.add(testOutcome)
         } catch (_: RuntimeException) {
@@ -252,13 +269,13 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
         val oldPageObjectCalls = TestQuestAction.POCallsOld[test.name] ?: emptyList()
         for (call in oldPageObjectCalls) {
             val oldPageObject = TestQuestAction.POsOld.find { it.name == call.pageObject }
-            val oldMethodInfo = oldPageObject?.methods?.find { it.name == call.method }
+            val oldMethodInfo = oldPageObject?.methods?.find { it.name == call.methodName }
             if (oldMethodInfo != null) oldLocatorsInTest.addAll(oldMethodInfo.locators)
         }
         val newPageObjectCalls = TestQuestAction.POCallsNew[test.name] ?: emptyList()
         for (call in newPageObjectCalls) {
             val newPageObject = TestQuestAction.POsNew.find { it.name == call.pageObject }
-            val newMethodInfo = newPageObject?.methods?.find { it.name == call.method }
+            val newMethodInfo = newPageObject?.methods?.find { it.name == call.methodName }
             if (newMethodInfo != null) newLocatorsInTest.addAll(newMethodInfo.locators)
         }
         return Pair(oldLocatorsInTest, newLocatorsInTest)
@@ -299,7 +316,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             //get all passed and nonexercised locators from PO methods preceding and following test error
             for (call in poCalls) {
                 val po = TestQuestAction.POsNew.find { it.name == call.pageObject }
-                val methodInfo = po?.methods?.find { it.name == call.method }
+                val methodInfo = po?.methods?.find { it.name == call.methodName }
                 if (call.line < testErrorLineNum)
                     passedLocs.addAll(methodInfo?.locators ?: emptyList())
                 else if (call.line > testErrorLineNum)

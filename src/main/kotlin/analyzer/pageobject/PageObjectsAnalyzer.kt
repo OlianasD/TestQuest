@@ -122,7 +122,7 @@ class PageObjectsAnalyzer {
     private fun calculateUnusedPOMethods() {
         val usedMethods = TestQuestAction.POCallsNew.values
             .flatten()
-            .map { it.pageObject to it.method }
+            .map { it.pageObject to it.methodName }
             .toSet()
         val unusedMethods = POs.flatMap { po ->
             po.methods.filter { method -> (po.name to method.name) !in usedMethods }

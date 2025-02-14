@@ -10,7 +10,7 @@ import java.io.Serializable
 
 data class PageObjectCall(
     val pageObject: String,
-    val method: String,
+    val methodName: String,
     val line: Int,
     val parameters: List<String> = emptyList()
 ): Serializable
@@ -20,13 +20,13 @@ data class PageObjectCall(
         if (javaClass != other?.javaClass) return false
         other as PageObjectCall
         if (pageObject != other.pageObject) return false
-        if (method != other.method) return false
+        if (methodName != other.methodName) return false
         if (parameters != other.parameters) return false
         return true
     }
     override fun hashCode(): Int {
         var result = pageObject.hashCode()
-        result = 31 * result + method.hashCode()
+        result = 31 * result + methodName.hashCode()
         result = 31 * result + parameters.hashCode()
         return result
     }

@@ -47,6 +47,31 @@ data class Locator(
                     methodName == other.methodName &&
                     className == other.className
     }
+
+    //this method is used to compare locators that changed class (i.e., from a Test class to a PO class)
+    //old locator = the locator in Test class
+    //the check is performed on attributes that should not change by changing class (i.e., className, methodName, position) from Test to PO (i.e., name, type, value)
+    fun compareThisLocInPOWithOldInTest(old: Locator): Boolean {
+        return this.locatorType == old.locatorType &&
+                this.locatorValue == old.locatorValue &&
+                this.locatorName == old.locatorName &&
+                this.className.endsWith("Page") && old.className.endsWith("Test")
+    }
+
+
+    //this method is used to compare locators that changed from noncanonical to canonical (i.e., from annontation/unnamed to named)
+    //old locator = the non canonical locator
+    //the check is performed on attributes that should not change if only canonical info (i.e., new name, position, method) are changed (i.e., type, value, class)
+    fun compareThisLocWithLocInNonCanonicalForm(old: Locator): Boolean {
+        return this.locatorType == old.locatorType &&
+                this.locatorValue == old.locatorValue &&
+                this.className == old.className &&  ((this.locatorName != null && this.locatorName != "" &&
+                (old.locatorName == null || old.locatorName == "")) || (!this.isAnnotation && old.isAnnotation)
+                || (this.methodName != "" && old.methodName == ""))
+    }
+
+
+
 }
 
 
