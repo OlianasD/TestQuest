@@ -14,81 +14,20 @@ class DailyManager {
 
     companion object {
 
-        private const val DAILY_GOAL: Int = 3 //TODO: to convert into a map (each daily may have specific requests)
-        private const val RANDOM_DAILY_XP: Int = 100 //TODO: to convert into a map (each daily may provide specific XP)
-        private const val TARGETED_DAILY_XP: Int = 25 //xp for each point fixed from targeted TODO
+        //TODO: we may want to convert goal, xps, and pics into a map specific for each daily
+        //TODO: also, we may want to refactor this class by organizing dailies as LocatorsDailyManager, PODailyManager, TestDailyManager
+        //TODO: dailies (random and targeted) about tests are still to be implemented and might require additional extractions mechanics (e.g., to extract test structure)
+        private const val DAILY_GOAL: Int = 3
+        private const val RANDOM_DAILY_XP: Int = 100
+        private const val TARGETED_DAILY_XP: Int = 25
         private const val DAILIES_PER_USER: Int = 5
 
 
         /**********************************RANDOM DAILIES**********************************/
-
-        //TODO: refactor this class by organizing dailies as LocatorsDailyManager, PODailyManager, TestDailyManager
-        private val RANDOM_DAILY_NAMES = listOf(
-            /************ DAILIES ABOUT LOCATORS ************/
-            "xpathAbs",
-            "xpathLength",
-            "xpathLevel",
-            "loc2xpath",
-            "loc2id",
-            "runLocs20",
-            "robustness",
-            "lengthShortenMax",
-            "addAttrToXPath",
-            "remAttrFromXPath",
-            "remJSFromXPath",
-            "edit5",
-            "levelLoweredMax",
-            "repair",
-            "reducePredicates",
-            "newXPath",
-            "newID",
-            "newSameLoc",
-            "newLengthShorterMax",
-            "newLevelLowerMax",
-            "newRobust",
-            "newWantedAttr",
-            "newUnwantedAttr",
-            "newJS",
-            "newLowPredicates",
-            /************ DAILIES ABOUT POS ************/
-            "addPO", //create a PO within test suite (i.e., basically just a class named _Page is ok)
-            "addMethodToPO", //add a method to a PO (i.e., basically just an empty method is ok)
-            "addLocsToMethod", //add locs to a PO method
-            "moveLocs2Method", //move locs from test to a PO method
-            "returnPOInMethod", //add a PO as return type for a method
-            "moveAssertsToTest", //move asserts from method to test
-            "adaptLocs2Format", //adapt locs to have format: WebElement e = driver.findElement(By...)
-            "interactWithLocsInMethod", //add Selenium instructions in method to interact with locators
-            "addAncestorPO", //add an ancestor PO
-            "moveCommonMethodToAncestorPO", //move a method shared among POs to a common ancestor
-            "callMethod", // call a method from a PO within a test
-            "callUnusedMethod", //call an unused method from a PO within a test
-            /************ DAILIES ABOUT TESTS ************/
-            //TODO: most are still to be implemented and might require additional extractions mechanics (e.g., to extract test structure)
-            "runtc",
-            "runts",
-            "addAssert2Test",
-            "shortenTestWorkFlow",//test workflow must be simple (i.e., checks if test has not too many interactions/locs and too many assertions)
-            "makeTestWorkFlowIndependent", //test workflow must be independent from any other test
-            "adaptTestName2Format", //test name must have 3 sections: what is being tested, circumnstances, exp result
-            "shortenMethodName",
-            "shortenVarName",
-            "addSetup",
-            "addTearDown",
-            "removeGlobVar",
-            "removeExpSleep",
-        )
-
-
-
-
-
-
-        //TODO: change icons, xp, target accordingly
         private val ALL_RANDOM_DAILIES = mutableListOf(
             /************ DAILIES ABOUT LOCATORS ************/
             Daily(
-                RANDOM_DAILY_NAMES[0],
+                "xpathAbs",
                 "Replace $DAILY_GOAL existing absolute XPath locators with $DAILY_GOAL relative ones",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -96,7 +35,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[1],
+                "xpathLength",
                 "Reduce the length of $DAILY_GOAL existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -104,7 +43,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[2],
+                "xpathLevel",
                 "Reduce the level of $DAILY_GOAL existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -112,7 +51,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[3],
+                "loc2xpath",
                 "Convert $DAILY_GOAL existing non-XPath locators to $DAILY_GOAL XPath ones",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -120,7 +59,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[4],
+                "loc2id",
                 "Convert $DAILY_GOAL existing non-ID locators to $DAILY_GOAL ID ones",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -128,7 +67,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[5],
+                "runLocs20",
                 "Run 20 locators successfully",
                 RANDOM_DAILY_XP,
                 20,
@@ -136,7 +75,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[6],
+                "robustness",
                 "Improve the robustness of $DAILY_GOAL existing locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -144,7 +83,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[7],
+                "lengthShortenMax",
                 "Shorten the length of $DAILY_GOAL existing XPath locators below " + GamificationManager.MAX_LENGTH + " characters",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -152,7 +91,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[8],
+                "addAttrToXPath",
                 "Add $DAILY_GOAL references to robust attributes to existing XPaths locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -160,7 +99,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[9],
+                "remAttrFromXPath",
                 "Remove $DAILY_GOAL references to fragile attributes from existing XPaths locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -168,7 +107,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[10],
+                "remJSFromXPath",
                 "Remove $DAILY_GOAL references to Javascript code from existing XPaths locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -176,7 +115,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[11],
+                "edit5",
                 "Modify 5 different existing locators",
                 RANDOM_DAILY_XP,
                 5,
@@ -184,7 +123,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[12],
+                "levelLoweredMax",
                 "Lower the level of $DAILY_GOAL existing locators below " + GamificationManager.MAX_LEVEL + " tags",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -192,7 +131,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[13],
+                "repair",
                 "Repair $DAILY_GOAL existing broken locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -200,7 +139,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[14],
+                "reducePredicates",
                 "Reduce the number of predicates from $DAILY_GOAL existing locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -208,7 +147,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[15],
+                "newXPath",
                 "Implement $DAILY_GOAL new XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -216,7 +155,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[16],
+                "newID",
                 "Implement $DAILY_GOAL new ID locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -224,7 +163,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[17],
+                "newSameLoc",
                 "Implement a newly locator value and use it more than once in a test suite",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -232,7 +171,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[18],
+                "newLengthShorterMax",
                 "Implement $DAILY_GOAL new XPath locators with length below " + GamificationManager.MAX_LENGTH+ " characters",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -240,7 +179,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[19],
+                "newLevelLowerMax",
                 "Implement $DAILY_GOAL new XPath locators with level below " + GamificationManager.MAX_LEVEL+ " tags",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -248,7 +187,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[20],
+                "newRobust",
                 "Implement $DAILY_GOAL new robust locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -256,7 +195,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[21],
+                "newWantedAttr",
                 "Implement $DAILY_GOAL new XPath locators with references to robust attributes",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -264,7 +203,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[22],
+                "newUnwantedAttr",
                 "Implement $DAILY_GOAL new XPath locators with no references to fragile attributes",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -272,7 +211,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[23],
+                "newJS",
                 "Implement $DAILY_GOAL new XPath locators with no references to Javascript code",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -280,7 +219,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[24],
+                "newLowPredicates",
                 "Implement $DAILY_GOAL new XPath locators with " + GamificationManager.MAX_POS_PRED + " or less positional predicates",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -289,23 +228,23 @@ class DailyManager {
             ),
             /************ DAILIES ABOUT POS ************/
             Daily(
-                RANDOM_DAILY_NAMES[25],
-                "Add a new PageObject to the test suite",
+                "addPO", //create a PO within test suite (i.e., basically just a class named _Page is ok)
+                "Add and use a new PageObject to the test suite",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[26],
-                "Add a new method to a PageObject",
+                "addMethodToPO", //add a method to a PO (i.e., basically just an empty method is ok)
+                "Add and use a new method of a PageObject",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[27],
+                "addLocsToMethod", //add locs to a PO method
                 "Add new $DAILY_GOAL locators to any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -313,39 +252,39 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[28],
-                "Move $DAILY_GOAL locators from tests to any PageObject method",
+                "moveLocs2Method", //move locs from test to a PO method
+                "Move $DAILY_GOAL existing locators from tests to any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[29],
-                "Set a PageObject return type for a PageObject method that originally did not",
+                "returnPOInMethod", //add a PO as return type for a method
+                "Change from void to a PageObject the return type of a PageObject method",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[30],
-                "Move $DAILY_GOAL asserts existing in any PageObject method to a test",
+                "moveAssertsToTest", //move asserts from method to test
+                "Move $DAILY_GOAL existing asserts from any PageObject method to a test",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[31],
-                "Adapts $DAILY_GOAL locators retrieval from any PageObject to the canonical form",
+                "adaptLocs2Format", //adapt locs to have format: WebElement e = driver.findElement(By...)
+                "Adapts $DAILY_GOAL locators declarations to the canonical form",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[32],
+                "interactWithLocsInMethod", //add Selenium instructions in method to interact with locators
                 "Add $DAILY_GOAL interactions with locators in any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -353,7 +292,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[33],
+                "addAncestorPO", //add an ancestor PO
                 "Assign an ancestor PageObject to any PageObject",
                 RANDOM_DAILY_XP,
                 1,
@@ -361,7 +300,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[34],
+                "moveCommonMethodToAncestorPO", //move a method shared among POs to a common ancestor
                 "Move a duplicated method from multiple PageObjects to a common ancestor",
                 RANDOM_DAILY_XP,
                 1,
@@ -369,7 +308,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[35],
+                "callMethod", // call a method from a PO within a test
                 "Call a PageObject method from any test",
                 RANDOM_DAILY_XP,
                 1,
@@ -377,7 +316,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[36],
+                "callUnusedMethod", //call an unused method from a PO within a test
                 "Call an unused PageObject method from any test",
                 RANDOM_DAILY_XP,
                 1,
@@ -386,15 +325,15 @@ class DailyManager {
             ),
             /************ DAILIES ABOUT TESTS ************/
             Daily(
-                RANDOM_DAILY_NAMES[37],
-                "Run ${DAILY_GOAL} test cases successfully",
+                "runtc",
+                "Run $DAILY_GOAL test cases successfully",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[38],
+                "runts",
                 "Run a test suite successfully",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -402,7 +341,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[39],
+                "addAssert2Test",
                 "Add an assert to a test case",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -410,7 +349,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[40],
+                "shortenTestWorkFlow",//test workflow must be simple (i.e., checks if test has not too many interactions/locs and too many assertions)
                 "Refactor a long test into two tests",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -418,7 +357,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[41],
+                "makeTestWorkFlowIndependent", //test workflow must be independent from any other test
                 "Make a test independent from other tests",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -426,7 +365,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[42],
+                "adaptTestName2Format", //test name must have 3 sections: what is being tested, circumnstances, exp result
                 "Adapt test name to canonical name",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -434,7 +373,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[43],
+                "shortenMethodName",
                 "Shorten a method name",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -442,7 +381,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[44],
+                "shortenVarName",
                 "Shorten a variable name",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -450,7 +389,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[45],
+                "addSetup",
                 "Add a setup method to a test class",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -458,7 +397,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[46],
+                "addTearDown",
                 "Add a tearDown method to a test class",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -466,7 +405,7 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[47],
+                "removeGlobVar",
                 "Remove a global variable from a test class",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
@@ -474,13 +413,133 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
             Daily(
-                RANDOM_DAILY_NAMES[48],
+                "removeExpSleep",
                 "Remove an explicit time sleep",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name
             ),
+        )
+
+
+        /**********************************TARGETED DAILIES**********************************/
+        private val ALL_TARGETED_DAILIES = mutableListOf(
+            /************ DAILIES ABOUT LOCATORS ************/
+            Daily(
+                "absolute",
+                "Turns the following absolute XPath locators into relative ones",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "length",
+                "Reduce the length of the following XPath locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "level",
+                "Reduce the levels of the following XPath locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "posPredicate",
+                "Remove/Replace the positional predicates from the following XPath locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "badPredicate",
+                "Remove/Replace the weak predicates from the following XPath locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "noIDOrXPath",
+                "Replace the following non-ID/XPath locators into ID/XPath ones",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "broken",
+                "Repair the following broken locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            /************ DAILIES ABOUT POs ************/
+            Daily(
+                "missingCommandMethods",
+                "Add Selenium commands to the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "missingRetPOMethods",
+                "Add a Page Object as return type to the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "assertInPOMethods",
+                "Move to test methods the assertions in the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "nonCanonicalLocs",
+                "Transforms into canonical form the following locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "unusedPOMethods",
+                "Make use of the following Page Object methods",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "outPOLocs",
+                "Move to Page Object methods the following locators",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
+                "missingAncestorPOs",
+                "Add an ancestor and move cloned methods to the following Page Objects",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            /************ DAILIES ABOUT TESTS ************/
         )
 
         private val DAILY_NAME_TO_DESCRIPTION = ALL_RANDOM_DAILIES.associate { it.name to it.description }
@@ -490,382 +549,79 @@ class DailyManager {
 
         private val RANDOM_DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
             /************ DAILIES ABOUT LOCS ************/
-            RANDOM_DAILY_NAMES[0] to { testOutcomes -> checkAbsXPathRemoved(testOutcomes) },
-            RANDOM_DAILY_NAMES[1] to { testOutcomes -> checkXPathLengthReduced(testOutcomes) },
-            RANDOM_DAILY_NAMES[2] to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
-            RANDOM_DAILY_NAMES[3] to { testOutcomes -> checkLocs2XPathConverted(testOutcomes) },
-            RANDOM_DAILY_NAMES[4] to { testOutcomes -> checkLocs2IDConverted(testOutcomes) },
-            RANDOM_DAILY_NAMES[5] to { testOutcomes -> checkRunLoc20(testOutcomes) },
-            RANDOM_DAILY_NAMES[6] to { testOutcomes -> checkRobustnessImprovement(testOutcomes) },
-            RANDOM_DAILY_NAMES[7] to { testOutcomes -> checkShortenedLengthMax(testOutcomes) },
-            RANDOM_DAILY_NAMES[8] to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
-            RANDOM_DAILY_NAMES[9] to { testOutcomes -> checkUnwantedAttrsInXPaths(testOutcomes) },
-            RANDOM_DAILY_NAMES[10] to { testOutcomes -> checkJSInXPaths(testOutcomes) },
-            RANDOM_DAILY_NAMES[11] to { testOutcomes -> checkChangedLocs5(testOutcomes) },
-            RANDOM_DAILY_NAMES[12] to { testOutcomes -> checkLoweredLevelMax(testOutcomes) },
-            RANDOM_DAILY_NAMES[13] to { testOutcomes -> checkRepair(testOutcomes) },
-            RANDOM_DAILY_NAMES[14] to { testOutcomes -> reducePredicates(testOutcomes) },
-            RANDOM_DAILY_NAMES[15] to { testOutcomes -> checkNewXPath(testOutcomes) },
-            RANDOM_DAILY_NAMES[16] to { testOutcomes -> checkNewID(testOutcomes) },
-            RANDOM_DAILY_NAMES[17] to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
-            RANDOM_DAILY_NAMES[18] to { testOutcomes -> checkNewXPathLengthMax(testOutcomes) },
-            RANDOM_DAILY_NAMES[19] to { testOutcomes -> checkNewXPathLevelMax(testOutcomes) },
-            RANDOM_DAILY_NAMES[20] to { testOutcomes -> checkNewRobust(testOutcomes) },
-            RANDOM_DAILY_NAMES[21] to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
-            RANDOM_DAILY_NAMES[22] to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
-            RANDOM_DAILY_NAMES[23] to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
-            RANDOM_DAILY_NAMES[24] to { testOutcomes -> checkNewXPathWithFewPosPredicates(testOutcomes) },
+            "xpathAbs" to { testOutcomes -> checkAbsXPathRemoved(testOutcomes) },
+            "xpathLength" to { testOutcomes -> checkXPathLengthReduced(testOutcomes) },
+            "xpathLevel" to { testOutcomes -> checkXPathLevelReduced(testOutcomes) },
+            "loc2xpath" to { testOutcomes -> checkLocs2XPathConverted(testOutcomes) },
+            "loc2id" to { testOutcomes -> checkLocs2IDConverted(testOutcomes) },
+            "runLocs20" to { testOutcomes -> checkRunLoc20(testOutcomes) },
+            "robustness" to { testOutcomes -> checkRobustnessImprovement(testOutcomes) },
+            "lengthShortenMax" to { testOutcomes -> checkShortenedLengthMax(testOutcomes) },
+            "addAttrToXPath" to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
+            "remAttrFromXPath" to { testOutcomes -> checkUnwantedAttrsInXPaths(testOutcomes) },
+            "remJSFromXPath" to { testOutcomes -> checkJSInXPaths(testOutcomes) },
+            "edit5" to { testOutcomes -> checkChangedLocs5(testOutcomes) },
+            "levelLoweredMax" to { testOutcomes -> checkLoweredLevelMax(testOutcomes) },
+            "repair" to { testOutcomes -> checkRepair(testOutcomes) },
+            "reducePredicates" to { testOutcomes -> reducePredicates(testOutcomes) },
+            "newXPath" to { testOutcomes -> checkNewXPath(testOutcomes) },
+            "newID" to { testOutcomes -> checkNewID(testOutcomes) },
+            "newSameLoc" to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
+            "newLengthShorterMax" to { testOutcomes -> checkNewXPathLengthMax(testOutcomes) },
+            "newLevelLowerMax" to { testOutcomes -> checkNewXPathLevelMax(testOutcomes) },
+            "newRobust" to { testOutcomes -> checkNewRobust(testOutcomes) },
+            "newWantedAttr" to { testOutcomes -> checkNewXPathWithWantedAttrs(testOutcomes) },
+            "newUnwantedAttr" to { testOutcomes -> checkNewXPathWithoutUnwantedAttrs(testOutcomes) },
+            "newJS" to { testOutcomes -> checkNewXPathWithoutJS(testOutcomes) },
+            "newLowPredicates" to { testOutcomes -> checkNewXPathWithFewPosPredicates(testOutcomes) },
             /************ DAILIES ABOUT POS ************/
-            RANDOM_DAILY_NAMES[25] to { testOutcomes -> checkNewPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[26] to { testOutcomes -> checkNewPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[27] to { testOutcomes -> checkNewLocsInPOMethods(testOutcomes) },
-            RANDOM_DAILY_NAMES[28] to { testOutcomes -> checkMovedLocsFromTestsToPOMethods(testOutcomes) },
-            RANDOM_DAILY_NAMES[29] to { testOutcomes -> checkReturnedPOInPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[30] to { testOutcomes -> checkMovedAssertsFromPOMethodToTests(testOutcomes) },
-            RANDOM_DAILY_NAMES[31] to { testOutcomes -> checkNowCanonicalLocs(testOutcomes) },
-            RANDOM_DAILY_NAMES[32] to { testOutcomes -> checkInteractionsWithLocsInPOMethods(testOutcomes) },
-            RANDOM_DAILY_NAMES[33] to { testOutcomes -> checkNewAncestorPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[34] to { testOutcomes -> checkMovedCommonMethodToAncestorPO(testOutcomes) },
-            RANDOM_DAILY_NAMES[35] to { testOutcomes -> checkCalledPOMethod(testOutcomes) },
-            RANDOM_DAILY_NAMES[36] to { testOutcomes -> checkCalledUnusedPOMethod(testOutcomes) },
+            "addPO" to { testOutcomes -> checkPOAdded(testOutcomes) },
+            "addMethodToPO" to { testOutcomes -> checkPOMethodAdded(testOutcomes) },
+            "addLocsToMethod" to { testOutcomes -> checkLocsInPOAdded(testOutcomes) },
+            "moveLocs2Method" to { testOutcomes -> checkLocsFromTestsToPOMoved(testOutcomes) },
+            "returnPOInMethod" to { testOutcomes -> checkPOReturnTypeAdded(testOutcomes) },
+            "moveAssertsToTest" to { testOutcomes -> checkAssertsFromPOToTestsMoved(testOutcomes) },
+            "adaptLocs2Format" to { testOutcomes -> checkNonCanonicalLocsChanged(testOutcomes) },
+            "interactWithLocsInMethod" to { testOutcomes -> checkSeleniumCommandsAdded(testOutcomes) },
+            "addAncestorPO" to { testOutcomes -> checkAncestorPOAdded(testOutcomes) },
+            "moveCommonMethodToAncestorPO" to { testOutcomes -> checkCommonMethodMoved(testOutcomes) },
+            "callMethod" to { testOutcomes -> checkPOMethodCalled(testOutcomes) },
+            "callUnusedMethod" to { testOutcomes -> checkUnusedPOMethodCalled(testOutcomes) },
             /************ DAILIES ABOUT TESTS ************/
-            RANDOM_DAILY_NAMES[37] to { testOutcomes -> checkRunTC(testOutcomes) },
-            RANDOM_DAILY_NAMES[38] to { testOutcomes -> checkRunTS(testOutcomes) },
-            RANDOM_DAILY_NAMES[39] to { testOutcomes -> checkAssertAddedToTest(testOutcomes) },
-            RANDOM_DAILY_NAMES[40] to { testOutcomes -> checkTestShortened(testOutcomes) },
-            RANDOM_DAILY_NAMES[41] to { testOutcomes -> checkTestIndependent(testOutcomes) },
-            RANDOM_DAILY_NAMES[42] to { testOutcomes -> checkTestNameAdapted(testOutcomes) },
-            RANDOM_DAILY_NAMES[43] to { testOutcomes -> checkMethodNameShortened(testOutcomes) },
-            RANDOM_DAILY_NAMES[44] to { testOutcomes -> checkVarNameShortened(testOutcomes) },
-            RANDOM_DAILY_NAMES[45] to { testOutcomes -> checkSetupAdded(testOutcomes) },
-            RANDOM_DAILY_NAMES[46] to { testOutcomes -> checkTearDownAdded(testOutcomes) },
-            RANDOM_DAILY_NAMES[47] to { testOutcomes -> checkGlobalVarRemoved(testOutcomes) },
-            RANDOM_DAILY_NAMES[48] to { testOutcomes -> checkExpSleepRemoved(testOutcomes) },
+            "runtc" to { testOutcomes -> checkRunTC(testOutcomes) },
+            "runts" to { testOutcomes -> checkRunTS(testOutcomes) },
+            "addAssert2Test" to { testOutcomes -> checkAssertAddedToTest(testOutcomes) },
+            "shortenTestWorkFlow" to { testOutcomes -> checkTestShortened(testOutcomes) },
+            "makeTestWorkFlowIndependent" to { testOutcomes -> checkTestIndependent(testOutcomes) },
+            "adaptTestName2Format" to { testOutcomes -> checkTestNameAdapted(testOutcomes) },
+            "shortenMethodName" to { testOutcomes -> checkMethodNameShortened(testOutcomes) },
+            "shortenVarName" to { testOutcomes -> checkVarNameShortened(testOutcomes) },
+            "addSetup" to { testOutcomes -> checkSetupAdded(testOutcomes) },
+            "addTearDown" to { testOutcomes -> checkTearDownAdded(testOutcomes) },
+            "removeGlobVar" to { testOutcomes -> checkGlobalVarRemoved(testOutcomes) },
+            "removeExpSleep" to { testOutcomes -> checkExpSleepRemoved(testOutcomes) },
         )
-
-
-
-
-
-
-
-
-
-        /**********************************TARGETED DAILIES**********************************/
-
-        private val TARGETED_DAILY_NAMES = listOf(
-            /************ DAILIES ABOUT LOCATORS ************/
-            "absolute",
-            "length",
-            "level",
-            "posPredicate",
-            "badPredicate",
-            "noIDOrXPath",
-            "broken",
-            /************ DAILIES ABOUT POS ************/
-            "missingCommandMethods",
-            "missingRetPOMethods",
-            "assertInPOMethods",
-            "nonCanonicalLocs",
-            "unusedPOMethods",
-            "outPOLocs",
-            "missingAncestorPOs"
-            /************ DAILIES ABOUT TESTS ************/ //TODO
-        )
-
-        private val ALL_TARGETED_DAILIES = mutableListOf(
-            /************ DAILIES ABOUT LOCATORS ************/
-            Daily(
-                TARGETED_DAILY_NAMES[0],
-                "Turns the following absolute XPath locators into relative ones",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[1],
-                "Reduce the length of the following XPath locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[2],
-                "Reduce the levels of the following XPath locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[3],
-                "Remove/Replace the positional predicates from the following XPath locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[4],
-                "Remove/Replace the weak predicates from the following XPath locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[5],
-                "Replace the following non-ID/XPath locators into ID/XPath ones",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[6],
-                "Repair the following broken locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            /************ DAILIES ABOUT POs ************/
-            Daily(
-                TARGETED_DAILY_NAMES[7],
-                "Add commands to interact with Web elements in the following Page Object methods",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[8],
-                "Add a Page Object as return type in the following Page Object methods",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[9],
-                "Move to test methods the assertions in the following Page Object methods",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[10],
-                "Transforms into canonical form the following locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[11],
-                "Make use of the following Page Object methods",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[12],
-                "Move to Page Object methods the following locators",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            Daily(
-                TARGETED_DAILY_NAMES[13],
-                "Add an ancestor and move cloned methods to the following Page Objects",
-                TARGETED_DAILY_XP,
-                null,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
-            ),
-            /************ DAILIES ABOUT TESTS ************/ //TODO
-        )
-
-
 
 
         private val TARGETED_DAILY_CHECKS: Map<String, (List<TestOutcome>) -> Int> = mapOf(
             /************ DAILIES ABOUT LOCATORS ************/
-            TARGETED_DAILY_NAMES[0] to { testOutcomes -> checkTargetedAbsoluteRemoved(testOutcomes) },
-            TARGETED_DAILY_NAMES[1] to { testOutcomes -> checkTargetedLengthReduced(testOutcomes) },
-            TARGETED_DAILY_NAMES[2] to { testOutcomes -> checkTargetedLevelReduced(testOutcomes) },
-            TARGETED_DAILY_NAMES[3] to { testOutcomes -> checkTargetedPosPredicateRemoved(testOutcomes) },
-            TARGETED_DAILY_NAMES[4] to { testOutcomes -> checkTargetedBadPredicateRemoved(testOutcomes) },
-            TARGETED_DAILY_NAMES[5] to { testOutcomes -> checkTargetedNoIDNoXpathChanged(testOutcomes) },
-            TARGETED_DAILY_NAMES[6] to { testOutcomes -> checkTargetedBrokenLocsRepaired(testOutcomes) },
+            "absolute" to { testOutcomes -> checkTargetedAbsoluteRemoved(testOutcomes) },
+            "length" to { testOutcomes -> checkTargetedLengthReduced(testOutcomes) },
+            "level" to { testOutcomes -> checkTargetedLevelReduced(testOutcomes) },
+            "posPredicate" to { testOutcomes -> checkTargetedPosPredicateRemoved(testOutcomes) },
+            "badPredicate" to { testOutcomes -> checkTargetedBadPredicateRemoved(testOutcomes) },
+            "noIDOrXPath" to { testOutcomes -> checkTargetedNoIDNoXpathChanged(testOutcomes) },
+            "broken" to { testOutcomes -> checkTargetedBrokenLocsRepaired(testOutcomes) },
             /************ DAILIES ABOUT POs ************/
-            TARGETED_DAILY_NAMES[7] to { testOutcomes -> checkCommandsAdded(testOutcomes) },
-            TARGETED_DAILY_NAMES[8] to { testOutcomes -> checkPOTypeReturned(testOutcomes) },
-            TARGETED_DAILY_NAMES[9] to { testOutcomes -> checkAssertsRemoved(testOutcomes) },
-            TARGETED_DAILY_NAMES[10] to { testOutcomes -> checkNonCanonicalLocsNowCanonical(testOutcomes) },
-            TARGETED_DAILY_NAMES[11] to { testOutcomes -> checkUnusedMethodsNowUsed(testOutcomes) },
-            TARGETED_DAILY_NAMES[12] to { testOutcomes -> checkLocsOutsidePOsRemoved(testOutcomes) },
-            //TARGETED_DAILY_NAMES[13] to { testOutcomes -> checkCommonAncestorsAdded(testOutcomes) }
-            /************ DAILIES ABOUT TESTS ************/ //TODO
+            "missingCommandMethods" to { testOutcomes -> checkCommandsAdded(testOutcomes) },
+            "missingRetPOMethods" to { testOutcomes -> checkPOTypeReturned(testOutcomes) },
+            "assertInPOMethods" to { testOutcomes -> checkAssertsRemoved(testOutcomes) },
+            "nonCanonicalLocs" to { testOutcomes -> checkNonCanonicalLocsNowCanonical(testOutcomes) },
+            "unusedPOMethods" to { testOutcomes -> checkUnusedMethodsNowUsed(testOutcomes) },
+            "outPOLocs" to { testOutcomes -> checkLocsOutsidePOsRemoved(testOutcomes) },
+            "missingAncestorPOs" to { testOutcomes -> checkCommonAncestorsAdded(testOutcomes) }
+            /************ DAILIES ABOUT TESTS ************/
         )
-
-
-
-
-
-        //dailies are assigned to user. initially, the usage mode is RANDOM so random dailies are assigned for setup
-        fun setupRandomDailies(userProfile: UserProfile) {
-            val dailies: List<Daily> = ALL_RANDOM_DAILIES.shuffled().take(DAILIES_PER_USER)
-            userProfile.assignDailies(dailies)
-        }
-
-        fun assignTargetedDailies(userProfile: UserProfile) {
-            val locAnalyzer = LocatorsAnalyzer()
-            val issuedLocatorsMap = locAnalyzer.findIssuesInLocators()
-            val poAnalyzer = PageObjectsAnalyzer()
-            val issuedPOsMap = poAnalyzer.findIssuesInPOs()
-            val currentTargetDailies = ALL_TARGETED_DAILIES.map { daily ->
-                val locatorsForDaily = issuedLocatorsMap[daily.name] ?: emptyList()
-                val posForDaily = issuedPOsMap[daily.name] ?: emptyList()//TODO: forse qui esplode perché non c'è la key
-                Daily(
-                    name = daily.name,
-                    description = daily.description,
-                    xp = daily.xp,
-                    target = daily.target,
-                    icon = daily.icon,
-                    type = daily.type,
-                    targetedLocators = locatorsForDaily,
-                    issuesInPOs = posForDaily
-                )
-            }
-            //remove all old targeted dailies as they will be updated by new check
-            userProfile.dailyProgresses.removeAll { dailyProgress ->
-                dailyProgress.daily.type.equals("targeted", ignoreCase = true)
-            }
-            userProfile.assignDailies(currentTargetDailies)
-            GUIManager.updateGUI(userProfile, false)
-        }
-
-        fun reassignRandomDailiesFromExpire(userProfile: UserProfile){
-            userProfile.dailyProgresses.removeAll { dailyProgress ->
-                dailyProgress.daily.type.equals("random", ignoreCase = true)
-            }
-            userProfile.timestamp = System.currentTimeMillis()//this to assign a new expiration time for new dailies
-            setupRandomDailies(userProfile)//note that even the same expired dailies could be reassigned
-            GUIManager.updateGUI(userProfile, false)
-            GamificationManager.updateUserProfile(userProfile)
-        }
-
-        fun reassignRandomDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
-            //find all dailies but the ones already assigned to user
-            val availableDailies = ALL_RANDOM_DAILIES.filter { d ->
-                userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
-            }
-            //a new daily is randomly selected with discarded set to true (only 1 discard within 24h is possible)
-            val newDaily: Daily = availableDailies.shuffled().first()
-            val newDailyProgress = DailyProgress(
-                newDaily,
-                progress = 0,
-                discarded = true
-            )
-            userProfile.dailyProgresses.add(newDailyProgress) //add new daily
-            userProfile.dailyProgresses.removeIf { it.daily == daily } //remove discarded daily
-            GamificationManager.updateUserProfile(userProfile) //update user profile
-            return newDailyProgress
-        }
-
-        fun getIconFromName(name: String): String {
-            return DAILY_NAME_TO_ICON[name] ?: ""
-        }
-
-        fun getDescriptionFromName(name: String): String {
-            return DAILY_NAME_TO_DESCRIPTION[name] ?: ""
-        }
-
-        fun getTargetFromName(name: String): Int {
-            return DAILY_NAME_TO_TARGET[name] ?: 0
-        }
-
-        fun getXPFromName(name: String): Int {
-            return DAILY_NAME_TO_XP[name] ?: 0
-        }
-
-        fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>> {
-            val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
-
-            //find the dailies to update according to gaming mode
-            val dailiesToUpdate = when (GamificationManager.mode) {
-                GamificationManager.DailyAssignmentMode.RANDOM -> ALL_RANDOM_DAILIES
-                GamificationManager.DailyAssignmentMode.TARGETED -> ALL_TARGETED_DAILIES
-                else -> emptyList() //TODO
-            }
-            //check the daily progress according to gaming mode
-            val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
-            copyOfDailyProgresses.forEach { dp ->
-                dailiesToUpdate.find { it.name == dp.daily.name }?.let {
-                    val progress = when (GamificationManager.mode) {
-                        GamificationManager.DailyAssignmentMode.RANDOM -> RANDOM_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
-                        GamificationManager.DailyAssignmentMode.TARGETED -> TARGETED_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
-                        GamificationManager.DailyAssignmentMode.INCLUSIVE -> TODO()
-                    }
-                    if (progress!! > 0) {
-                        val dailyProgress = update(userProfile, it, progress)
-                        progresses.add(dailyProgress)  //TODO:  add a more sophisticated check/return type if a more sophisticated notification must be provided
-                    }
-                }
-            }
-            return progresses //this to keep track of any changes and update the GUI
-        }
-
-        private fun update(userProfile: UserProfile, daily: Daily, progress: Int): Pair<Int, Daily?> {
-            var gainedXP = 0 //to track the gained xp
-            var involvedDaily: Daily? = null //to track the involved daily
-
-            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM) {
-                val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
-                dailyProgress?.let { dp ->
-                    dp.progress += progress
-                    if (dp.progress >= dp.daily.target!!) { // if the daily has been completed, assign xp and remove it from list
-                        gainedXP = dp.daily.xp
-                        involvedDaily = dp.daily
-                        userProfile.currentXP += gainedXP
-                        userProfile.dailyProgresses.removeIf { it.daily.name == dp.daily.name }
-                    }
-                }
-            }
-            //since targeted dailies might involve a large number of locators, the xp is given for each (counted by progress)
-            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
-                gainedXP = daily.xp * progress
-
-                //TODO: remove the following, used just for testing
-                //gainedXP = 50000000
-
-
-                involvedDaily = daily
-                userProfile.currentXP += gainedXP
-            }
-            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.INCLUSIVE) {
-                //TODO
-            }
-            return Pair(gainedXP, involvedDaily)
-        }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1015,21 +771,23 @@ class DailyManager {
         //that were once (POsOld) without Selenium commands and now have them (POsNew)
         private fun checkCommandsAdded(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val passedCalls = testOutcome.poMethodCallsPassed
-                for (poCall in passedCalls) {
-                    //get PO related to PO method call, old and new
-                    val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
-                    val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
-                    //get PO method related to PO method call, old and new
-                    val oldMethod = oldPO?.methods?.find { it.name == poCall.methodName }
-                    val newMethod = newPO?.methods?.find { it.name == poCall.methodName }
-                    //count methods that now have Selenium commands that once had not
-                    val hadNoSeleniumCommands = oldMethod?.seleniumCommands.isNullOrEmpty()
-                    val hasNewSeleniumCommands = newMethod?.seleniumCommands?.isNotEmpty() == true
-                    if (hadNoSeleniumCommands && hasNewSeleniumCommands)
-                        count++
-                }
+            //retrieve passed methods from all tests, keeping no duplicates
+            val passedMethods = testOutcomes
+                .flatMap { it.poMethodCallsPassed }
+                .map { it.methodName }
+                .toSet()
+            for (methodName in passedMethods) {
+                //get old/new associated PO
+                val oldPO = TestQuestAction.POsOld.find { po -> po.methods.any { it.name == methodName } }
+                val newPO = TestQuestAction.POsNew.find { po -> po.methods.any { it.name == methodName } }
+                //get old/new method version
+                val oldMethod = oldPO?.methods?.find { it.name == methodName }
+                val newMethod = newPO?.methods?.find { it.name == methodName }
+                //count methods when they previously had no commands and that now have so
+                val hadNoSeleniumCommands = oldMethod?.seleniumCommands.isNullOrEmpty()
+                val hasNewSeleniumCommands = newMethod?.seleniumCommands?.isNotEmpty() == true
+                if (hadNoSeleniumCommands && hasNewSeleniumCommands)
+                    count++
             }
             return count
         }
@@ -1038,24 +796,30 @@ class DailyManager {
         //that had once (POsOld) no return type and commands and now have a PageObject as return type (POsNew)
         private fun checkPOTypeReturned(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val passedCalls = testOutcome.poMethodCallsPassed
-                for (poCall in passedCalls) {
-                    //get PO related to PO method call, old and new
-                    val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
-                    val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
-                    //get PO method related to PO method call, old and new
-                    val oldMethod = oldPO?.methods?.find { it.name == poCall.methodName }
-                    val newMethod = newPO?.methods?.find { it.name == poCall.methodName }
-                    //count methods that now have PageObject return types that once had void
-                    val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
-                    val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
-                    if (wasVoid && isNowPageObject)
-                        count++
-                }
+            //retrieve passed methods from all tests, keeping no duplicates
+            val passedMethods = testOutcomes
+                .flatMap { it.poMethodCallsPassed }
+                .map { it.methodName }
+                .toSet()
+            for (methodName in passedMethods) {
+                //get old/new associated PO
+                val oldPO = TestQuestAction.POsOld.find { po -> po.methods.any { it.name == methodName } }
+                val newPO = TestQuestAction.POsNew.find { po -> po.methods.any { it.name == methodName } }
+                //get old/new method version
+                val oldMethod = oldPO?.methods?.find { it.name == methodName }
+                val newMethod = newPO?.methods?.find { it.name == methodName }
+                //count methods that once had void as return type but that now have a PO
+                val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
+                val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
+                if (wasVoid && isNowPageObject)
+                    count++
             }
             return count
         }
+
+
+
+
 
         //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
         //that had once (POsOld) assertions and now have not (POsNew)
@@ -1133,14 +897,63 @@ class DailyManager {
         }
 
 
+        private fun checkCommonAncestorsAdded(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            //find common methods from POs without ancestors
+            val oldCommonMethods = mutableSetOf<String>()
+            for (po in TestQuestAction.POsOld)
+                if (po.ancestors.isEmpty())
+                    for (method in po.methods)
+                        if (TestQuestAction.POsOld.any { it != po && it.methods.contains(method) && it.ancestors.isEmpty() })
+                            oldCommonMethods.add(method.name)
+            //check that common methods (passed only) are now in common ancestor
+            for (outcome in testOutcomes) {
+                for (call in outcome.poMethodCallsPassed) {
+                    val methodName = call.methodName
+                    //if method was common
+                    if (methodName in oldCommonMethods) {
+                        //check that the PO now has no more that method, which is instead inside ancestor
+                        val poWithAncestor = TestQuestAction.POsNew.find { po ->
+                            po.methods.none { it.name == methodName } &&
+                                    po.ancestors.isNotEmpty() &&
+                                    po.ancestors.any { ancestorName ->
+                                        val ancestorPO = TestQuestAction.POsNew.find { it.name == ancestorName }
+                                        ancestorPO?.methods?.any { it.name == methodName } == true
+                                    } &&
+                                    TestQuestAction.POsOld.any { oldPo ->
+                                        oldPo.ancestors.isEmpty() &&
+                                                oldPo.name == po.name &&
+                                                oldPo.methods.any { it.name == methodName }
+                                    }
+                        }
 
-        //TODO: questo seguente va implementato in modo che consideri non solo i PO ma anche il fatto di aver spostato metodi duplicati
-        //TARGETED_DAILY_NAMES[13] to { testOutcomes -> checkCommonAncestorsAdded(testOutcomes) }*/
+
+                        if (poWithAncestor != null) {
+                            // 4. Verifica che il metodo NON sia più nei vecchi PO senza antenati
+                            val stillInOldPOs = TestQuestAction.POsOld.any { po ->
+                                po.ancestors.isEmpty() && po.methods.any { it.name == methodName }
+                            }
+                            if (!stillInOldPOs) {
+                                count++
+                            }
+                        }
+                    }
+                }
+            }
+
+            return count
+        }
 
 
 
 
-        /******* TARGETED DAILY CHECKS ABOUT TESTS *******/ //TODO
+
+        /******* TARGETED DAILY CHECKS ABOUT TESTS *******/
+
+
+
+
+
 
 
 
@@ -1629,120 +1442,145 @@ class DailyManager {
 
 
         /******* RANDOM DAILY CHECKS ABOUT PAGE OBJECTS *******/
-        private fun checkNewPO(testOutcomes: List<TestOutcome>): Int {
-            val oldPONames = TestQuestAction.POsOld.map { it.name }.toSet()
-            return if (TestQuestAction.POsNew.any { it.name !in oldPONames }) 1 else 0
-        }
 
-        private fun checkNewPOMethod(testOutcomes: List<TestOutcome>): Int {
-            for (testOutcome in testOutcomes) {
+        private fun checkPOAdded(testOutcomes: List<TestOutcome>): Int {
+            val oldPONames = TestQuestAction.POsOld.map { it.name }.toSet()
+            for (testOutcome in testOutcomes)
+                //check from passed PO calls any call that is related to a new PO
                 for (poCall in testOutcome.poMethodCallsPassed) {
-                    val oldCalls = TestQuestAction.POCallsOld[testOutcome.testName]?.map { it.methodName } ?: emptyList()
-                    if (poCall.methodName !in oldCalls)
+                    val poName = poCall.pageObject
+                    if (poName !in oldPONames)
                         return 1
                 }
-            }
             return 0
         }
 
-        private fun checkNewLocsInPOMethods(testOutcomes: List<TestOutcome>): Int {
-            return testOutcomes
-                .filter { it.className.endsWith("Page.java") }
-                .sumOf { outcome ->
-                    outcome.locatorsPassed.count { it !in outcome.locatorsOld }
+        private fun checkPOMethodAdded(testOutcomes: List<TestOutcome>): Int {
+            for (testOutcome in testOutcomes)
+                //check from passed PO calls any call that is related to a new method
+                for (poCall in testOutcome.poMethodCallsPassed) {
+                    if (TestQuestAction.POsOld
+                            .find { it.name == poCall.pageObject }
+                            ?.methods
+                            ?.none { it.name == poCall.methodName } != false) {
+                        return 1
+                    }
                 }
+            return 0
         }
 
-        private fun checkMovedLocsFromTestsToPOMethods(testOutcomes: List<TestOutcome>): Int {
-            var movedLocatorsCount = 0
-            for (testOutcome in testOutcomes) {
-                val passedLocators = testOutcome.locatorsPassed
-                for (passedLocator in passedLocators) {
-                    val matchingOldLocator = testOutcome.locatorsOld.find { oldLocator ->
-                        passedLocator.compareThisLocInPOWithOldInTest(oldLocator) //we compare new loc that changed class with previous version
+        private fun checkLocsInPOAdded(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            //check from passed locs all those that are in PO and new
+            for (passedLoc in passedLocs)
+                if (passedLoc !in TestQuestAction.locatorsOld && passedLoc.className.endsWith("Page.java"))
+                    count++
+            return count
+        }
+
+        private fun checkLocsFromTestsToPOMoved(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            //check from passed locs all those that are moved from tests to PO
+            for (passedLoc in passedLocs) {
+                    val matchingOldLocator = TestQuestAction.locatorsOld.find { oldLocator ->
+                        passedLoc.compareThisLocInPOWithOldInTest(oldLocator) //we compare new loc that changed class with previous version
                                                                         //as some key attributes changed, basic equal cannot be used
                     }
                     if (matchingOldLocator != null)
-                        movedLocatorsCount++
-                }
+                        count++
             }
-            return movedLocatorsCount
+            return count
         }
 
-        private fun checkReturnedPOInPOMethod(testOutcomes: List<TestOutcome>): Int {
-            val oldPOMethods = TestQuestAction.POsOld.associateBy(
-                { po -> po.name },
-                { po -> po.methods.associateBy({ method -> method.name }, { method -> method.returnType }) }
-            )
+        private fun checkPOReturnTypeAdded(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
+                //check passed methods that had void as old return type and PageObject as new
                 for (passedMethod in testOutcome.poMethodCallsPassed) {
-                    val oldReturnType = oldPOMethods[passedMethod.pageObject]?.get(passedMethod.methodName)
+                    val oldReturnType = TestQuestAction.POsOld
+                        .find { it.name == passedMethod.pageObject }
+                        ?.methods?.find { it.name == passedMethod.methodName }
+                        ?.returnType
                     val newReturnType = TestQuestAction.POsNew
                         .find { it.name == passedMethod.pageObject }
                         ?.methods?.find { it.name == passedMethod.methodName }
                         ?.returnType
-                    if (newReturnType?.endsWith("Page") == true && (oldReturnType == null || !oldReturnType.endsWith("Page")))
+                    if (newReturnType!!.endsWith("Page") && oldReturnType.equals("void"))
                         return 1
                 }
             }
             return 0
         }
 
-        private fun checkMovedAssertsFromPOMethodToTests(testOutcomes: List<TestOutcome>): Int {
-            var movedAssertionsCount = 0
-            for (testOutcome in testOutcomes) {
-                for (passedMethod in testOutcome.poMethodCallsPassed) {
-                    val oldAssertions = TestQuestAction.POsOld
-                        .find { it.name == passedMethod.pageObject }
-                        ?.methods?.find { it.name == passedMethod.methodName }
-                        ?.assertionLines?.size ?: 0
-                    val newAssertions = TestQuestAction.POsNew
-                        .find { it.name == passedMethod.pageObject }
-                        ?.methods?.find { it.name == passedMethod.methodName }
-                        ?.assertionLines?.size ?: 0
-                    if (oldAssertions > newAssertions) {
-                        movedAssertionsCount += (oldAssertions - newAssertions)
-                    }
-                }
+        private fun checkAssertsFromPOToTestsMoved(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            //retrieve passed methods from all tests, keeping no duplicates
+            val passedMethods = testOutcomes
+                .flatMap { it.poMethodCallsPassed }
+                .map { it }
+                .toSet()
+            //count removed asserts from passed methods in PageObjects
+            for (passedMethod in passedMethods) {
+                val oldAssertions = TestQuestAction.POsOld
+                    .find { it.name == passedMethod.pageObject }
+                    ?.methods?.find { it.name == passedMethod.methodName }
+                    ?.assertionLines?.size ?: 0
+                val newAssertions = TestQuestAction.POsNew
+                    .find { it.name == passedMethod.pageObject }
+                    ?.methods?.find { it.name == passedMethod.methodName }
+                    ?.assertionLines?.size ?: 0
+                if (oldAssertions > newAssertions)
+                    count += (oldAssertions - newAssertions)
             }
-            return movedAssertionsCount
+            return count
         }
 
-        private fun checkNowCanonicalLocs(testOutcomes: List<TestOutcome>): Int {
-            var adaptedLocatorsCount = 0
-            for (testOutcome in testOutcomes) {
-                val passedLocators = testOutcome.locatorsPassed
-                for (passedLocator in passedLocators) {
-                    val matchingOldLocator = testOutcome.locatorsOld
-                        .find { oldLocator -> passedLocator.compareThisLocWithLocInNonCanonicalForm(oldLocator) } //we compare new loc that changed class with previous version
-                                                                                                        //as some key attributes changed, basic equal cannot be used
-                    if (matchingOldLocator != null)
-                        adaptedLocatorsCount++
-                }
+        private fun checkNonCanonicalLocsChanged(testOutcomes: List<TestOutcome>): Int {
+            var count = 0
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            //check from passed locs all those that are changed from noncanonical to canonical
+            for (passedLoc in passedLocs) {
+                val oldNonCanonicalLoc = TestQuestAction.locatorsOld.find { oldLocator ->
+                    passedLoc.compareThisLocWithLocInNonCanonicalForm(oldLocator) } //we compare new loc that changed class with previous version
+                                                                                    //as some key attributes changed, basic equal cannot be used
+                if (oldNonCanonicalLoc != null)
+                    count++
             }
-            return adaptedLocatorsCount
+            return count
         }
 
-        private fun checkInteractionsWithLocsInPOMethods(testOutcomes: List<TestOutcome>): Int {
+        private fun checkSeleniumCommandsAdded(testOutcomes: List<TestOutcome>): Int {
             var oldInteractions = 0
             var newInteractions = 0
-            for (testOutcome in testOutcomes) {
-                val passedMethods = testOutcome.poMethodCallsPassed
-                for (passedMethod in passedMethods) {
-                    oldInteractions += TestQuestAction.POsOld
-                        .flatMap { it.methods }
-                        .filter { it.name == passedMethod.methodName }
-                        .sumOf { it.seleniumCommands.size }
-                    newInteractions += TestQuestAction.POsNew
-                        .flatMap { it.methods }
-                        .filter { it.name == passedMethod.methodName }
-                        .sumOf { it.seleniumCommands.size }
-                }
+            //retrieve passed methods from all tests, keeping no duplicates
+            val passedMethods = testOutcomes
+                .flatMap { it.poMethodCallsPassed }
+                .map { it }
+                .toSet()
+            //check diff in interactions from all passed methods
+            for (passedMethod in passedMethods) {
+                oldInteractions += TestQuestAction.POsOld
+                    .filter { it.name == passedMethod.pageObject } //this to count this specific method for this specific page object
+                    .flatMap { it.methods }
+                    .filter { it.name == passedMethod.methodName}
+                    .sumOf { it.seleniumCommands.size }
+                newInteractions += TestQuestAction.POsNew
+                    .filter { it.name == passedMethod.pageObject } //this to count this specific method for this specific page object
+                    .flatMap { it.methods }
+                    .filter { it.name == passedMethod.methodName }
+                    .sumOf { it.seleniumCommands.size }
             }
             return newInteractions - oldInteractions
         }
 
-        private fun checkNewAncestorPO(testOutcomes: List<TestOutcome>): Int {
+        private fun checkAncestorPOAdded(testOutcomes: List<TestOutcome>): Int {
             return if (TestQuestAction.POsNew.any { newPO ->
                     val oldPO = TestQuestAction.POsOld.find { it.name == newPO.name }
                     oldPO != null && oldPO.ancestors.size < newPO.ancestors.size
@@ -1753,8 +1591,8 @@ class DailyManager {
             }
         }
 
-        private fun checkMovedCommonMethodToAncestorPO(testOutcomes: List<TestOutcome>): Int {
-            val movedMethods = mutableSetOf<String>()
+        private fun checkCommonMethodMoved(testOutcomes: List<TestOutcome>): Int {
+            val commonMethodsMoved = mutableSetOf<String>()
             for (i in 0 until TestQuestAction.POsOld.size) {
                 for (j in i + 1 until TestQuestAction.POsOld.size) {
                     val poOld1 = TestQuestAction.POsOld[i]
@@ -1765,7 +1603,7 @@ class DailyManager {
                     //find common methods
                     val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
                     for (method in commonMethods) {
-                        //check no common ancestors had that method
+                        //check no common ancestors had that method before changes
                         if (commonAncestorsOld.none { it.methods.contains(method) }) {
                             //find new versions of the compared POs
                             val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
@@ -1773,12 +1611,12 @@ class DailyManager {
                             if (poNew1 != null && poNew2 != null) {
                                 //check that method is no more present in POs
                                 if (!poNew1.methods.contains(method) && !poNew2.methods.contains(method)) {
-                                    //find common ancestors
+                                    //find common ancestors NEW
                                     val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
                                     val commonAncestorsNew = TestQuestAction.POsNew.filter { it.name in commonAncestorsNewNames }
                                     //check a common ancestor now has that method
                                     if (commonAncestorsNew.any { it.methods.contains(method) }) {
-                                        movedMethods.add(method.name)
+                                        commonMethodsMoved.add(method.name)
                                     }
                                 }
                             }
@@ -1786,14 +1624,14 @@ class DailyManager {
                     }
                 }
             }
-            //check if any of these moved method is passed wrt a test
+            //check if any of these moved common methods is passed wrt a test
             for (testOutcome in testOutcomes)
-                if (testOutcome.poMethodCallsPassed.any { it.methodName in movedMethods })
+                if (testOutcome.poMethodCallsPassed.any { it.methodName in commonMethodsMoved })
                     return 1
             return 0
         }
 
-        private fun checkCalledPOMethod(testOutcomes: List<TestOutcome>): Int {
+        private fun checkPOMethodCalled(testOutcomes: List<TestOutcome>): Int {
             for (outcome in testOutcomes) {
                 //find PO method calls for each test. if new calls are more in any test (i.e., a method call was added), 1 is returned
                 val oldCalledMethods = TestQuestAction.POCallsOld[outcome.testName]?.toSet() ?: emptySet()
@@ -1809,10 +1647,10 @@ class DailyManager {
             return 0
         }
 
-        private fun checkCalledUnusedPOMethod(testOutcomes: List<TestOutcome>): Int {
+        private fun checkUnusedPOMethodCalled(testOutcomes: List<TestOutcome>): Int {
             val oldCalledMethods = mutableSetOf<PageObjectCall>()
             val newCalledMethods = mutableSetOf<PageObjectCall>()
-            //collect all old and new PO calls
+            //collect old and new PO calls from all tests
             for (outcome in testOutcomes) {
                 TestQuestAction.POCallsOld[outcome.testName]?.let { oldCalledMethods.addAll(it) }
                 TestQuestAction.POCallsNew[outcome.testName]?.let { newCalledMethods.addAll(it) }
@@ -1857,7 +1695,6 @@ class DailyManager {
             return 1
         }
 
-        //TODO: these must be completed
         private fun checkAssertAddedToTest(testOutcomes: List<TestOutcome>): Int {
             return 1
         }
@@ -1939,6 +1776,150 @@ class DailyManager {
 
         private fun countJavaScriptReferences(locatorValue: String): Int {
             return GamificationManager.BAD_JS.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
+        }
+
+
+
+
+
+
+
+
+        //dailies are assigned to user. initially, the usage mode is RANDOM so random dailies are assigned for setup
+        fun setupRandomDailies(userProfile: UserProfile) {
+            val dailies: List<Daily> = ALL_RANDOM_DAILIES.shuffled().take(DAILIES_PER_USER)
+            userProfile.assignDailies(dailies)
+        }
+
+        fun assignTargetedDailies(userProfile: UserProfile) {
+            val locAnalyzer = LocatorsAnalyzer()
+            val issuedLocatorsMap = locAnalyzer.findIssuesInLocators()
+            val poAnalyzer = PageObjectsAnalyzer()
+            val issuedPOsMap = poAnalyzer.findIssuesInPOs()
+            val currentTargetDailies = ALL_TARGETED_DAILIES.map { daily ->
+                val locatorsForDaily = issuedLocatorsMap[daily.name] ?: emptyList()
+                val posForDaily = issuedPOsMap[daily.name] ?: emptyList()//TODO: forse qui esplode perché non c'è la key
+                Daily(
+                    name = daily.name,
+                    description = daily.description,
+                    xp = daily.xp,
+                    target = daily.target,
+                    icon = daily.icon,
+                    type = daily.type,
+                    targetedLocators = locatorsForDaily,
+                    issuesInPOs = posForDaily
+                )
+            }
+            //remove all old targeted dailies as they will be updated by new check
+            userProfile.dailyProgresses.removeAll { dailyProgress ->
+                dailyProgress.daily.type.equals("targeted", ignoreCase = true)
+            }
+            userProfile.assignDailies(currentTargetDailies)
+            GUIManager.updateGUI(userProfile, false)
+        }
+
+        fun reassignRandomDailiesFromExpire(userProfile: UserProfile){
+            userProfile.dailyProgresses.removeAll { dailyProgress ->
+                dailyProgress.daily.type.equals("random", ignoreCase = true)
+            }
+            userProfile.timestamp = System.currentTimeMillis()//this to assign a new expiration time for new dailies
+            setupRandomDailies(userProfile)//note that even the same expired dailies could be reassigned
+            GUIManager.updateGUI(userProfile, false)
+            GamificationManager.updateUserProfile(userProfile)
+        }
+
+        fun reassignRandomDailyFromDiscard(userProfile: UserProfile, daily: Daily): DailyProgress {
+            //find all dailies but the ones already assigned to user
+            val availableDailies = ALL_RANDOM_DAILIES.filter { d ->
+                userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
+            }
+            //a new daily is randomly selected with discarded set to true (only 1 discard within 24h is possible)
+            val newDaily: Daily = availableDailies.shuffled().first()
+            val newDailyProgress = DailyProgress(
+                newDaily,
+                progress = 0,
+                discarded = true
+            )
+            userProfile.dailyProgresses.add(newDailyProgress) //add new daily
+            userProfile.dailyProgresses.removeIf { it.daily == daily } //remove discarded daily
+            GamificationManager.updateUserProfile(userProfile) //update user profile
+            return newDailyProgress
+        }
+
+        fun getIconFromName(name: String): String {
+            return DAILY_NAME_TO_ICON[name] ?: ""
+        }
+
+        fun getDescriptionFromName(name: String): String {
+            return DAILY_NAME_TO_DESCRIPTION[name] ?: ""
+        }
+
+        fun getTargetFromName(name: String): Int {
+            return DAILY_NAME_TO_TARGET[name] ?: 0
+        }
+
+        fun getXPFromName(name: String): Int {
+            return DAILY_NAME_TO_XP[name] ?: 0
+        }
+
+        fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>> {
+            val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
+
+            //find the dailies to update according to gaming mode
+            val dailiesToUpdate = when (GamificationManager.mode) {
+                GamificationManager.DailyAssignmentMode.RANDOM -> ALL_RANDOM_DAILIES
+                GamificationManager.DailyAssignmentMode.TARGETED -> ALL_TARGETED_DAILIES
+                else -> emptyList() //TODO
+            }
+            //check the daily progress according to gaming mode
+            val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
+            copyOfDailyProgresses.forEach { dp ->
+                dailiesToUpdate.find { it.name == dp.daily.name }?.let {
+                    val progress = when (GamificationManager.mode) {
+                        GamificationManager.DailyAssignmentMode.RANDOM -> RANDOM_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
+                        GamificationManager.DailyAssignmentMode.TARGETED -> TARGETED_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
+                        GamificationManager.DailyAssignmentMode.INCLUSIVE -> TODO()
+                    }
+                    if (progress!! > 0) {
+                        val dailyProgress = update(userProfile, it, progress)
+                        progresses.add(dailyProgress)  //TODO:  add a more sophisticated check/return type if a more sophisticated notification must be provided
+                    }
+                }
+            }
+            return progresses //this to keep track of any changes and update the GUI
+        }
+
+        private fun update(userProfile: UserProfile, daily: Daily, progress: Int): Pair<Int, Daily?> {
+            var gainedXP = 0 //to track the gained xp
+            var involvedDaily: Daily? = null //to track the involved daily
+
+            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM) {
+                val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
+                dailyProgress?.let { dp ->
+                    dp.progress += progress
+                    if (dp.progress >= dp.daily.target!!) { // if the daily has been completed, assign xp and remove it from list
+                        gainedXP = dp.daily.xp
+                        involvedDaily = dp.daily
+                        userProfile.currentXP += gainedXP
+                        userProfile.dailyProgresses.removeIf { it.daily.name == dp.daily.name }
+                    }
+                }
+            }
+            //since targeted dailies might involve a large number of locators, the xp is given for each (counted by progress)
+            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
+                gainedXP = daily.xp * progress
+
+                //TODO: remove the following, used just for testing
+                //gainedXP = 50000000
+
+
+                involvedDaily = daily
+                userProfile.currentXP += gainedXP
+            }
+            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.INCLUSIVE) {
+                //TODO
+            }
+            return Pair(gainedXP, involvedDaily)
         }
 
 

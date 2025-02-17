@@ -5,7 +5,7 @@ import testquest.TestQuestAction
 import utils.UserProgressFileHandler
 
 
-//this class is used to find problematic locators to fix with targeted dailies
+//this class is used to find problematic POs to fix with targeted dailies
 class PageObjectsAnalyzer {
 
     companion object {
@@ -173,7 +173,7 @@ class PageObjectsAnalyzer {
             // Mutable map to track the most recent PO by hash
             val fixedPOsMap = mutableMapOf<Int, Any>()
 
-            // Find issued locators that are now fixed and pending (i.e., no more present in targetedIssuedLocators)
+            // Find issued pos that are now fixed and pending (i.e., no more present in targetedIssuedLocators)
             initialPOs.forEach { initialPO ->
                 val wasFixed = issuedPOs.none { it.hashCode() == initialPO.hashCode() }
                 if (wasFixed)

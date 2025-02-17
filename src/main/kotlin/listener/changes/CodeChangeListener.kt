@@ -78,8 +78,6 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
 
                     //updates locators/POs/PO calls from classes named as _Test.java or _Page.java, and compute new fragility scores
                     val extractor = LocatorsExtractor()
-                    //TestQuestAction.locatorsOldStatic = TestQuestAction.locatorsNewStatic
-                    //TestQuestAction.locatorsNewStatic = testFilePaths.flatMap { extractor.parseLocators(it) }
                     TestQuestAction.locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
                     val updatedScores = loadLocatorScores()
                     locatorTooltipListeners.values.forEach { listener ->
@@ -88,15 +86,12 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
 
                     //extract PageObjects (i.e., from classes named as _Page.java)
                     val poExtractor = PageObjectExtractor()
-                    //TestQuestAction.POsOld = TestQuestAction.POsNew
                     TestQuestAction.POsNew = testFilePaths
                         .filter { it.fileName.toString().endsWith("Page.java") }
-                        //.map { po -> poExtractor.parsePageObject(po, TestQuestAction.locatorsNewStatic) }
                         .map { po -> poExtractor.parsePageObject(po, TestQuestAction.locatorsNew) }
 
                     //extract PageObject calls from Tests (if any, from classes named as _Test.java)
                     val poCallsExtractor = PageObjectCallExtractor()
-                    //TestQuestAction.POCallsOld = TestQuestAction.POCallsNew
                     TestQuestAction.POCallsNew = testFilePaths
                         .filter { it.fileName.toString().endsWith("Test.java") }
                         .flatMap { fp ->
@@ -123,12 +118,10 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
     private fun loadLocatorScores(): Map<Locator, Double> {
         val locEstimator = LocatorsFragilityCalculator()
         val locatorScores = mutableMapOf<Locator, Double>()
-        //for (locator in TestQuestAction.locatorsNewStatic) {
         for (locator in TestQuestAction.locatorsNew) {
             val score = locEstimator.calculateFragility(locator)
             locatorScores[locator] = score
         }
-        //val estimation = locEstimator.calculateOverallFragility(TestQuestAction.locatorsNewStatic)
         val estimation = locEstimator.calculateOverallFragility(TestQuestAction.locatorsNew)
         GUIManager.showOverallLocsFragilityScore(estimation)
         GUIManager.showLocatorScores(proj, locatorScores)
