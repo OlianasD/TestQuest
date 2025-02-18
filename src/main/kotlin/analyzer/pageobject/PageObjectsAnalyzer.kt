@@ -1,6 +1,7 @@
 package analyzer.pageobject
 
 
+import extractor.pageobject.MethodInfo
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
 
@@ -49,13 +50,14 @@ class PageObjectsAnalyzer {
     //find POs that present issues in the test suite (i.e., targeted as they target the actual issues)
     fun findIssuesInPOs(): MutableMap<String, List<Any>> {
         previousTargetedIssuedPOs = targetedIssuedPOs.toMap() //copy map to keep track of problems fixed BEFORE any new problem found
-        calculateMissingCommands()
-        calculateMissingReturnedPOs()
+        calculateEmptyPageObjects()
+        calculateMissingCommandsMethods()
+        calculateMissingReturnedPOMethods()
         calculateAssertionsInPOs()
         calculateNonCanonicalLocators()
         calculateUnusedPOMethods()
         calculateLocsOutPOs()
-        calculateMissingCommonAncestors()
+        calculateDuplicatedPOMethods()
 
         //load fixedAndPending from file, if exist
         val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingPOsData()
@@ -87,7 +89,14 @@ class PageObjectsAnalyzer {
 
 
 
-    private fun calculateMissingCommands() {
+
+    private fun calculateEmptyPageObjects() {
+        val emptyPOs = POs.filter { it.methods.isEmpty() }
+        if (emptyPOs.isNotEmpty())
+            targetedIssuedPOs["emptyPageObjects"] = emptyPOs
+    }
+
+    private fun calculateMissingCommandsMethods() {
         val missingCommandsMethods = POs.flatMap { po ->
             po.methods.filter { it.seleniumCommands.isEmpty() }.map { it }
         }
@@ -95,7 +104,7 @@ class PageObjectsAnalyzer {
             targetedIssuedPOs["missingCommandMethods"] = missingCommandsMethods
     }
 
-    private fun calculateMissingReturnedPOs() {
+    private fun calculateMissingReturnedPOMethods() {
         val voidReturnMethods = POs.flatMap { po ->
             po.methods.filter { it.returnType.equals("void", ignoreCase = true) }.map { it }
         }
@@ -104,19 +113,17 @@ class PageObjectsAnalyzer {
     }
 
     private fun calculateAssertionsInPOs() {
-        val includingAssertionsMethods = POs.flatMap { po ->
-            po.methods.filter { it.assertionLines.isNotEmpty() }.map { it }
+        val assertionsInPOs = POs.flatMap { po ->
+            po.methods.flatMap { it.assertionLines }
         }
-        if (includingAssertionsMethods.isNotEmpty()) {
-            targetedIssuedPOs["assertInPOMethods"] = includingAssertionsMethods
-        }
+        if (assertionsInPOs.isNotEmpty())
+            targetedIssuedPOs["assertInPOs"] = assertionsInPOs
     }
 
     private fun calculateNonCanonicalLocators() {
         val nonCanonicalLocators = POs.flatMap { it.nonCanonicalLocators }
-        if (nonCanonicalLocators.isNotEmpty()) {
+        if (nonCanonicalLocators.isNotEmpty())
             targetedIssuedPOs["nonCanonicalLocs"] = nonCanonicalLocators
-        }
     }
 
     private fun calculateUnusedPOMethods() {
@@ -127,9 +134,8 @@ class PageObjectsAnalyzer {
         val unusedMethods = POs.flatMap { po ->
             po.methods.filter { method -> (po.name to method.name) !in usedMethods }
         }
-        if (unusedMethods.isNotEmpty()) {
+        if (unusedMethods.isNotEmpty())
             targetedIssuedPOs["unusedPOMethods"] = unusedMethods
-        }
     }
 
     private fun calculateLocsOutPOs() {
@@ -138,21 +144,19 @@ class PageObjectsAnalyzer {
             targetedIssuedPOs["outPOLocs"] = invalidClassLocators
     }
 
-    //compute POs with same methods but no common ancestors to store the same methods
-    private fun calculateMissingCommonAncestors() {
-        val POsWithMissingCommonAncestors = POs.filter { po1 ->
-            POs.any { po2 ->
-                po1 != po2 &&
-                        po1.methods.any { method1 ->
-                            po2.methods.any { method2 ->
-                                method1 == method2
-                            }
-                        } && po1.ancestors.none { it in po2.ancestors }
-            }
-        }
-        if (POsWithMissingCommonAncestors.isNotEmpty())
-            targetedIssuedPOs["missingAncestorPOs"] = POsWithMissingCommonAncestors
+    //compute duplicated methods that should be moved to common ancestor
+    private fun calculateDuplicatedPOMethods() {
+        val clonedMethods = mutableSetOf<MethodInfo>()
+        for (po1 in POs)
+            for (po2 in POs)
+                if (po1 != po2) {
+                    val commonMethods = po1.methods.intersect(po2.methods.toSet())
+                    clonedMethods.addAll(commonMethods)
+                }
+        if (clonedMethods.isNotEmpty())
+            targetedIssuedPOs["clonedPOMethods"] = clonedMethods.toList()
     }
+
 
 
 

@@ -229,7 +229,7 @@ class DailyManager {
             /************ DAILIES ABOUT POS ************/
             Daily(
                 "addPO", //create a PO within test suite (i.e., basically just a class named _Page is ok)
-                "Add and use a new PageObject to the test suite",
+                "Add a new PageObject to the test suite and use it in a test",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -237,7 +237,7 @@ class DailyManager {
             ),
             Daily(
                 "addMethodToPO", //add a method to a PO (i.e., basically just an empty method is ok)
-                "Add and use a new method of a PageObject",
+                "Add a new method of a PageObject and use it in a test",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -269,7 +269,7 @@ class DailyManager {
             ),
             Daily(
                 "moveAssertsToTest", //move asserts from method to test
-                "Move $DAILY_GOAL existing asserts from any PageObject method to a test",
+                "Remove $DAILY_GOAL existing assertions from any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -285,7 +285,7 @@ class DailyManager {
             ),
             Daily(
                 "interactWithLocsInMethod", //add Selenium instructions in method to interact with locators
-                "Add $DAILY_GOAL interactions with locators in any PageObject method",
+                "Add $DAILY_GOAL Selenium commands in any PageObject method",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -301,7 +301,7 @@ class DailyManager {
             ),
             Daily(
                 "moveCommonMethodToAncestorPO", //move a method shared among POs to a common ancestor
-                "Move a duplicated method from multiple PageObjects to a common ancestor",
+                "Move a cloned method from multiple PageObjects to a common ancestor",
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -484,8 +484,16 @@ class DailyManager {
             ),
             /************ DAILIES ABOUT POs ************/
             Daily(
+                "emptyPOs",
+                "Add methods to the following empty Page Objects",
+                TARGETED_DAILY_XP,
+                null,
+                FilePathSolver.DAILY_PICS_PATH,
+                GamificationManager.DailyAssignmentMode.TARGETED.name
+            ),
+            Daily(
                 "missingCommandMethods",
-                "Add Selenium commands to the following Page Object methods",
+                "Add Selenium commands to the following empty Page Object methods",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -493,7 +501,7 @@ class DailyManager {
             ),
             Daily(
                 "missingRetPOMethods",
-                "Add a Page Object as return type to the following Page Object methods",
+                "Change from void to a PageObject the return type of the following Page Object methods",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -501,7 +509,7 @@ class DailyManager {
             ),
             Daily(
                 "assertInPOMethods",
-                "Move to test methods the assertions in the following Page Object methods",
+                "Remove from the Page Object methods the following assertions",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -509,7 +517,7 @@ class DailyManager {
             ),
             Daily(
                 "nonCanonicalLocs",
-                "Transforms into canonical form the following locators",
+                "Adapt into canonical form the declarations of the following locators",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -517,7 +525,7 @@ class DailyManager {
             ),
             Daily(
                 "unusedPOMethods",
-                "Make use of the following Page Object methods",
+                "Make use of the following unused Page Object methods",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -525,15 +533,15 @@ class DailyManager {
             ),
             Daily(
                 "outPOLocs",
-                "Move to Page Object methods the following locators",
+                "Move from tests to Page Object methods the following locators",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name
             ),
             Daily(
-                "missingAncestorPOs",
-                "Add an ancestor and move cloned methods to the following Page Objects",
+                "duplicatedMethods",
+                "Move to a common PageObject ancestor the following cloned Page Object methods",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -613,13 +621,14 @@ class DailyManager {
             "noIDOrXPath" to { testOutcomes -> checkTargetedNoIDNoXpathChanged(testOutcomes) },
             "broken" to { testOutcomes -> checkTargetedBrokenLocsRepaired(testOutcomes) },
             /************ DAILIES ABOUT POs ************/
+            "emptyPOs" to { testOutcomes -> checkMethodsToEmptyPOAdded(testOutcomes) },
             "missingCommandMethods" to { testOutcomes -> checkCommandsAdded(testOutcomes) },
             "missingRetPOMethods" to { testOutcomes -> checkPOTypeReturned(testOutcomes) },
             "assertInPOMethods" to { testOutcomes -> checkAssertsRemoved(testOutcomes) },
             "nonCanonicalLocs" to { testOutcomes -> checkNonCanonicalLocsNowCanonical(testOutcomes) },
             "unusedPOMethods" to { testOutcomes -> checkUnusedMethodsNowUsed(testOutcomes) },
             "outPOLocs" to { testOutcomes -> checkLocsOutsidePOsRemoved(testOutcomes) },
-            "missingAncestorPOs" to { testOutcomes -> checkCommonAncestorsAdded(testOutcomes) }
+            "duplicatedMethods" to { testOutcomes -> checkClonedMethodsMoved(testOutcomes) }
             /************ DAILIES ABOUT TESTS ************/
         )
 
@@ -767,6 +776,24 @@ class DailyManager {
 
         /******* TARGETED DAILY CHECKS ABOUT POs *******/
 
+        //it counts the number of empty PO that have now one or more methods executed correctly
+        private fun checkMethodsToEmptyPOAdded(testOutcomes: List<TestOutcome>): Int {
+            val count: Int
+            val passedMethods = testOutcomes
+                .flatMap { it.poMethodCallsPassed }
+                .map { it.methodName }
+                .toSet()
+            count = TestQuestAction.POsOld
+                .filter { it.methods.isEmpty() }
+                .count { oldPO ->
+                    TestQuestAction.POsNew
+                        .find { it.name == oldPO.name }
+                        ?.methods
+                        ?.any { it.name in passedMethods } == true
+                }
+            return count
+        }
+
         //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
         //that were once (POsOld) without Selenium commands and now have them (POsNew)
         private fun checkCommandsAdded(testOutcomes: List<TestOutcome>): Int {
@@ -774,15 +801,15 @@ class DailyManager {
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
                 .flatMap { it.poMethodCallsPassed }
-                .map { it.methodName }
+                .map { it }
                 .toSet()
-            for (methodName in passedMethods) {
+            for (passedMethod in passedMethods) {
                 //get old/new associated PO
-                val oldPO = TestQuestAction.POsOld.find { po -> po.methods.any { it.name == methodName } }
-                val newPO = TestQuestAction.POsNew.find { po -> po.methods.any { it.name == methodName } }
+                val oldPO = TestQuestAction.POsOld.find { po -> po.name == passedMethod.pageObject }
+                val newPO = TestQuestAction.POsNew.find { po -> po.name == passedMethod.pageObject }
                 //get old/new method version
-                val oldMethod = oldPO?.methods?.find { it.name == methodName }
-                val newMethod = newPO?.methods?.find { it.name == methodName }
+                val oldMethod = oldPO?.methods?.find { it.name == passedMethod.methodName }
+                val newMethod = newPO?.methods?.find { it.name == passedMethod.methodName }
                 //count methods when they previously had no commands and that now have so
                 val hadNoSeleniumCommands = oldMethod?.seleniumCommands.isNullOrEmpty()
                 val hasNewSeleniumCommands = newMethod?.seleniumCommands?.isNotEmpty() == true
@@ -799,15 +826,15 @@ class DailyManager {
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
                 .flatMap { it.poMethodCallsPassed }
-                .map { it.methodName }
+                .map { it }
                 .toSet()
-            for (methodName in passedMethods) {
+            for (passedMethod in passedMethods) {
                 //get old/new associated PO
-                val oldPO = TestQuestAction.POsOld.find { po -> po.methods.any { it.name == methodName } }
-                val newPO = TestQuestAction.POsNew.find { po -> po.methods.any { it.name == methodName } }
+                val oldPO = TestQuestAction.POsOld.find { po -> po.name == passedMethod.pageObject }
+                val newPO = TestQuestAction.POsNew.find { po -> po.name == passedMethod.pageObject }
                 //get old/new method version
-                val oldMethod = oldPO?.methods?.find { it.name == methodName }
-                val newMethod = newPO?.methods?.find { it.name == methodName }
+                val oldMethod = oldPO?.methods?.find { it.name == passedMethod.methodName }
+                val newMethod = newPO?.methods?.find { it.name == passedMethod.methodName }
                 //count methods that once had void as return type but that now have a PO
                 val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
                 val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
@@ -817,130 +844,128 @@ class DailyManager {
             return count
         }
 
-
-
-
-
-        //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
-        //that had once (POsOld) assertions and now have not (POsNew)
+        //it counts the number of assertions from PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
+        //that were once in POs and are now removed
         private fun checkAssertsRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val passedCalls = testOutcome.poMethodCallsPassed
-                for (poCall in passedCalls) {
-                    //get PO related to PO method call, old and new
-                    val oldPO = TestQuestAction.POsOld.find { it.name == poCall.pageObject }
-                    val newPO = TestQuestAction.POsNew.find { it.name == poCall.pageObject }
-                    //get PO method related to PO method call, old and new
-                    val oldMethod = oldPO?.methods?.find { it.name == poCall.methodName }
-                    val newMethod = newPO?.methods?.find { it.name == poCall.methodName }
-                    //count methods that had assertions and now have not
-                    val hadAsserts = oldMethod?.assertionLines?.isNotEmpty() == true
-                    val hasNoAsserts = newMethod?.assertionLines?.isEmpty() == true
-                    if (hadAsserts && hasNoAsserts)
-                        count++
-                }
+            //retrieve passed methods from all tests, keeping no duplicates
+            val passedMethods = testOutcomes
+                .flatMap { it.poMethodCallsPassed }
+                .map { it }
+                .toSet()
+            for (passedMethod in passedMethods) {
+                val oldAssertions = TestQuestAction.POsOld
+                    .find { it.name == passedMethod.pageObject }
+                    ?.methods?.find { it.name == passedMethod.methodName }
+                    ?.assertionLines?.size ?: 0
+                val newAssertions = TestQuestAction.POsNew
+                    .find { it.name == passedMethod.pageObject }
+                    ?.methods?.find { it.name == passedMethod.methodName }
+                    ?.assertionLines?.size ?: 0
+                if (oldAssertions > newAssertions)
+                    count += (oldAssertions - newAssertions)
             }
             return count
         }
 
+        //it counts the number of locators from PO methods called by tests and executed correctly
+        // that once were non canonical and that are now so
         private fun checkNonCanonicalLocsNowCanonical(testOutcomes: List<TestOutcome>): Int {
-            var adaptedLocatorsCount = 0
-            for (testOutcome in testOutcomes) {
-                val passedLocators = testOutcome.locatorsPassed
-                for (passedLocator in passedLocators) {
-                    val matchingOldLocator = testOutcome.locatorsOld
-                        .find { oldLocator -> passedLocator.compareThisLocWithLocInNonCanonicalForm(oldLocator) } //we compare new loc that changed class with previous version
-                                                                                                        //as some key attributes changed, basic equal cannot be used
-                    if (matchingOldLocator != null)
-                        adaptedLocatorsCount++
-                }
+            var count = 0
+            //retrieve passed locs from all tests, keeping no duplicates
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            //check from passed locs all those that are changed from noncanonical to canonical
+            for (passedLoc in passedLocs) {
+                //we compare new loc that changed class with previous version
+                //as some key attributes changed, basic equal cannot be used
+                val oldNonCanonicalLoc = TestQuestAction.locatorsOld.find { oldLocator ->
+                    passedLoc.compareThisLocWithLocInNonCanonicalForm(oldLocator) }
+                if (oldNonCanonicalLoc != null)
+                    count++
             }
-            return adaptedLocatorsCount
+            return count
         }
 
         //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
         //that were not used before in any test
         private fun checkUnusedMethodsNowUsed(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            val oldMethodCalls = TestQuestAction.POCallsOld.flatMap { it.value } //get old called PO methods
-            val countedMethods = mutableSetOf<Int>() //count unique PO method calls
-            for (testOutcome in testOutcomes) {
-                val passedCalls = testOutcome.poMethodCallsPassed
-                //count now used method calls that are unique
-                for (call in passedCalls) {
-                    val wasUsedBefore = oldMethodCalls.any { oldCall -> oldCall == call }
-                    if (!wasUsedBefore && call.hashCode() !in countedMethods) {
-                        countedMethods.add(call.hashCode())
-                        count++
-                    }
+            val count: Int
+            val oldCalledMethods = mutableSetOf<PageObjectCall>()
+            val newCalledMethods = mutableSetOf<PageObjectCall>()
+            //collect old and new PO calls from all tests
+            for (outcome in testOutcomes) {
+                TestQuestAction.POCallsOld[outcome.testName]?.let { oldCalledMethods.addAll(it) }
+                TestQuestAction.POCallsNew[outcome.testName]?.let { newCalledMethods.addAll(it) }
+            }
+            //check if there exist new PO method calls that were not called before and that are passed
+            val newlyCalledMethods = newCalledMethods - oldCalledMethods
+            count = newlyCalledMethods.count { newMethod ->
+                testOutcomes.any { outcome ->
+                    outcome.poMethodCallsPassed.any { it.methodName == newMethod.methodName }
                 }
             }
             return count
         }
 
+        //it counts the number of locators called by tests and executed correctly
+        //that once were in test methods and are now in PO methods
         private fun checkLocsOutsidePOsRemoved(testOutcomes: List<TestOutcome>): Int {
-            var movedLocatorsCount = 0
-            for (testOutcome in testOutcomes) {
-                val passedLocators = testOutcome.locatorsPassed
-                for (passedLocator in passedLocators) {
-                    val matchingOldLocator = testOutcome.locatorsOld.find { oldLocator ->
-                        passedLocator.compareThisLocInPOWithOldInTest(oldLocator) //we compare new loc that changed class with previous version
-                                                                                    //as some key attributes changed, basic equal cannot be used
-                    }
-                    if (matchingOldLocator != null)
-                        movedLocatorsCount++
+            var count = 0
+            //retrieve passed locs from all tests, keeping no duplicates
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            //check from passed locs all those that are moved from tests to PO
+            for (passedLoc in passedLocs) {
+                //we compare new loc that changed class with previous version
+                //as some key attributes changed, basic equal cannot be used
+                val matchingOldLocator = TestQuestAction.locatorsOld.find { oldLocator ->
+                    passedLoc.compareThisLocInPOWithOldInTest(oldLocator)
                 }
+                if (matchingOldLocator != null)
+                    count++
             }
-            return movedLocatorsCount
-
+            return count
         }
 
+        private fun checkClonedMethodsMoved(testOutcomes: List<TestOutcome>): Int {
+            val count: Int
+            //used a set to count the number of movement actions to move common methods to an ancestor
+            // (e.g., if 3 methods have same name and into this set, we will count them as 1 movement)
+            val commonMethodsMoved = mutableSetOf<String>()
+            for (i in 0 until TestQuestAction.POsOld.size)
+                for (j in i + 1 until TestQuestAction.POsOld.size) {
+                    val poOld1 = TestQuestAction.POsOld[i]
+                    val poOld2 = TestQuestAction.POsOld[j]
+                    //find common ancestors OLD
+                    val commonAncestorsOldNames = poOld1.ancestors.intersect(poOld2.ancestors.toSet())
+                    val commonAncestorsOld = TestQuestAction.POsOld.filter { it.name in commonAncestorsOldNames }
+                    //find common methods OLD
+                    val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
+                    for (method in commonMethods)
+                        //check no common ancestors OLD had that method before changes
+                        if (commonAncestorsOld.none { it.methods.contains(method) }) {
+                            //find new versions of the compared POs
+                            val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
+                            val poNew2 = TestQuestAction.POsNew.find { it.name == poOld2.name }
+                            if (poNew1 != null && poNew2 != null)
+                                //check that method is no more present in POs
+                                if (!poNew1.methods.contains(method) && !poNew2.methods.contains(method)) {
+                                    //find common ancestors NEW
+                                    val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
+                                    val commonAncestorsNew = TestQuestAction.POsNew.filter { it.name in commonAncestorsNewNames }
+                                    //check a common ancestor that now has that method
+                                    if (commonAncestorsNew.any { it.methods.contains(method) })
+                                        commonMethodsMoved.add(method.name)
+                                }
 
-        private fun checkCommonAncestorsAdded(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            //find common methods from POs without ancestors
-            val oldCommonMethods = mutableSetOf<String>()
-            for (po in TestQuestAction.POsOld)
-                if (po.ancestors.isEmpty())
-                    for (method in po.methods)
-                        if (TestQuestAction.POsOld.any { it != po && it.methods.contains(method) && it.ancestors.isEmpty() })
-                            oldCommonMethods.add(method.name)
-            //check that common methods (passed only) are now in common ancestor
-            for (outcome in testOutcomes) {
-                for (call in outcome.poMethodCallsPassed) {
-                    val methodName = call.methodName
-                    //if method was common
-                    if (methodName in oldCommonMethods) {
-                        //check that the PO now has no more that method, which is instead inside ancestor
-                        val poWithAncestor = TestQuestAction.POsNew.find { po ->
-                            po.methods.none { it.name == methodName } &&
-                                    po.ancestors.isNotEmpty() &&
-                                    po.ancestors.any { ancestorName ->
-                                        val ancestorPO = TestQuestAction.POsNew.find { it.name == ancestorName }
-                                        ancestorPO?.methods?.any { it.name == methodName } == true
-                                    } &&
-                                    TestQuestAction.POsOld.any { oldPo ->
-                                        oldPo.ancestors.isEmpty() &&
-                                                oldPo.name == po.name &&
-                                                oldPo.methods.any { it.name == methodName }
-                                    }
                         }
-
-
-                        if (poWithAncestor != null) {
-                            // 4. Verifica che il metodo NON sia più nei vecchi PO senza antenati
-                            val stillInOldPOs = TestQuestAction.POsOld.any { po ->
-                                po.ancestors.isEmpty() && po.methods.any { it.name == methodName }
-                            }
-                            if (!stillInOldPOs) {
-                                count++
-                            }
-                        }
-                    }
                 }
-            }
-
+            //check if any of these moved common methods is passed wrt a test
+            val passedMethods = testOutcomes.flatMap { it.poMethodCallsPassed.map { call -> call.methodName } }.toSet()
+            count = passedMethods.count { it in commonMethodsMoved }
             return count
         }
 
@@ -1488,12 +1513,12 @@ class DailyManager {
                 .toSet()
             //check from passed locs all those that are moved from tests to PO
             for (passedLoc in passedLocs) {
-                    val matchingOldLocator = TestQuestAction.locatorsOld.find { oldLocator ->
-                        passedLoc.compareThisLocInPOWithOldInTest(oldLocator) //we compare new loc that changed class with previous version
-                                                                        //as some key attributes changed, basic equal cannot be used
-                    }
-                    if (matchingOldLocator != null)
-                        count++
+                //we compare new loc that changed class with previous version
+                //as some key attributes changed, basic equal cannot be used
+                val matchingOldLocator = TestQuestAction.locatorsOld.find { oldLocator ->
+                        passedLoc.compareThisLocInPOWithOldInTest(oldLocator)  }
+                if (matchingOldLocator != null)
+                    count++
             }
             return count
         }
@@ -1547,9 +1572,10 @@ class DailyManager {
                 .toSet()
             //check from passed locs all those that are changed from noncanonical to canonical
             for (passedLoc in passedLocs) {
+                //we compare new loc that changed class with previous version
+                //as some key attributes changed, basic equal cannot be used
                 val oldNonCanonicalLoc = TestQuestAction.locatorsOld.find { oldLocator ->
-                    passedLoc.compareThisLocWithLocInNonCanonicalForm(oldLocator) } //we compare new loc that changed class with previous version
-                                                                                    //as some key attributes changed, basic equal cannot be used
+                    passedLoc.compareThisLocWithLocInNonCanonicalForm(oldLocator) }
                 if (oldNonCanonicalLoc != null)
                     count++
             }
