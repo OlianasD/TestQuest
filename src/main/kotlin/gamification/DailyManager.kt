@@ -233,7 +233,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "addMethodToPO", //add a method to a PO (i.e., basically just an empty method is ok)
@@ -241,7 +242,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "addLocsToMethod", //add locs to a PO method
@@ -249,7 +251,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "moveLocs2Method", //move locs from test to a PO method
@@ -257,7 +260,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "returnPOInMethod", //add a PO as return type for a method
@@ -265,7 +269,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "moveAssertsToTest", //move asserts from method to test
@@ -273,7 +278,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "adaptLocs2Format", //adapt locs to have format: WebElement e = driver.findElement(By...)
@@ -281,7 +287,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "interactWithLocsInMethod", //add Selenium instructions in method to interact with locators
@@ -289,7 +296,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "addAncestorPO", //add an ancestor PO
@@ -297,7 +305,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "moveCommonMethodToAncestorPO", //move a method shared among POs to a common ancestor
@@ -305,7 +314,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "callMethod", // call a method from a PO within a test
@@ -313,7 +323,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "callUnusedMethod", //call an unused method from a PO within a test
@@ -321,7 +332,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 1,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             /************ DAILIES ABOUT TESTS ************/
             Daily(
@@ -330,7 +342,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "runts",
@@ -338,7 +351,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "addAssert2Test",
@@ -346,7 +360,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "shortenTestWorkFlow",//test workflow must be simple (i.e., checks if test has not too many interactions/locs and too many assertions)
@@ -354,15 +369,17 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
-                "makeTestWorkFlowIndependent", //test workflow must be independent from any other test
+                "makeTestWorkFlowIndependent", //test workflow must be independently from any other test
                 "Make a test independent from other tests",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "adaptTestName2Format", //test name must have 3 sections: what is being tested, circumnstances, exp result
@@ -370,7 +387,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "shortenMethodName",
@@ -378,7 +396,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "shortenVarName",
@@ -386,7 +405,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "addSetup",
@@ -394,7 +414,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "addTearDown",
@@ -402,7 +423,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "removeGlobVar",
@@ -410,7 +432,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
             Daily(
                 "removeExpSleep",
@@ -418,7 +441,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                isAdvanced = true
             ),
         )
 
@@ -489,7 +513,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "missingCommandMethods",
@@ -497,7 +522,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "missingRetPOMethods",
@@ -505,7 +531,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "assertInPOMethods",
@@ -513,7 +540,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "nonCanonicalLocs",
@@ -521,7 +549,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "unusedPOMethods",
@@ -529,7 +558,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "outPOLocs",
@@ -537,7 +567,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             Daily(
                 "duplicatedMethods",
@@ -545,7 +576,8 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                isAdvanced = true
             ),
             /************ DAILIES ABOUT TESTS ************/
         )
@@ -633,6 +665,18 @@ class DailyManager {
         )
 
 
+        fun getTargetedLocatorDailyNames(): List<String> {
+            return listOf(
+                "absolute", "length", "level", "posPredicate", "badPredicate", "noIDOrXPath", "broken"
+            )
+        }
+
+        fun getTargetedPageObjectDailyNames(): List<String> {
+            return listOf(
+                "emptyPOs", "missingCommandMethods", "missingRetPOMethods", "assertInPOMethods",
+                "nonCanonicalLocs", "unusedPOMethods", "outPOLocs", "duplicatedMethods"
+            )
+        }
 
         /******* TARGETED DAILY CHECKS ABOUT LOCATORS *******/
 
@@ -1811,10 +1855,15 @@ class DailyManager {
 
 
 
-        //dailies are assigned to user. initially, the usage mode is RANDOM so random dailies are assigned for setup
+        //dailies are assigned to new user at the start. initially, the usage mode is RANDOM so random dailies are assigned for setup
+        //further, dailies are assigned randomly from not advanced ones (i.e., only those based on locators) if that is the chosen gamification mode
         fun setupRandomDailies(userProfile: UserProfile) {
-            val dailies: List<Daily> = ALL_RANDOM_DAILIES.shuffled().take(DAILIES_PER_USER)
-            userProfile.assignDailies(dailies)
+            val filteredDailies = if (GamificationManager.gamificationMode == GamificationManager.GamificationMode.LOCATOR) {
+                ALL_RANDOM_DAILIES.filter { !it.isAdvanced }
+            } else
+                ALL_RANDOM_DAILIES
+            val selectedDailies: List<Daily> = filteredDailies.shuffled().take(DAILIES_PER_USER)
+            userProfile.assignDailies(selectedDailies)
         }
 
         fun assignTargetedDailies(userProfile: UserProfile) {
@@ -1822,9 +1871,15 @@ class DailyManager {
             val issuedLocatorsMap = locAnalyzer.findIssuesInLocators()
             val poAnalyzer = PageObjectsAnalyzer()
             val issuedPOsMap = poAnalyzer.findIssuesInPOs()
-            val currentTargetDailies = ALL_TARGETED_DAILIES.map { daily ->
+            //filter dailies based on gamification mode
+            val filteredTargetDailies = if (GamificationManager.gamificationMode == GamificationManager.GamificationMode.LOCATOR) {
+                ALL_TARGETED_DAILIES.filterNot { it.isAdvanced }
+            } else {
+                ALL_TARGETED_DAILIES
+            }
+            val currentTargetDailies = filteredTargetDailies.map { daily ->
                 val locatorsForDaily = issuedLocatorsMap[daily.name] ?: emptyList()
-                val posForDaily = issuedPOsMap[daily.name] ?: emptyList()//TODO: forse qui esplode perché non c'è la key
+                val posForDaily = issuedPOsMap[daily.name]
                 Daily(
                     name = daily.name,
                     description = daily.description,
@@ -1859,8 +1914,14 @@ class DailyManager {
             val availableDailies = ALL_RANDOM_DAILIES.filter { d ->
                 userProfile.dailyProgresses.none { dailyProgress -> dailyProgress.daily.name == d.name }
             }
+            //filter dailies according to gamification mode (e.g., if mode is LOCATOR only non advanced dailies are selected)
+            val filteredDailies = if (GamificationManager.gamificationMode == GamificationManager.GamificationMode.LOCATOR) {
+                availableDailies.filterNot { it.isAdvanced }
+            } else {
+                availableDailies
+            }
             //a new daily is randomly selected with discarded set to true (only 1 discard within 24h is possible)
-            val newDaily: Daily = availableDailies.shuffled().first()
+            val newDaily: Daily = filteredDailies.shuffled().first()
             val newDailyProgress = DailyProgress(
                 newDaily,
                 progress = 0,
@@ -1871,6 +1932,38 @@ class DailyManager {
             GamificationManager.updateUserProfile(userProfile) //update user profile
             return newDailyProgress
         }
+
+        //this is called to update the random dailies and substitute advanced ones with locator-based if locator mode
+        //is selected as gamification mode
+        fun updateRandomDailies(userProfile: UserProfile) {
+            if (GamificationManager.gamificationMode == GamificationManager.GamificationMode.LOCATOR) {
+                val removedCount = userProfile.dailyProgresses.count { it.daily.isAdvanced }
+                //remove advanced dailies if gamification mode is set to locator
+                userProfile.dailyProgresses.removeAll { it.daily.isAdvanced }
+                //find locator-based dailies as substitute
+                val assignedDailies = userProfile.dailyProgresses.map { it.daily.name }.toSet()
+                val availableDailies = ALL_RANDOM_DAILIES
+                    .filter { !it.isAdvanced && it.name !in assignedDailies }
+                    .shuffled()
+                    .take(removedCount)
+                userProfile.assignDailies(availableDailies)
+            }
+            GamificationManager.updateUserProfile(userProfile)
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         fun getIconFromName(name: String): String {
             return DAILY_NAME_TO_ICON[name] ?: ""
@@ -1888,11 +1981,17 @@ class DailyManager {
             return DAILY_NAME_TO_XP[name] ?: 0
         }
 
+        fun getIsAdvancedFromName(name: String): Boolean {
+            return (ALL_RANDOM_DAILIES + ALL_TARGETED_DAILIES)
+                .find { it.name == name }
+                ?.isAdvanced ?: false
+        }
+
         fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>> {
             val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
 
             //find the dailies to update according to gaming mode
-            val dailiesToUpdate = when (GamificationManager.mode) {
+            val dailiesToUpdate = when (GamificationManager.assignmentMode) {
                 GamificationManager.DailyAssignmentMode.RANDOM -> ALL_RANDOM_DAILIES
                 GamificationManager.DailyAssignmentMode.TARGETED -> ALL_TARGETED_DAILIES
                 else -> emptyList() //TODO
@@ -1901,7 +2000,7 @@ class DailyManager {
             val copyOfDailyProgresses = ArrayList(userProfile.dailyProgresses) //needed since the list is updated during loop
             copyOfDailyProgresses.forEach { dp ->
                 dailiesToUpdate.find { it.name == dp.daily.name }?.let {
-                    val progress = when (GamificationManager.mode) {
+                    val progress = when (GamificationManager.assignmentMode) {
                         GamificationManager.DailyAssignmentMode.RANDOM -> RANDOM_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
                         GamificationManager.DailyAssignmentMode.TARGETED -> TARGETED_DAILY_CHECKS[it.name]?.invoke(testOutcomes)
                         GamificationManager.DailyAssignmentMode.INCLUSIVE -> TODO()
@@ -1919,7 +2018,7 @@ class DailyManager {
             var gainedXP = 0 //to track the gained xp
             var involvedDaily: Daily? = null //to track the involved daily
 
-            if(GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM) {
+            if(GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.RANDOM) {
                 val dailyProgress = userProfile.dailyProgresses.find { it.daily.name == daily.name }
                 dailyProgress?.let { dp ->
                     dp.progress += progress
@@ -1932,7 +2031,7 @@ class DailyManager {
                 }
             }
             //since targeted dailies might involve a large number of locators, the xp is given for each (counted by progress)
-            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
+            else if (GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.TARGETED) {
                 gainedXP = daily.xp * progress
 
                 //TODO: remove the following, used just for testing
@@ -1942,7 +2041,7 @@ class DailyManager {
                 involvedDaily = daily
                 userProfile.currentXP += gainedXP
             }
-            else if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.INCLUSIVE) {
+            else if (GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.INCLUSIVE) {
                 //TODO
             }
             return Pair(gainedXP, involvedDaily)

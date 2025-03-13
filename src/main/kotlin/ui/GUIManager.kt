@@ -20,6 +20,9 @@ import extractor.locator.Locator
 import listener.changes.CodeChangeListener
 import listener.test.TestExecutionListener
 import analyzer.locator.LocatorsAnalyzer
+import analyzer.pageobject.PageObjectsAnalyzer
+import extractor.pageobject.MethodInfo
+import extractor.pageobject.PageObject
 import utils.FilePathSolver
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -43,8 +46,8 @@ import javax.swing.table.TableCellRenderer
 
 object GUIManager {
 
-    private var TestQuestWindow: JTextArea? = null // window to show main gamification aspects
-    private var LocsScoreWindow: JFrame? = null // window to show locator scores
+    private var GamificationWindow: JTextArea? = null // window to show main gamification aspects
+    private var FragilityWindow: JFrame? = null // window to show locator scores
     private var currentPopup: JDialog? = null // window to show user changes (e.g., progression, daily mode change)
 
 
@@ -369,26 +372,26 @@ object GUIManager {
             val dailyAssignmentModePanel = JPanel(FlowLayout(FlowLayout.RIGHT))
             dailyAssignmentModePanel.background = JBColor.LIGHT_GRAY
             val randomMode = JRadioButton("Random")
-            randomMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.RANDOM
+            randomMode.isSelected = GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.RANDOM
             randomMode.addActionListener {
                 if (randomMode.isSelected) {
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.RANDOM
+                    GamificationManager.assignmentMode = GamificationManager.DailyAssignmentMode.RANDOM
                     updateGUI(userProfile, false)
                 }
             }
             val targetedMode = JRadioButton("Targeted")
-            targetedMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED
+            targetedMode.isSelected = GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.TARGETED
             targetedMode.addActionListener {
                 if (targetedMode.isSelected) {
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.TARGETED
+                    GamificationManager.assignmentMode = GamificationManager.DailyAssignmentMode.TARGETED
                     GamificationManager.assignTargetDailies()//this includes updateGUI() but is preceded by assignment
                 }
             }
             val inclusiveMode = JRadioButton("Inclusive")
-            inclusiveMode.isSelected = GamificationManager.mode == GamificationManager.DailyAssignmentMode.INCLUSIVE
+            inclusiveMode.isSelected = GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.INCLUSIVE
             inclusiveMode.addActionListener {
                 if (inclusiveMode.isSelected) {
-                    GamificationManager.mode = GamificationManager.DailyAssignmentMode.INCLUSIVE
+                    GamificationManager.assignmentMode = GamificationManager.DailyAssignmentMode.INCLUSIVE
                     updateGUI(userProfile, false)
                 }
             }
@@ -414,11 +417,11 @@ object GUIManager {
             mainPanel.add(dailyAssignmentModePanel, gbc)
 
             // Refresh GUI & send notification in case of changes
-            TestQuestWindow?.removeAll()
-            TestQuestWindow?.layout = BorderLayout()
-            TestQuestWindow?.add(mainPanel, BorderLayout.CENTER)
-            TestQuestWindow?.revalidate()
-            TestQuestWindow?.repaint()
+            GamificationWindow?.removeAll()
+            GamificationWindow?.layout = BorderLayout()
+            GamificationWindow?.add(mainPanel, BorderLayout.CENTER)
+            GamificationWindow?.revalidate()
+            GamificationWindow?.repaint()
             mainPanel.revalidate()
             mainPanel.repaint()
             if (notifyChange) {
@@ -434,8 +437,8 @@ object GUIManager {
         val frame = JFrame("TestQuest").apply {
             defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
             layout = BorderLayout()
-            TestQuestWindow = JTextArea().apply { isEditable = false }
-            add(JScrollPane(TestQuestWindow), BorderLayout.CENTER)
+            GamificationWindow = JTextArea().apply { isEditable = false }
+            add(JScrollPane(GamificationWindow), BorderLayout.CENTER)
             isResizable = false
             setSize(1000, 800)
             setLocationRelativeTo(null)
@@ -443,7 +446,7 @@ object GUIManager {
         }
         frame.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
-                LocsScoreWindow?.dispose()
+                FragilityWindow?.dispose()
                 CodeChangeListener.instance.dispose()
                 TestExecutionListener.instance.dispose()
                 //exitProcess(0)
@@ -453,12 +456,17 @@ object GUIManager {
 
 
 
+
+
     private fun populateDailiesPanel(dailiesPanel: JPanel, userProfile: UserProfile, font: Font) {
         // Clear the panel before repopulating
         dailiesPanel.removeAll()
+        // Create an inner panel for the scrolling content
+        val innerPanel = JPanel()
+        innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         for (dailyProgress in userProfile.dailyProgresses) {
             val type = dailyProgress.daily.type
-            if (type.equals(GamificationManager.mode.name, ignoreCase = true)) {  // Show only the dailies of the current mode
+            if (type.equals(GamificationManager.assignmentMode.name, ignoreCase = true)) {  //Show only the dailies of the current mode
                 val dailyPanel = JPanel()
                 dailyPanel.layout = BoxLayout(dailyPanel, BoxLayout.X_AXIS)
                 dailyPanel.alignmentX = Component.LEFT_ALIGNMENT
@@ -472,33 +480,34 @@ object GUIManager {
                         val newDailyProgress = DailyManager.reassignRandomDailyFromDiscard(userProfile, dailyProgress.daily)
                         dailyPanel.remove(removeButton)  // Remove discard button as only 1 discard is allowed
                         showDailyDetails(dailyPanel, newDailyProgress, font)  // Update panel with newly assigned daily info
-                        dailiesPanel.revalidate()
-                        dailiesPanel.repaint()
+                        innerPanel.revalidate()
+                        innerPanel.repaint()
                     }
                     dailyPanel.add(removeButton)
                 }
-                dailiesPanel.add(dailyPanel)
+                // Add each daily panel to the innerPanel (the scrollable area)
+                innerPanel.add(dailyPanel)
             }
         }
+        // Add the scroll pane around the innerPanel that contains all dailies
+        val scrollPane = JScrollPane(innerPanel).apply {
+            preferredSize = Dimension(500, 200)  // Set the preferred size for the scroll pane
+            verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+            horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        }
+        // Add the scroll pane to the dailiesPanel
+        dailiesPanel.add(scrollPane)
         // Revalidate and repaint the panel to reflect changes
         dailiesPanel.revalidate()
         dailiesPanel.repaint()
     }
 
 
-
-
-
-
-
-
-
-
-
-
     private fun showDailyDetails(dailyPanel: JPanel, dailyProgress: DailyProgress, font: Font) {
         dailyPanel.removeAll() // Remove old elements
         val locatorsToVerifyMap = LocatorsAnalyzer.getFixedAndPendingLocatorsMap() //retrieve map of fixed locators still to verify
+        val posToVerifyMap = PageObjectsAnalyzer.getFixedAndPendingLocatorsMap()
+
         // Create daily label on mouse over for random dailies
         if (dailyProgress.daily.type.equals("random", ignoreCase = true)) {
             val imageStream = this::class.java.classLoader.getResourceAsStream(dailyProgress.daily.icon)
@@ -515,11 +524,14 @@ object GUIManager {
             }
             dailyPanel.add(dailyLabel)
         }
-        // Create daily label on mouse over and locators details for targeted dailies
+        // Create daily label on mouse over and details for targeted dailies
         else if (dailyProgress.daily.type.equals("targeted", ignoreCase = true)) {
-            // If no locators (neither to fix or fixed to be verified) are associated with daily, skip
-            if (dailyProgress.daily.targetedLocators.isEmpty() &&
-                (locatorsToVerifyMap.isEmpty() || locatorsToVerifyMap[dailyProgress.daily.name]!!.isEmpty()))
+            // If no locators or POs (neither to fix or fixed to be verified) are associated with daily, skip
+            if (dailyProgress.daily.isLocatorRelated() && dailyProgress.daily.targetedLocators.isEmpty() &&
+                (locatorsToVerifyMap.isEmpty() || (locatorsToVerifyMap[dailyProgress.daily.name]?.isEmpty() == true)))
+                return
+            if  (dailyProgress.daily.isPageObjectRelated() && dailyProgress.daily.issuesInPOs?.isEmpty() == true &&
+                (posToVerifyMap.isEmpty() || (posToVerifyMap[dailyProgress.daily.name]?.isEmpty() == true)))
                 return
             val imageStream = this::class.java.classLoader.getResourceAsStream(dailyProgress.daily.icon)
             val icon = ImageIO.read(imageStream)
@@ -534,7 +546,7 @@ object GUIManager {
             }
             dailyPanel.add(dailyLabel)
 
-            // Show locators details for targeted dailies with show/hide buttons opening a dedicated window
+            // Show details for targeted dailies with show/hide buttons opening a dedicated window
             var detailsFrame: JFrame? = null
             val toggleButton = JButton("Show")
             toggleButton.addActionListener {
@@ -542,44 +554,125 @@ object GUIManager {
                     detailsFrame = JFrame(dailyProgress.daily.description).apply {
                         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
                         layout = BorderLayout()
-                        val locatorsPanel = JPanel().apply {
+                        val targetedIssuesPanel = JPanel().apply {
                             layout = BoxLayout(this, BoxLayout.Y_AXIS)
                         }
                         val smallFont = font.deriveFont((font.size * 0.8f).coerceAtLeast(8f))
 
-                        // show targeted locators for the current daily
-                        dailyProgress.daily.targetedLocators.forEach { locator ->
-                            val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
-                            val locatorInfo = "${locator.locatorName ?: "N/A"} " +
-                                    "[${locator.className}$methodPart, ${locator.line}]"
-                            val locatorLabel = JLabel(locatorInfo).apply {
-                                this.font = smallFont
-                                foreground = JBColor.DARK_GRAY
+                        // show targeted issues for the current daily, whether locators or POs based
+                        if  (dailyProgress.daily.isLocatorRelated()) {
+                            dailyProgress.daily.targetedLocators.forEach { locator ->
+                                val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
+                                val locatorInfo = "${locator.locatorName ?: "N/A"} " +
+                                        "[${locator.className}$methodPart, ${locator.line}]"
+                                val locatorLabel = JLabel(locatorInfo).apply {
+                                    this.font = smallFont
+                                    foreground = JBColor.DARK_GRAY
+                                }
+                                targetedIssuesPanel.add(locatorLabel)
                             }
-                            locatorsPanel.add(locatorLabel)
+                        }
+                        else if(dailyProgress.daily.isPageObjectRelated()) {
+                            dailyProgress.daily.issuesInPOs!!.forEach { issue ->
+                                when (issue) {
+                                    is String -> { //e.g., a PO issue about an assertion line
+                                        val label = JLabel(issue).apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                    is PageObject -> { //e.g., a PO issue about PO itself
+                                        val label = JLabel(issue.name).apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                    is Locator -> { //e.g., a PO issue about some of its locators
+                                        val methodPart =
+                                            if (issue.methodName.isNotEmpty()) ".${issue.methodName}" else ""
+                                        val locatorInfo = "${issue.locatorName ?: "N/A"} " +
+                                                "[${issue.className}$methodPart, ${issue.line}]"
+                                        val label = JLabel(locatorInfo).apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                    is MethodInfo -> { //e.g., a PO issue about some of its methods
+                                        val label = JLabel(issue.name + " [" + issue.pageObject + "]").apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                }
+                            }
                         }
 
-                        // separator between targeted locators and potentially fixed locators (to verify via test execution)
-                        val separatorLabel = JLabel("---- Fixed and pending locators (test execution needed) ----").apply {
+                        // separator between targeted issues and potentially fixed issues (to verify via test execution)
+                        val separatorLabel = JLabel("---- Fixed and pending (test execution needed) ----").apply {
                             this.font = smallFont
                             foreground = JBColor.GRAY
                         }
-                        locatorsPanel.add(separatorLabel)
+                        targetedIssuesPanel.add(separatorLabel)
 
-                        // show info of potentially fixed locators to verify
-                        val locatorsFromMap = locatorsToVerifyMap[dailyProgress.daily.name]
-                        locatorsFromMap?.forEach { locator ->
-                            val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
-                            val locatorInfo = "${locator.locatorName ?: "N/A"} " +
-                                    "[${locator.className}$methodPart, ${locator.line}]"
-                            val locatorLabel = JLabel(locatorInfo).apply {
-                                this.font = smallFont
-                                foreground = JBColor.DARK_GRAY
+                        // show info of potentially fixed issues to verify, whether locators or POs based
+                        if(dailyProgress.daily.isLocatorRelated()) {
+                            val locatorsFromMap = locatorsToVerifyMap[dailyProgress.daily.name]
+                            locatorsFromMap?.forEach { locator ->
+                                val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
+                                val locatorInfo = "${locator.locatorName ?: "N/A"} " +
+                                        "[${locator.className}$methodPart, ${locator.line}]"
+                                val locatorLabel = JLabel(locatorInfo).apply {
+                                    this.font = smallFont
+                                    foreground = JBColor.DARK_GRAY
+                                }
+                                targetedIssuesPanel.add(locatorLabel)
                             }
-                            locatorsPanel.add(locatorLabel)
+                        }
+                        else if(dailyProgress.daily.isPageObjectRelated()) {
+                            val POsFromMap = posToVerifyMap[dailyProgress.daily.name]
+                            POsFromMap?.forEach { issue ->
+                                when (issue) {
+                                    is String -> { //e.g., a PO issue about an assertion line
+                                        val label = JLabel(issue).apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                    is PageObject -> { //e.g., a PO issue about PO itself
+                                        val label = JLabel(issue.name).apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                    is Locator -> { //e.g., a PO issue about some of its locators
+                                        val methodPart =
+                                            if (issue.methodName.isNotEmpty()) ".${issue.methodName}" else ""
+                                        val locatorInfo = "${issue.locatorName ?: "N/A"} " +
+                                                "[${issue.className}$methodPart, ${issue.line}]"
+                                        val label = JLabel(locatorInfo).apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                    is MethodInfo -> { //e.g., a PO issue about some of its methods
+                                        val label = JLabel(issue.name + " [" + issue.pageObject + "]").apply {
+                                            this.font = smallFont
+                                            foreground = JBColor.DARK_GRAY
+                                        }
+                                        targetedIssuesPanel.add(label)
+                                    }
+                                }
+                            }
                         }
 
-                        val scrollPane = JScrollPane(locatorsPanel).apply {
+                        val scrollPane = JScrollPane(targetedIssuesPanel).apply {
                             preferredSize = Dimension(300, 150)
                             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
                             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
@@ -609,7 +702,6 @@ object GUIManager {
         dailyPanel.revalidate()
         dailyPanel.repaint()
     }
-
 
 
 
@@ -692,8 +784,8 @@ object GUIManager {
 
 
     fun showLocatorScores(project: Project, locatorScores: Map<Locator, Double>) {
-        LocsScoreWindow?.dispose()//to close any already open window
-        LocsScoreWindow = JFrame("Locator Details Panel").apply {
+        FragilityWindow?.dispose()//to close any already open window
+        FragilityWindow = JFrame("Locator Details Panel").apply {
             defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE //avoid to close this window
             setSize(800, 400)
             setLocationRelativeTo(null)
@@ -744,8 +836,8 @@ object GUIManager {
                 }
             }
         })
-        LocsScoreWindow!!.add(JScrollPane(table), BorderLayout.CENTER)
-        LocsScoreWindow!!.isVisible = true
+        FragilityWindow!!.add(JScrollPane(table), BorderLayout.CENTER)
+        FragilityWindow!!.isVisible = true
     }
 
     private fun getScoreColor(score: Double): Color {
@@ -795,6 +887,27 @@ object GUIManager {
             return result == JOptionPane.YES_OPTION
         }
         return false
+    }
+
+
+
+
+    fun showGamificationModeChoice(): Boolean {
+        val panel = JPanel()
+        panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
+        panel.add(JLabel("<html>Please choose a gamification mode for this session:<br></html>"))
+        val options = arrayOf("Locator-based", "Advanced")
+        val result = JOptionPane.showOptionDialog(
+            null,
+            panel,
+            "Gamification Mode",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]
+        )
+        return result == 0 //returns true if the user chose Locator-based, false otherwise
     }
 
 

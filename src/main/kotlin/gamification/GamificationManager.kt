@@ -8,15 +8,23 @@ import utils.XMLWriter
 import java.io.File
 import java.util.*
 
-class GamificationManager() {
+class GamificationManager {
 
 
     // random = random daily assignment
     // targeted = daily assignment based on problems and bad practices observed by analysing test artifacts
-    // inclusive = daily assignment to cover functionalities not covered by test artifacts, given the DOM
+    // inclusive = daily assignment to cover functionalities not covered by test artifacts, given the DOM //TODO
     enum class DailyAssignmentMode {
         RANDOM, TARGETED, INCLUSIVE
     }
+
+
+    //LOCATOR = only locator-based dailies can be assigned
+    //ADVANCED = all type of dailies can be assigned
+    enum class GamificationMode {
+        LOCATOR, ADVANCED
+    }
+
 
     companion object {
 
@@ -28,25 +36,24 @@ class GamificationManager() {
             }
         }
 
-        var usersDataFile: File = FilePathSolver.getUserDataFile()
+        var usersDataFile: File = FilePathSolver.getUserDataFile()//path to users file
         lateinit var userProfile: UserProfile //the current user
-        var mode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
+        var assignmentMode: DailyAssignmentMode = DailyAssignmentMode.RANDOM //this flag is initially set to random and can be changed via GUI
+        var gamificationMode: GamificationMode = GamificationMode.LOCATOR//this flag is initially set to locator mode so to assign only locator-based dailiees
 
 
-        //PROPERTIES USED TO DETERMINE GOOD/BAD LOCATORS
+        //METRICS USED TO DETERMINE GOOD/BAD LOCATORS
         const val MAX_LENGTH = 50
         const val MAX_LEVEL = 5
         const val MAX_POS_PRED = 3
         val GOOD_PREDS = setOf(
-            "@id", "@name", "@class", "@title", "@alt", "@value") //TODO: just a subset
+            "@id", "@name", "@class", "@title", "@alt", "@value") //TODO: this is just a subset. more good predicates could be considered
         val BAD_PREDS = setOf(
             "src", "href", "height", "width")
         val BAD_JS = setOf("onclick", "onload",
             "onmouseover", "onmouseout", "onchange", "onsubmit",
             "onfocus", "onkeydown")
         const val ROBUST_THRESHOLD = 0.5
-
-
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),
@@ -149,6 +156,12 @@ class GamificationManager() {
             DailyManager.assignTargetedDailies(userProfile)
         }
 
+        //this is called to update the random dailies and substitute advanced ones with locator-based if locator mode
+        //is selected as gamification mode
+        fun updateRandomDailies(){
+            DailyManager.updateRandomDailies(userProfile)
+        }
+
     }
 
 
@@ -177,8 +190,10 @@ class GamificationManager() {
         else {
             userProfile = tempUserProfile
             AchievementManager.updateUserProfile(userProfile)
-            if(mode == DailyAssignmentMode.TARGETED)
+            if(assignmentMode == DailyAssignmentMode.TARGETED)
                 assignTargetDailies()
+            else
+                updateRandomDailies()
         }
         GUIManager.updateGUI(userProfile, false)
     }

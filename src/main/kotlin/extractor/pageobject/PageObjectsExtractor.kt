@@ -34,7 +34,8 @@ data class MethodInfo(
     val paramTypes: List<String>,
     val locators: List<Locator>, // list of locators within method
     val assertionLines: List<String>, // list of assertions associated with method info (hopefully, none)
-    val seleniumCommands: List<String> // list of selenium commands associated with method info
+    val seleniumCommands: List<String>, // list of selenium commands associated with method info
+    val pageObject: String? = null //the related page object name
 ): Serializable{
 
     override fun equals(other: Any?): Boolean {
@@ -155,7 +156,8 @@ class PageObjectExtractor {
                             paramTypes = parameterTypes,
                             locators = methodLocators,
                             assertionLines = assertionLines,
-                            seleniumCommands = seleniumCommands
+                            seleniumCommands = seleniumCommands,
+                            pageObject = className
                         )
                     )
                 }

@@ -46,7 +46,7 @@ class XMLWriter {
                 node.getElementsByTagName("nextXP").item(0).textContent = userProfile.nextXP.toString()
                 node.getElementsByTagName("title").item(0).textContent = userProfile.title
                 node.getElementsByTagName("propic").item(0).textContent = userProfile.propic
-                node.setAttribute("mode", GamificationManager.mode.name)
+                node.setAttribute("mode", GamificationManager.assignmentMode.name)
                 val dailiesNode = node.getElementsByTagName("dailies").item(0) as Element
                 //daily expiration time is saved
                 dailiesNode.setAttribute("timestamp", userProfile.timestamp.toString())
@@ -132,7 +132,7 @@ class XMLWriter {
         userProfileNode.appendChild(createElementWithText(doc, "nextXP", userProfile.nextXP.toString()))
         userProfileNode.appendChild(createElementWithText(doc, "title", userProfile.title))
         userProfileNode.appendChild(createElementWithText(doc, "propic", userProfile.propic))
-        userProfileNode.setAttribute("mode", GamificationManager.mode.name)
+        userProfileNode.setAttribute("mode", GamificationManager.assignmentMode.name)
         // Create achievements element
         val achievementsNode = doc.createElement("achievements")
         val completedNode = doc.createElement("completed")

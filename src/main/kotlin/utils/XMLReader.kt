@@ -25,7 +25,7 @@ class XMLReader {
                 completedAchievements = mutableListOf(),
                 propic = userProfileNode.getElementsByTagName("propic").item(0).textContent,
             )
-            GamificationManager.mode = GamificationManager.fromString(userProfileNode.getAttribute("mode"))
+            GamificationManager.assignmentMode = GamificationManager.fromString(userProfileNode.getAttribute("mode"))
             loadAchievementProgresses(userProfile, userProfileNode)
             loadDailyProgresses(userProfile, userProfileNode)
             return userProfile
@@ -92,6 +92,7 @@ class XMLReader {
             val dailyIcon = DailyManager.getIconFromName(dailyName)
             val dailyProgress = dailyNode.getAttribute("progress").toInt()
             val dailyDiscarded = dailyNode.getAttribute("discarded").toBoolean()
+            val dailyIsAdvanced = DailyManager.getIsAdvancedFromName(dailyName)
             val modifiedLocs = mutableListOf<String>()
             val dailyType = dailyNode.getAttribute("type")
             val targetedLocators = mutableListOf<Locator>()//to manage locators associated with targeted dailies
@@ -125,7 +126,7 @@ class XMLReader {
                     }
                 }
             }
-            val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon, dailyType, targetedLocators)
+            val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon, dailyType, targetedLocators, isAdvanced = dailyIsAdvanced)
             val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyDiscarded, modifiedLocs)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }

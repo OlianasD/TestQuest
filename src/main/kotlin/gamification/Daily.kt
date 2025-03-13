@@ -10,7 +10,16 @@ class Daily(
     val icon: String,
     var type: String,//it can either be 'random', 'targeted', or 'inclusive'
     var targetedLocators: List<Locator> = emptyList(),//it can be either null or with list or target locators to manage
-    var issuesInPOs: List<Any> = emptyList()//it can be either null or with list or target issues (e.g., methods, POs, locators)
+    var issuesInPOs: List<Any>? = emptyList(),//it can be either null or with list or target issues in POs (e.g., empty PO)
+    val isAdvanced: Boolean = false //if false the daily is about locators mode only. if yes, it is about the
+                                        //advanced mode (i.e., PO, test, ...)
 )
 {
+    fun isLocatorRelated(): Boolean {
+        return name in DailyManager.getTargetedLocatorDailyNames()
+    }
+
+    fun isPageObjectRelated(): Boolean {
+        return name in DailyManager.getTargetedPageObjectDailyNames()
+    }
 }

@@ -7,6 +7,7 @@ import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
 import analyzer.locator.LocatorsAnalyzer
+import analyzer.pageobject.PageObjectsAnalyzer
 import extractor.test.PageObjectCall
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
@@ -106,16 +107,20 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
         try {
             server.stop()
-            //check how events affected tasks
+
+            //1. CHECK EVENTS FOR PROGRESSION
             GamificationManager.analyzeEvents(testOutcomes)
             testOutcomes.forEach { testOutcome ->
                 LocatorsAnalyzer.removePendingFixedLocators(testOutcome.locatorsPassed)
+                //PageObjectsAnalyzer.removePendingFixedPOs(testOutcome.)
             }
-            //old data is updated with:
+
+            //old data (locators, PO calls, POs) is updated with:
             // - new data that passed the tests
             // - old data that passed the tests
             // - old data that did not pass the test but still exists
 
+            //2. LOCATORS UPDATE
             //TestQuestAction.locatorsOld = TestQuestAction.locatorsNew
             val locatorsPassed = testOutcomes.flatMap { it.locatorsPassed }.distinct()
             TestQuestAction.locatorsOld = TestQuestAction.locatorsOld
@@ -124,6 +129,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
                 .apply { addAll(locatorsPassed) } //add new passed
                 .toList()
 
+            //3. PO CALLS UPDATE
             //TestQuestAction.POCallsOld = TestQuestAction.POCallsNew
             val callsPassed = testOutcomes.flatMap { it.poMethodCallsPassed }.distinct()
             TestQuestAction.POCallsOld = TestQuestAction.POCallsOld.mapValues { (key, oldCalls) ->
@@ -135,6 +141,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
                 }.toList()
             }.toMutableMap()
 
+            //4. POs UPDATE
             //TestQuestAction.POsOld = TestQuestAction.POsNew
             val exercisedPOs = callsPassed.map { it.pageObject }.toSet()
             TestQuestAction.POsOld = TestQuestAction.POsOld.map { oldPO ->
@@ -173,12 +180,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
                 }
             }.toList()
 
-
-
-
-
-
-
+            //5. SAVE CHANGES ON FILE
             UserProgressFileHandler.saveProgressData()//to store user progress that needs to be tested next time
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
@@ -195,7 +197,6 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             val (oldLocatorsInTest, newLocatorsInTest) = collectLocators(test)
             // 2. FIND ERROR LINE (IF ANY), LOCATORS PASSED/BROKEN (IF ANY)/UNEXERCISED (IF ANY)
             val analysisResult = analyzeErrorInfo(test, newLocatorsInTest)
-
             //3. FIND PO METHOD CALLS THAT ARE PASSED/UNEXERCISED DUE TO FAILURE
             val (passedCalls, unexercisedCalls) = TestQuestAction.POCallsNew[test.name]?.let { calls ->
                 if (analysisResult.testErrorLineNum == -1) //if testErrorLineNum è -1, all calls are passed
@@ -205,8 +206,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
                             calls.filter { it.line >= analysisResult.testErrorLineNum }
 
             } ?: (emptyList<PageObjectCall>() to emptyList())
-
-
+            //4. TEST OUTCOME IS CREATED
             val testOutcome = TestOutcome(
                 test.name,
                 test.parent.name,
@@ -317,11 +317,9 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
         //first, get locators from test only
         val locationUrl = test.locationUrl
         val testClassName = locationUrl!!.removePrefix("java:test://").substringAfterLast('.').substringBefore('/')
-        //val oldLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsOldDynamic
         val oldLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsOld
             .filter { it.methodName == test.name && it.className == testClassName }
             .toMutableList()
-        //val newLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsNewDynamic
         val newLocatorsInTest: MutableList<Locator> = TestQuestAction.locatorsNew
             .filter { it.methodName == test.name && it.className == testClassName }
             .toMutableList()

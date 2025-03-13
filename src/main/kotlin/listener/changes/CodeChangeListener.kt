@@ -100,7 +100,7 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                         .associate { it.key to it.value }
 
                     //reassign targeted dailies based on changes
-                    if (GamificationManager.mode == GamificationManager.DailyAssignmentMode.TARGETED) {
+                    if (GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.TARGETED) {
                         GamificationManager.assignTargetDailies()
                     }
                 }

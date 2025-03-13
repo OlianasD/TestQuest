@@ -1,9 +1,7 @@
 package utils
 
-import testquest.PluginData
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.ui.Messages
 import java.io.File
 import java.nio.file.Path
 

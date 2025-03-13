@@ -1,6 +1,8 @@
 package analyzer.pageobject
 
 
+import analyzer.locator.LocatorsAnalyzer
+import extractor.locator.Locator
 import extractor.pageobject.MethodInfo
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
@@ -19,14 +21,18 @@ class PageObjectsAnalyzer {
         private var targetedFixedAndPendingPOs = mutableMapOf<String, MutableList<Any>>()
 
 
+        fun getFixedAndPendingLocatorsMap(): MutableMap<String, MutableList<Any>>{
+            return targetedFixedAndPendingPOs
+        }
+
 
         //this method is called to remove the list of fixed POs from pending, once they are exercised in a test
-        fun removePendingFixedPOs(passedPOs: List<Any>) {
+        fun removePendingFixedPOs(passedIssue: List<Any>) {
             //remove fixed and confirmed POs (i.e., PO fixed, following a test execution to confirm)
             targetedFixedAndPendingPOs.keys.forEach { key ->
                 val fixedAndPendingPOs = targetedFixedAndPendingPOs[key]?.toMutableList() ?: return@forEach
                 val stillFixedAndPendingPOs = fixedAndPendingPOs.filterNot { fixedPendingPO ->
-                    passedPOs.any { it.hashCode() == fixedPendingPO.hashCode()
+                    passedIssue.any { it.hashCode() == fixedPendingPO.hashCode()
                     }
                 }
                 if (stillFixedAndPendingPOs.isEmpty()) {
@@ -156,7 +162,6 @@ class PageObjectsAnalyzer {
         if (clonedMethods.isNotEmpty())
             targetedIssuedPOs["clonedPOMethods"] = clonedMethods.toList()
     }
-
 
 
 

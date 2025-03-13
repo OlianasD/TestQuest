@@ -56,6 +56,14 @@ class TestQuestAction : AnAction() {
                 }
                 .associate { it.key to it.value }
 
+            //asks the user if they want locator-based gamification mode (i.e., only dailies about locators)
+            //or advanced gamification mode (i.e., all dailies)
+            val locatorMode = GUIManager.showGamificationModeChoice()
+            if (locatorMode)
+                GamificationManager.gamificationMode = GamificationManager.GamificationMode.LOCATOR
+            else
+                GamificationManager.gamificationMode = GamificationManager.GamificationMode.ADVANCED
+
             //setup gamification profile
             val gamificationManager = GamificationManager()
             gamificationManager.showGUI()
