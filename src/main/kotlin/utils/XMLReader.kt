@@ -93,6 +93,7 @@ class XMLReader {
             val dailyProgress = dailyNode.getAttribute("progress").toInt()
             val dailyDiscarded = dailyNode.getAttribute("discarded").toBoolean()
             val dailyIsAdvanced = DailyManager.getIsAdvancedFromName(dailyName)
+            val addDescription = DailyManager.getAdditionalDescriptionFromName(dailyName)
             val modifiedLocs = mutableListOf<String>()
             val dailyType = dailyNode.getAttribute("type")
             val targetedLocators = mutableListOf<Locator>()//to manage locators associated with targeted dailies
@@ -110,23 +111,23 @@ class XMLReader {
                             className = locatorNode.getAttribute("className"),
                             locatorName = locatorNode.getAttribute("locatorName").takeIf { it.isNotEmpty() },
                             locatorPosition = locatorNode.getAttribute("locatorPosition").toInt(),
-                            filePath = locatorNode.getAttribute("filePath")
+                            filePath = locatorNode.getAttribute("filePath"),
                         )
                         targetedLocators.add(locator)
                     }
                 }
             }
-            if(dailyName.equals("edit5")) {
-                val modifiedLocsNode = dailyNode.getElementsByTagName("modified-locs")
-                if (modifiedLocsNode.length > 0) {
-                    val locNodes = (modifiedLocsNode.item(0) as Element).getElementsByTagName("loc")
-                    for (j in 0 until locNodes.length) {
-                        val loc = locNodes.item(j).textContent
-                        modifiedLocs.add(loc)
-                    }
-                }
-            }
-            val daily = Daily(dailyName, dailyDescription, dailyXP, dailyTarget, dailyIcon, dailyType, targetedLocators, isAdvanced = dailyIsAdvanced)
+            val daily = Daily(
+                dailyName,
+                dailyDescription,
+                dailyXP,
+                dailyTarget,
+                dailyIcon,
+                dailyType,
+                targetedLocators,
+                isAdvanced = dailyIsAdvanced,
+                additionalDescription = addDescription
+            )
             val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyDiscarded, modifiedLocs)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }

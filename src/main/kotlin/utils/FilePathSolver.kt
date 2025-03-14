@@ -25,11 +25,11 @@ object FilePathSolver {
         return file
     }
 
-    fun getSavedProgressFile(user: String): File {
+    fun getSavedOldDataFile(user: String): File {
         val userFolder = File(BASE_PLUGIN_PATH, user)
         if (!userFolder.exists())
             userFolder.mkdir()
-        return File(userFolder, "progress.txt")
+        return File(userFolder, "oldData.txt")//old locs, POs, PO calls
     }
 
     fun getSavedPendingLocsFile(user: String): File {

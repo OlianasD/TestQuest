@@ -28,11 +28,14 @@ class DailyManager {
             /************ DAILIES ABOUT LOCATORS ************/
             Daily(
                 "xpathAbs",
-                "Replace $DAILY_GOAL existing absolute XPath locators with $DAILY_GOAL relative ones",
+                "Convert $DAILY_GOAL existing absolute XPath locators to relative XPath",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Absolute XPaths are characterized by the tag 'html' at the beginning (e.g., /html/body/div/form/input[2]) " +
+                        "You might want to avoid absolute XPaths and make them relative to improve flexibility and robustness, " +
+                        "ensuring they remain valid even if the document structure changes slightly (E.g., /html/body/div/form/input[2] --> //input[2])  "
             ),
             Daily(
                 "xpathLength",
@@ -40,31 +43,42 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
+                        "You might want to reduce the length of an XPath to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
             ),
             Daily(
                 "xpathLevel",
-                "Reduce the level of $DAILY_GOAL existing XPath locators",
+                "Reduce the levels of $DAILY_GOAL existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription =
+                        "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
+                        "You might want to reduce the levels of an XPath to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
             ),
             Daily(
                 "loc2xpath",
-                "Convert $DAILY_GOAL existing non-XPath locators to $DAILY_GOAL XPath ones",
+                "Convert $DAILY_GOAL existing non-XPath locators to XPath",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "As XPath locators are known a reliable locator strategy, you might want to have " +
+                        "them implemented in the test suite, by converting non-XPath locators to XPath."
             ),
             Daily(
                 "loc2id",
-                "Convert $DAILY_GOAL existing non-ID locators to $DAILY_GOAL ID ones",
+                "Convert $DAILY_GOAL existing non-ID locators to ID",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "As ID locators are known to be the most reliable locator strategy, you might want to have " +
+                        "them implemented in the test suite, by converting non-ID locators to ID."
             ),
             Daily(
                 "runLocs20",
@@ -72,7 +86,8 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 20,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Once implemented, you might want to exercise locators with test scripts to validate them."
             ),
             Daily(
                 "robustness",
@@ -80,7 +95,11 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "The robustness of a locator defines its ability to withstand future evolutions " +
+                        "of the app without breaking, as it does not rely on fragile aspects that change over time. " +
+                        "There are specific characteristics that make a locator robust (e.g., being of type ID or relative XPath, having short length, etc)." +
+                        "You might want to improve the robustness of existing locators."
             ),
             Daily(
                 "lengthShortenMax",
@@ -88,47 +107,52 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
+                        "You might want to reduce the length of an XPath below a maximum value, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2]). "
             ),
             Daily(
                 "addAttrToXPath",
-                "Add $DAILY_GOAL references to robust attributes to existing XPaths locators",
+                "Add $DAILY_GOAL references to robust attributes to existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Since XPaths can refer to robust predicates (e.g., //input[@class='userData']), as they change rarely over time, " +
+                        "you might want to add to existing XPath locators the references " +
+                        "to these robust predicates, particularly @id, @name, @class, @title, @alt, and @value."
             ),
             Daily(
                 "remAttrFromXPath",
-                "Remove $DAILY_GOAL references to fragile attributes from existing XPaths locators",
+                "Remove $DAILY_GOAL references to fragile attributes from existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Since XPaths can refer to fragile predicates (e.g., //input[@width='158']), as they expose to structural properties that change frequently over time, " +
+                        "you might want to remove from existing XPath locators the references to these fragile predicates, particularly @src, @href, @height, and @width."
             ),
             Daily(
                 "remJSFromXPath",
-                "Remove $DAILY_GOAL references to Javascript code from existing XPaths locators",
+                "Remove $DAILY_GOAL references to Javascript code from existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
-            ),
-            Daily(
-                "edit5",
-                "Modify 5 different existing locators",
-                RANDOM_DAILY_XP,
-                5,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Since XPaths can refer to fragile predicates (e.g., //input[@onLoad='...']), as they expose Javascript code that changes frequently over time, " +
+                        "you might want to remove from existing XPath locators the references to these fragile predicates, particularly @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown"
             ),
             Daily(
                 "levelLoweredMax",
-                "Lower the level of $DAILY_GOAL existing locators below " + GamificationManager.MAX_LEVEL + " tags",
+                "Lower the levels of $DAILY_GOAL existing locators below " + GamificationManager.MAX_LEVEL,
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription =  "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
+                        "You might want to reduce the levels of an XPath below a maximum estimation, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
             ),
             Daily(
                 "repair",
@@ -136,7 +160,9 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "As locators break sooner or later due to the software evolution, you might want to have them repaired by " +
+                        "finding a new value for the locator and, if needed, a new locator strategy."
             ),
             Daily(
                 "reducePredicates",
@@ -144,7 +170,9 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription ="Since the exposure of predicates, even robust ones, can be a source of locator fragility as they reveal information, " +
+                        "you might want to reduce their number where possible (e.g., //div[3]/form[@class='userData']/input[2] --> //form/input[2])."
             ),
             Daily(
                 "newXPath",
@@ -152,7 +180,9 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "As XPath locators are known as a reliable locator strategy, you might want to " +
+                        "implement new ones in the test suite, when needed."
             ),
             Daily(
                 "newID",
@@ -160,31 +190,31 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
-            ),
-            Daily(
-                "newSameLoc",
-                "Implement a newly locator value and use it more than once in a test suite",
-                RANDOM_DAILY_XP,
-                DAILY_GOAL,
-                FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "As ID locators are known as the most reliable locator strategy, you might want to " +
+                        "implement new ones in the test suite, when needed."
             ),
             Daily(
                 "newLengthShorterMax",
-                "Implement $DAILY_GOAL new XPath locators with length below " + GamificationManager.MAX_LENGTH+ " characters",
+                "Implement $DAILY_GOAL new XPath locators with length below " + GamificationManager.MAX_LENGTH,
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
+                        "You might want to add new XPath locators with the length below a maximum value, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2]). "
             ),
             Daily(
                 "newLevelLowerMax",
-                "Implement $DAILY_GOAL new XPath locators with level below " + GamificationManager.MAX_LEVEL+ " tags",
+                "Implement $DAILY_GOAL new XPath locators with levels below " + GamificationManager.MAX_LEVEL,
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription =  "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
+                        "You might want to add new XPath locators with the levels below a maximum estimation, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
             ),
             Daily(
                 "newRobust",
@@ -192,7 +222,11 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "The robustness of a locator defines its ability to withstand future evolutions " +
+                        "of the app without breaking, as it does not rely on fragile aspects that change over time. " +
+                        "There are specific characteristics that make a locator robust (e.g., being of type ID or relative XPath, having short length, etc)." +
+                        "You might want to add new locators that can be considered robust 'enough'"
             ),
             Daily(
                 "newWantedAttr",
@@ -200,7 +234,10 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Since XPaths can reference predicates (e.g., //input[@class='userData']), some predicates are notoriously more " +
+                        "robust than others, as they change less frequently over time. You might want to add new XPath locators with references " +
+                        "to these robust predicates, particularly @id, @name, @class, @title, @alt, and @value."
             ),
             Daily(
                 "newUnwantedAttr",
@@ -208,7 +245,10 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Since XPaths can reference predicates (e.g., //input[@width='158']), some predicates are notoriously less " +
+                        "robust than others, as they refer to structural properties that change frequently over time. " +
+                        "You might want to add new XPath locators avoiding the references to these fragile predicates, particularly @src, @href, @height, and @width."
             ),
             Daily(
                 "newJS",
@@ -216,7 +256,10 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription = "Since XPaths can reference predicates (e.g., //input[@onLoad='...']), some predicates are notoriously less " +
+                        "robust than others, as they refer to Javascript code that changes frequently over time. " +
+                        "You might want to add new XPath locators avoiding the references to these fragile predicates, particularly @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown"
             ),
             Daily(
                 "newLowPredicates",
@@ -224,7 +267,9 @@ class DailyManager {
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.RANDOM.name
+                GamificationManager.DailyAssignmentMode.RANDOM.name,
+                additionalDescription ="Since the exposure of predicates, even robust ones, can be a source of locator fragility as they reveal information, " +
+                        "you might want to add new locators limiting the number of predicates when possible (e.g., //div[3]/form[@class='userData']/input[2] --> //form/input[2])."
             ),
             /************ DAILIES ABOUT POS ************/
             Daily(
@@ -452,11 +497,14 @@ class DailyManager {
             /************ DAILIES ABOUT LOCATORS ************/
             Daily(
                 "absolute",
-                "Turns the following absolute XPath locators into relative ones",
+                "Convert the following absolute XPath locators to relative",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription = "Absolute XPaths are characterized by the tag 'html' at the beginning (e.g., /html/body/div/form/input[2]) " +
+                        "You might want to avoid absolute XPaths and make them relative to improve flexibility and robustness, " +
+                        "ensuring they remain valid even if the document structure changes slightly (E.g., /html/body/div/form/input[2] --> //input[2])  "
             ),
             Daily(
                 "length",
@@ -464,7 +512,10 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
+                        "You might want to reduce the length of an XPath to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
             ),
             Daily(
                 "level",
@@ -472,31 +523,42 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription =
+                "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
+                        "You might want to reduce the levels of an XPath to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
             ),
             Daily(
                 "posPredicate",
-                "Remove/Replace the positional predicates from the following XPath locators",
+                "Remove the positional predicates from the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription ="Since the exposure of predicates, even robust ones, can be a source of locator fragility as they reveal information, " +
+                        "you might want to reduce their number where possible (e.g., //div[3]/form[1]/input[2] --> //form/input[2])."
             ),
             Daily(
                 "badPredicate",
-                "Remove/Replace the weak predicates from the following XPath locators",
+                "Remove the fragile predicates from the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription = "Since XPaths can refer to fragile predicates (e.g., //input[@width='158']), as they expose to structural properties or Javascript code that change frequently over time, " +
+                        "you might want to remove from existing XPath locators the references to these fragile predicates, " +
+                        "particularly @src, @href, @height, @width, @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown."
             ),
             Daily(
                 "noIDOrXPath",
-                "Replace the following non-ID/XPath locators into ID/XPath ones",
+                "Convert the following non-ID/XPath locators into ID/XPath",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription = "As ID and XPath locators are known as reliable locator strategies, you might want to convert " +
+                        "non-ID and non-XPath locators into them."
             ),
             Daily(
                 "broken",
@@ -504,7 +566,9 @@ class DailyManager {
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
-                GamificationManager.DailyAssignmentMode.TARGETED.name
+                GamificationManager.DailyAssignmentMode.TARGETED.name,
+                additionalDescription = "As locators break sooner or later due to the software evolution, you might want to have them repaired by " +
+                        "finding a new value for the locator and, if needed, a new locator strategy."
             ),
             /************ DAILIES ABOUT POs ************/
             Daily(
@@ -600,13 +664,11 @@ class DailyManager {
             "addAttrToXPath" to { testOutcomes -> checkWantedAttrsInXPaths(testOutcomes) },
             "remAttrFromXPath" to { testOutcomes -> checkUnwantedAttrsInXPaths(testOutcomes) },
             "remJSFromXPath" to { testOutcomes -> checkJSInXPaths(testOutcomes) },
-            "edit5" to { testOutcomes -> checkChangedLocs5(testOutcomes) },
             "levelLoweredMax" to { testOutcomes -> checkLoweredLevelMax(testOutcomes) },
             "repair" to { testOutcomes -> checkRepair(testOutcomes) },
             "reducePredicates" to { testOutcomes -> reducePredicates(testOutcomes) },
             "newXPath" to { testOutcomes -> checkNewXPath(testOutcomes) },
             "newID" to { testOutcomes -> checkNewID(testOutcomes) },
-            "newSameLoc" to { testOutcomes -> checkNewMultipleUseLoc(testOutcomes) },
             "newLengthShorterMax" to { testOutcomes -> checkNewXPathLengthMax(testOutcomes) },
             "newLevelLowerMax" to { testOutcomes -> checkNewXPathLevelMax(testOutcomes) },
             "newRobust" to { testOutcomes -> checkNewRobust(testOutcomes) },
@@ -664,34 +726,25 @@ class DailyManager {
             /************ DAILIES ABOUT TESTS ************/
         )
 
-
-        fun getTargetedLocatorDailyNames(): List<String> {
-            return listOf(
-                "absolute", "length", "level", "posPredicate", "badPredicate", "noIDOrXPath", "broken"
-            )
-        }
-
-        fun getTargetedPageObjectDailyNames(): List<String> {
-            return listOf(
-                "emptyPOs", "missingCommandMethods", "missingRetPOMethods", "assertInPOMethods",
-                "nonCanonicalLocs", "unusedPOMethods", "outPOLocs", "duplicatedMethods"
-            )
-        }
-
         /******* TARGETED DAILY CHECKS ABOUT LOCATORS *******/
 
         private fun checkTargetedAbsoluteRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
-                for (oldLocator in testOutcome.locatorsOld) {
-                    val newLocator = locatorsNewMap[oldLocator.hashCode()]
-                    if (newLocator != null &&
-                        newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        !newLocator.locatorValue.startsWith("/html") &&
-                        oldLocator.locatorValue.startsWith("/html")) {
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        !passedLoc.locatorValue.startsWith("/html") &&
+                        oldLoc.locatorValue.startsWith("/html"))
                         count++
-                    }
+                    break
                 }
             }
             return count
@@ -699,15 +752,20 @@ class DailyManager {
 
         private fun checkTargetedLengthReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
-                for (oldLocator in testOutcome.locatorsOld) {
-                    val newLocator = locatorsNewMap[oldLocator.hashCode()]
-                    if (newLocator != null &&
-                        newLocator.locatorValue.length <= GamificationManager.MAX_LENGTH &&
-                        oldLocator.locatorValue.length > GamificationManager.MAX_LENGTH) {
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (passedLoc.locatorValue.length <= GamificationManager.MAX_LENGTH &&
+                        oldLoc.locatorValue.length > GamificationManager.MAX_LENGTH)
                         count++
-                    }
+                    break
                 }
             }
             return count
@@ -715,57 +773,71 @@ class DailyManager {
 
         private fun checkTargetedLevelReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
-                for (oldLocator in testOutcome.locatorsOld) {
-                    val newLocator = locatorsNewMap[oldLocator.hashCode()]
-                    val oldLevels = oldLocator.locatorValue.split("/").count { it.isNotEmpty() }
-                    val newLevels = newLocator?.locatorValue?.split("/")?.count { it.isNotEmpty() } ?: 0
-                    if (newLocator != null &&
-                        newLevels <= GamificationManager.MAX_LEVEL &&
-                        oldLevels > GamificationManager.MAX_LEVEL) {
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    val oldLevels = oldLoc.locatorValue.split("/").count { it.isNotEmpty() }
+                    val newLevels = passedLoc.locatorValue.split("/").count { it.isNotEmpty() }
+                    if (GamificationManager.MAX_LEVEL in newLevels..<oldLevels)
                         count++
-                    }
+                    break
                 }
             }
             return count
         }
 
         private fun checkTargetedPosPredicateRemoved(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
             val predicateRegex = Regex("\\[\\d+]")
-            for (testOutcome in testOutcomes) {
-                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
-                for (oldLocator in testOutcome.locatorsOld) {
-                    val newLocator = locatorsNewMap[oldLocator.hashCode()]
-                    val oldPredicateCount = predicateRegex.findAll(oldLocator.locatorValue).count()
-                    val newPredicateCount = newLocator?.locatorValue?.let { predicateRegex.findAll(it).count() } ?: 0
-                    if (newLocator != null &&
-                        newPredicateCount <= GamificationManager.MAX_POS_PRED &&
-                        oldPredicateCount > GamificationManager.MAX_POS_PRED) {
+            var count = 0
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    val oldPredicateCount = oldLoc.locatorValue.let { predicateRegex.findAll(it).count() }
+                    val newPredicateCount = passedLoc.locatorValue.let { predicateRegex.findAll(it).count() }
+                    if (GamificationManager.MAX_POS_PRED in newPredicateCount..<oldPredicateCount)
                         count++
-                    }
+                    break
                 }
             }
             return count
         }
 
         private fun checkTargetedBadPredicateRemoved(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
             val problematicAttributes = GamificationManager.BAD_PREDS + GamificationManager.BAD_JS
-            for (testOutcome in testOutcomes) {
-                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
-                for (oldLocator in testOutcome.locatorsOld) {
-                    val newLocator = locatorsNewMap[oldLocator.hashCode()]
+            var count = 0
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
                     val hadBadPredicate = problematicAttributes.any { attr ->
-                        oldLocator.locatorValue.contains("@$attr", ignoreCase = true)
+                        oldLoc.locatorValue.contains("@$attr", ignoreCase = true)
                     }
-                    val isResolved = newLocator != null && problematicAttributes.none { attr ->
-                        newLocator.locatorValue.contains("@$attr", ignoreCase = true)
+                    val isResolved = problematicAttributes.none { attr ->
+                        passedLoc.locatorValue.contains("@$attr", ignoreCase = true)
                     }
-                    if (hadBadPredicate && isResolved) {
+                    if (hadBadPredicate && isResolved)
                         count++
-                    }
+                    break
                 }
             }
             return count
@@ -773,18 +845,23 @@ class DailyManager {
 
         private fun checkTargetedNoIDNoXpathChanged(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsNewMap = testOutcome.locatorsPassed.associateBy { it.hashCode() }
-                for (oldLocator in testOutcome.locatorsOld) {
-                    val newLocator = locatorsNewMap[oldLocator.hashCode()]
-                    val wasNonIDOrXpath = !oldLocator.locatorType.equals("id", ignoreCase = true) &&
-                            !oldLocator.locatorType.equals("xpath", ignoreCase = true)
-                    val isNowIDOrXpath = newLocator != null &&
-                            (newLocator.locatorType.equals("id", ignoreCase = true) ||
-                                    newLocator.locatorType.equals("xpath", ignoreCase = true))
-                    if (wasNonIDOrXpath && isNowIDOrXpath) {
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    val wasNonIDOrXpath = !oldLoc.locatorType.equals("id", ignoreCase = true) &&
+                            !oldLoc.locatorType.equals("xpath", ignoreCase = true)
+                    val isNowIDOrXpath = passedLoc.locatorType.equals("id", ignoreCase = true) ||
+                            passedLoc.locatorType.equals("xpath", ignoreCase = true)
+                    if (wasNonIDOrXpath && isNowIDOrXpath)
                         count++
-                    }
+                    break
                 }
             }
             return count
@@ -1039,18 +1116,22 @@ class DailyManager {
 
         private fun checkAbsXPathRemoved(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        oldLocator.locatorValue.startsWith("/html")) {
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            !newLocator.locatorValue.startsWith("/html"))
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLoc.locatorValue.startsWith("/html") &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        !passedLoc.locatorValue.startsWith("/html"))
                             count++
-                    }
+                    break
                 }
             }
             return count
@@ -1059,17 +1140,21 @@ class DailyManager {
 
         private fun checkXPathLengthReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)
-                            && newLocator.locatorValue.length < oldLocator.locatorValue.length)
-                            count++
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true)
+                        && passedLoc.locatorValue.length < oldLoc.locatorValue.length)
+                        count++
+                    break
                 }
             }
             return count
@@ -1077,18 +1162,22 @@ class DailyManager {
 
         private fun checkXPathLevelReduced(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)
-                            && (newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <
-                            oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size))
-                            count++
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <
+                                oldLoc.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size)
+                        count++
+                    break
                 }
             }
             return count
@@ -1096,16 +1185,20 @@ class DailyManager {
 
         private fun checkLocs2XPathConverted(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (!oldLocator.locatorType.equals("xpath", ignoreCase = true)) {
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
-                            count++
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (!oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                     passedLoc.locatorType.equals("xpath", ignoreCase = true))
+                        count++
+                    break
                 }
             }
             return count
@@ -1113,16 +1206,20 @@ class DailyManager {
 
         private fun checkLocs2IDConverted(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (!oldLocator.locatorType.equals("id", ignoreCase = true)) {
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("id", ignoreCase = true))
-                            count++
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (!oldLoc.locatorType.equals("id", ignoreCase = true) &&
+                        passedLoc.locatorType.equals("id", ignoreCase = true))
+                        count++
+                    break
                 }
             }
             return count
@@ -1130,15 +1227,19 @@ class DailyManager {
 
         private fun checkRobustnessImprovement(testOutcomes: List<TestOutcome>): Int{
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                    if (newLocator != null && computeFragilityCoefficient(newLocator) <
-                        computeFragilityCoefficient(oldLocator))
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (computeFragilityCoefficient(passedLoc) <  computeFragilityCoefficient(oldLoc))
                         count++
+                    break
                 }
             }
             return count
@@ -1146,16 +1247,22 @@ class DailyManager {
 
         private fun checkShortenedLengthMax(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorValue.length > GamificationManager.MAX_LENGTH){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorValue.length <= GamificationManager.MAX_LENGTH)
-                            count++
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLoc.locatorValue.length > GamificationManager.MAX_LENGTH &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorValue.length <= GamificationManager.MAX_LENGTH)
+                        count++
+                    break
                 }
             }
             return count
@@ -1163,17 +1270,21 @@ class DailyManager {
 
         private fun checkWantedAttrsInXPaths(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
-                            count += countWantedAttributes(newLocator.locatorValue) -
-                                    countWantedAttributes(oldLocator.locatorValue)
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true))
+                            count += countWantedAttributes(passedLoc.locatorValue) -
+                                    countWantedAttributes(oldLoc.locatorValue)
+                    break
                 }
             }
             return count
@@ -1181,17 +1292,21 @@ class DailyManager {
 
         private fun checkUnwantedAttrsInXPaths(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
-                            count += countUnwantedAttributes(oldLocator.locatorValue) -
-                                    countUnwantedAttributes(newLocator.locatorValue)
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true))
+                        count += countUnwantedAttributes(oldLoc.locatorValue) -
+                                countUnwantedAttributes(passedLoc.locatorValue)
+                    break
                 }
             }
             return count
@@ -1199,54 +1314,44 @@ class DailyManager {
 
         private fun checkJSInXPaths(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true))
-                            count += countJavaScriptReferences(oldLocator.locatorValue) -
-                                    countJavaScriptReferences(newLocator.locatorValue)
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true)&&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true))
+                        count += countJavaScriptReferences(oldLoc.locatorValue) -
+                                    countJavaScriptReferences(passedLoc.locatorValue)
+                    break
                 }
             }
             return count
         }
 
-        private fun checkChangedLocs5(testOutcomes: List<TestOutcome>): Int {
-            val dailyProgress = GamificationManager.userProfile.dailyProgresses
-                .find { it.daily.name == "edit5" }
-            val existingModifiedLocs = dailyProgress!!.modifiedLocs.toMutableSet()
-            val oldSize = existingModifiedLocs.size
-            for (testOutcome in testOutcomes) {
-                //it checks if locators have changed values and are different from those that were already changed
-                val locatorsOldMap = testOutcome.locatorsOld.associateBy { it.locatorName }
-                testOutcome.locatorsPassed.forEach { locatorNew ->
-                    val locatorOld = locatorsOldMap[locatorNew.locatorName]
-                    if (locatorOld != null && locatorNew.locatorValue != locatorOld.locatorValue)
-                        existingModifiedLocs.add(locatorNew.locatorName.toString())
-                }
-            }
-            dailyProgress.modifiedLocs = existingModifiedLocs.toList()
-            return existingModifiedLocs.size - oldSize //it returns the number of newly changed locs
-        }
-
         private fun checkLoweredLevelMax(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for(testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                        oldLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size > GamificationManager.MAX_LEVEL){
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)
-                            && newLocator.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <= GamificationManager.MAX_LEVEL)
-                            count++
-                    }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        oldLoc.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size > GamificationManager.MAX_LEVEL &&
+                        passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                        passedLoc.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <= GamificationManager.MAX_LEVEL)
+                        count++
+                    break
                 }
             }
             return count
@@ -1303,20 +1408,23 @@ class DailyManager {
 
         private fun reducePredicates(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val newLocatorsMap = locatorsNew.associateBy { it.hashCode() }
-                for (oldLocator in locatorsOld) {
-                    if (oldLocator.locatorType.equals("xpath", ignoreCase = true)) {
-                        val newLocator = newLocatorsMap[oldLocator.hashCode()]
-                        if (newLocator != null && newLocator.locatorType.equals("xpath", ignoreCase = true)) {
-                            val oldPredicatesCount = oldLocator.locatorValue.split("[", "]").size / 2 - 1
-                            val newPredicatesCount = newLocator.locatorValue.split("[", "]").size / 2 - 1
-                            if (newPredicatesCount < oldPredicatesCount)
-                                count++
-                        }
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            for (passedLoc in passedLocs) {
+                for (oldLoc in oldLocs) {
+                    if(passedLoc.hashCode() != oldLoc.hashCode())
+                        continue
+                    if (oldLoc.locatorType.equals("xpath", ignoreCase = true) && passedLoc.locatorType.equals("xpath", ignoreCase = true)) {
+                        val oldPredicatesCount = oldLoc.locatorValue.split("[", "]").size / 2 - 1
+                        val newPredicatesCount = passedLoc.locatorValue.split("[", "]").size / 2 - 1
+                        if (newPredicatesCount < oldPredicatesCount)
+                            count++
                     }
+                    break
                 }
             }
             return count
@@ -1324,185 +1432,160 @@ class DailyManager {
 
         private fun checkNewXPath(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                //new locator hashes only
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true)
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
 
         private fun checkNewID(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                //new locator hashes only
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("id", ignoreCase = true)
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("id", ignoreCase = true) &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
-        }
-
-        //two cases: new locators using multiple old values or new locators using multiple new values
-        private fun checkNewMultipleUseLoc(testOutcomes: List<TestOutcome>): Int {
-            val oldLocatorsHashes = mutableSetOf<Int>()
-            val newLocators = mutableListOf<Locator>()
-            //locators are considered from the whole test suite and not separated by method
-            for (testOutcome in testOutcomes) {
-                oldLocatorsHashes.addAll(testOutcome.locatorsOld.map { it.hashCode() })
-                newLocators.addAll(testOutcome.locatorsPassed)
-            }
-            //new locator hashes only
-            val filteredNewLocators = newLocators.filter { newLocator ->
-                !oldLocatorsHashes.contains(newLocator.hashCode())
-            }
-            //count locator value usages
-            val locatorCountMap = mutableMapOf<String, Int>()
-            for (locator in filteredNewLocators)
-                locatorCountMap[locator.locatorValue] = locatorCountMap.getOrDefault(locator.locatorValue, 0) + 1
-            return locatorCountMap.values.count { it > 1 }
         }
 
         private fun checkNewXPathLengthMax(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                //new locator hashes only
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            (newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                                    newLocator.locatorValue.length <= GamificationManager.MAX_LENGTH)
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                passedLoc.locatorValue.length <= GamificationManager.MAX_LENGTH &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
         private fun checkNewXPathLevelMax(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            newLocator.locatorValue.split("/")
-                                .filter { node -> node.isNotEmpty() }
-                                .size <= GamificationManager.MAX_LEVEL
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                passedLoc.locatorValue.split("/").filter { node -> node.isNotEmpty() }.size <= GamificationManager.MAX_LEVEL &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
         private fun checkNewRobust(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            computeFragilityCoefficient(newLocator) <= GamificationManager.ROBUST_THRESHOLD
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                computeFragilityCoefficient(passedLoc) <= GamificationManager.ROBUST_THRESHOLD &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
         private fun checkNewXPathWithWantedAttrs(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            GamificationManager.GOOD_PREDS.any { attribute ->
-                                newLocator.locatorValue.contains("@$attribute", ignoreCase = true)
-                            }
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                GamificationManager.GOOD_PREDS.any { attribute -> passedLoc.locatorValue.contains("@$attribute", ignoreCase = true) } &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
         private fun checkNewXPathWithoutUnwantedAttrs(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            GamificationManager.BAD_PREDS.none { attribute ->
-                                newLocator.locatorValue.contains("@$attribute", ignoreCase = true)
-                            }
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                GamificationManager.BAD_PREDS.none { attribute -> passedLoc.locatorValue.contains("@$attribute", ignoreCase = true) } &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
         private fun checkNewXPathWithoutJS(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            GamificationManager.BAD_JS.none { attribute ->
-                                newLocator.locatorValue.contains("@$attribute", ignoreCase = true)
-                            }
-                }
-                count += newLocators.size
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                GamificationManager.BAD_JS.none { attribute -> passedLoc.locatorValue.contains("@$attribute", ignoreCase = true) } &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
         private fun checkRunLoc20(testOutcomes: List<TestOutcome>): Int {
-            var count = 0
-            for(testOutcome in testOutcomes) {
-                count += testOutcome.locatorsPassed.size
-            }
-            return count
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            return passedLocs.size
         }
 
         private fun checkNewXPathWithFewPosPredicates(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            for (testOutcome in testOutcomes) {
-                val locatorsOld = testOutcome.locatorsOld
-                val locatorsNew = testOutcome.locatorsPassed
-                val oldLocatorsHashes = locatorsOld.map { it.hashCode() }.toSet()
-                val regex = "\\[.*?]".toRegex() //to count positional predicates
-                //find locators that are actually new
-                val newLocators = locatorsNew.filter { newLocator ->
-                    !oldLocatorsHashes.contains(newLocator.hashCode()) &&
-                            newLocator.locatorType.equals("xpath", ignoreCase = true) &&
-                            regex.findAll(newLocator.locatorValue).count() <= GamificationManager.MAX_POS_PRED
-                }
-                count += newLocators.size
+            val regex = "\\[.*?]".toRegex() //to count positional predicates
+            val passedLocs = testOutcomes
+                .flatMap { it.locatorsPassed }
+                .toSet()
+            val oldLocs = testOutcomes
+                .flatMap { it.locatorsOld }
+                .toSet()
+            val newPassedLocs = passedLocs.filter { passedLoc ->
+                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                regex.findAll(passedLoc.locatorValue).count() <= GamificationManager.MAX_POS_PRED &&
+                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
+            count += newPassedLocs.size
             return count
         }
 
@@ -1888,7 +1971,9 @@ class DailyManager {
                     icon = daily.icon,
                     type = daily.type,
                     targetedLocators = locatorsForDaily,
-                    issuesInPOs = posForDaily
+                    issuesInPOs = posForDaily,
+                    isAdvanced = daily.isAdvanced,
+                    additionalDescription = daily.additionalDescription
                 )
             }
             //remove all old targeted dailies as they will be updated by new check
@@ -1987,6 +2072,12 @@ class DailyManager {
                 ?.isAdvanced ?: false
         }
 
+        fun getAdditionalDescriptionFromName(name: String): String {
+            return (ALL_RANDOM_DAILIES + ALL_TARGETED_DAILIES)
+                .find { it.name == name }
+                ?.additionalDescription!!
+        }
+
         fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>> {
             val progresses = mutableListOf<Pair<Int, Daily?>>() //to track the progresses (i.e., xp gained and associated daily)
 
@@ -2033,11 +2124,6 @@ class DailyManager {
             //since targeted dailies might involve a large number of locators, the xp is given for each (counted by progress)
             else if (GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.TARGETED) {
                 gainedXP = daily.xp * progress
-
-                //TODO: remove the following, used just for testing
-                //gainedXP = 50000000
-
-
                 involvedDaily = daily
                 userProfile.currentXP += gainedXP
             }

@@ -75,15 +75,6 @@ class XMLWriter {
                         }
                         dailyNode.appendChild(locatorsNode)
                     }
-                    if (dailyProgress.daily.name == "edit5") {
-                        val modifiedLocsNode = doc.createElement("modified-locs")
-                        dailyProgress.modifiedLocs.forEach { loc ->
-                            val locNode = doc.createElement("loc")
-                            locNode.textContent = loc
-                            modifiedLocsNode.appendChild(locNode)
-                        }
-                        dailyNode.appendChild(modifiedLocsNode)
-                    }
                     dailiesNode.appendChild(dailyNode)
                 }
                 //update achievements
@@ -180,15 +171,6 @@ class XMLWriter {
                     locatorsNode.appendChild(locatorNode)
                 }
                 dailyNode.appendChild(locatorsNode)
-            }
-            if (dailyProgress.daily.name == "edit5") { //TODO: test on new user getting assigned this daily
-                val modifiedLocsNode = doc.createElement("modified-locs")
-                dailyProgress.modifiedLocs.forEach { loc ->
-                    val locNode = doc.createElement("loc")
-                    locNode.textContent = loc
-                    modifiedLocsNode.appendChild(locNode)
-                }
-                dailyNode.appendChild(modifiedLocsNode)
             }
             dailiesNode.appendChild(dailyNode)
         }

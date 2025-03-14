@@ -515,8 +515,28 @@ object GUIManager {
             val iconLabel = JLabel()
             iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
             dailyPanel.add(iconLabel)
+
+
+            /*val additionalDesc = dailyProgress.daily.additionalDescription?.let { "$it<br>" } ?: ""
             val progressPerc = (dailyProgress.progress * 100 / dailyProgress.daily.target!!)
-            val dailyMessage = "Progress: ${progressPerc}%"
+            val dailyMessage = "<html>$additionalDesc<br>Progress: ${progressPerc}%</html>"
+            val dailyLabel = JLabel(dailyProgress.daily.description).apply {
+                this.font = font
+                foreground = JBColor.BLACK
+                toolTipText = dailyMessage
+            }
+            dailyPanel.add(dailyLabel)*/
+            val additionalDesc = dailyProgress.daily.additionalDescription?.let { "$it<br>" } ?: ""
+            val progressPerc = (dailyProgress.progress * 100 / dailyProgress.daily.target!!)
+            val dailyMessage = """
+                    <html>
+                        <div style="width: max-content; max-width: 200px; white-space: normal;">
+                            $additionalDesc<br>
+                            <b>Reward:</b> ${dailyProgress.daily.xp} XPs<br>
+                            <b>Progress:</b> ${progressPerc}%
+                        </div>
+                    </html>
+                """.trimIndent()
             val dailyLabel = JLabel(dailyProgress.daily.description).apply {
                 this.font = font
                 foreground = JBColor.BLACK
@@ -527,10 +547,10 @@ object GUIManager {
         // Create daily label on mouse over and details for targeted dailies
         else if (dailyProgress.daily.type.equals("targeted", ignoreCase = true)) {
             // If no locators or POs (neither to fix or fixed to be verified) are associated with daily, skip
-            if (dailyProgress.daily.isLocatorRelated() && dailyProgress.daily.targetedLocators.isEmpty() &&
+            if (!dailyProgress.daily.isAdvanced && dailyProgress.daily.targetedLocators.isEmpty() &&
                 (locatorsToVerifyMap.isEmpty() || (locatorsToVerifyMap[dailyProgress.daily.name]?.isEmpty() == true)))
                 return
-            if  (dailyProgress.daily.isPageObjectRelated() && dailyProgress.daily.issuesInPOs?.isEmpty() == true &&
+            if  (dailyProgress.daily.isAdvanced && dailyProgress.daily.issuesInPOs?.isEmpty() == true &&
                 (posToVerifyMap.isEmpty() || (posToVerifyMap[dailyProgress.daily.name]?.isEmpty() == true)))
                 return
             val imageStream = this::class.java.classLoader.getResourceAsStream(dailyProgress.daily.icon)
@@ -538,7 +558,16 @@ object GUIManager {
             val iconLabel = JLabel()
             iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
             dailyPanel.add(iconLabel)
-            val dailyMessage = "${dailyProgress.daily.xp} XP for each listed issue fixed"
+            val additionalDesc = dailyProgress.daily.additionalDescription?.let { "$it<br>" } ?: ""
+            val rewardMsg = "${dailyProgress.daily.xp} XP for each listed issue fixed"
+            val dailyMessage = """
+                    <html>
+                        <div style="width: max-content; max-width: 200px; white-space: normal;">
+                            $additionalDesc<br>
+                            <b>Reward:</b> ${rewardMsg}<br>
+                        </div>
+                    </html>
+                """.trimIndent()
             val dailyLabel = JLabel(dailyProgress.daily.description).apply {
                 this.font = font
                 foreground = JBColor.BLACK
@@ -560,7 +589,7 @@ object GUIManager {
                         val smallFont = font.deriveFont((font.size * 0.8f).coerceAtLeast(8f))
 
                         // show targeted issues for the current daily, whether locators or POs based
-                        if  (dailyProgress.daily.isLocatorRelated()) {
+                        if  (!dailyProgress.daily.isAdvanced) {
                             dailyProgress.daily.targetedLocators.forEach { locator ->
                                 val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
                                 val locatorInfo = "${locator.locatorName ?: "N/A"} " +
@@ -572,7 +601,7 @@ object GUIManager {
                                 targetedIssuesPanel.add(locatorLabel)
                             }
                         }
-                        else if(dailyProgress.daily.isPageObjectRelated()) {
+                        else if(dailyProgress.daily.isAdvanced) {
                             dailyProgress.daily.issuesInPOs!!.forEach { issue ->
                                 when (issue) {
                                     is String -> { //e.g., a PO issue about an assertion line
@@ -619,7 +648,7 @@ object GUIManager {
                         targetedIssuesPanel.add(separatorLabel)
 
                         // show info of potentially fixed issues to verify, whether locators or POs based
-                        if(dailyProgress.daily.isLocatorRelated()) {
+                        if(!dailyProgress.daily.isAdvanced) {
                             val locatorsFromMap = locatorsToVerifyMap[dailyProgress.daily.name]
                             locatorsFromMap?.forEach { locator ->
                                 val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
@@ -632,7 +661,7 @@ object GUIManager {
                                 targetedIssuesPanel.add(locatorLabel)
                             }
                         }
-                        else if(dailyProgress.daily.isPageObjectRelated()) {
+                        else if(dailyProgress.daily.isAdvanced) {
                             val POsFromMap = posToVerifyMap[dailyProgress.daily.name]
                             POsFromMap?.forEach { issue ->
                                 when (issue) {

@@ -7,7 +7,6 @@ import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
 import analyzer.locator.LocatorsAnalyzer
-import analyzer.pageobject.PageObjectsAnalyzer
 import extractor.test.PageObjectCall
 import testquest.TestQuestAction
 import utils.UserProgressFileHandler
@@ -181,7 +180,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             }.toList()
 
             //5. SAVE CHANGES ON FILE
-            UserProgressFileHandler.saveProgressData()//to store user progress that needs to be tested next time
+            UserProgressFileHandler.saveOldData()//to store user progress that needs to be tested next time
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }

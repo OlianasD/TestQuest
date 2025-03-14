@@ -19,9 +19,9 @@ object UserProgressFileHandler {
 
 
 
-    fun saveProgressData() {
+    fun saveOldData() {
         try {
-            val file = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
+            val file = FilePathSolver.getSavedOldDataFile(PluginData.userProfileId)
             ObjectOutputStream(FileOutputStream(file)).use { oos ->
                 oos.writeObject(TestQuestAction.locatorsOld)
                 oos.writeObject(TestQuestAction.POsOld)
@@ -32,9 +32,9 @@ object UserProgressFileHandler {
         }
     }
 
-    fun loadProgressData() {
+    fun loadOldData() {
         try {
-            val file = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
+            val file = FilePathSolver.getSavedOldDataFile(PluginData.userProfileId)
             ObjectInputStream(FileInputStream(file)).use { ois ->
                 val locatorsOld = ois.readObject() as List<Locator>
                 val POsOld = ois.readObject() as List<PageObject>
@@ -53,7 +53,7 @@ object UserProgressFileHandler {
         var file = FilePathSolver.getSavedPendingLocsFile(PluginData.userProfileId)
         if (file.exists())
             file.delete()
-        file = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
+        file = FilePathSolver.getSavedOldDataFile(PluginData.userProfileId)
         if (file.exists())
             file.delete()
         file = FilePathSolver.getSavedPendingPOsFile(PluginData.userProfileId)
@@ -122,7 +122,7 @@ object UserProgressFileHandler {
 
 
     fun getMostRecentSavedData(): String {
-        val progressFile = FilePathSolver.getSavedProgressFile(PluginData.userProfileId)
+        val progressFile = FilePathSolver.getSavedOldDataFile(PluginData.userProfileId)
         val pendingLocsFile = FilePathSolver.getSavedPendingLocsFile(PluginData.userProfileId)
         val pendingPOsFile = FilePathSolver.getSavedPendingPOsFile(PluginData.userProfileId)
         val progressCreationTime = getFileCreationTime(progressFile)

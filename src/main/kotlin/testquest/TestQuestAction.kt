@@ -75,7 +75,7 @@ class TestQuestAction : AnAction() {
             val savedDataTime = UserProgressFileHandler.getMostRecentSavedData()
             val useSavedData = GUIManager.showWindowStoredDataChoice(savedDataTime)
             if(useSavedData) {
-                UserProgressFileHandler.loadProgressData()
+                UserProgressFileHandler.loadOldData()
                 if (locatorsOld.isEmpty())
                     locatorsOld = locatorsNew
                 if (POsOld.isEmpty())
@@ -89,7 +89,7 @@ class TestQuestAction : AnAction() {
                 POsOld = POsNew
                 POCallsOld = POCallsNew
             }
-            UserProgressFileHandler.saveProgressData()
+            UserProgressFileHandler.saveOldData()
 
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
