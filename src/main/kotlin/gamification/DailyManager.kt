@@ -28,14 +28,15 @@ class DailyManager {
             /************ DAILIES ABOUT LOCATORS ************/
             Daily(
                 "xpathAbs",
-                "Convert $DAILY_GOAL existing absolute XPath locators to relative XPath",
+                "Convert $DAILY_GOAL existing absolute XPath locators to relative XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Absolute XPaths are characterized by the tag 'html' at the beginning (e.g., /html/body/div/form/input[2]) " +
-                        "You might want to avoid absolute XPaths and make them relative to improve flexibility and robustness, " +
-                        "ensuring they remain valid even if the document structure changes slightly (E.g., /html/body/div/form/input[2] --> //input[2])  "
+                additionalDescription = "Absolute XPath locators are characterized by the tag 'html' at the beginning (e.g., /html/body/div/form/input[2]). " +
+                        "You might want to avoid absolute XPaths, as they expose the full page structure, and make them relative to improve flexibility and robustness, " +
+                        "ensuring they remain valid if the document structure changes slightly.",
+                exampleDescription = "/html/body/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "xpathLength",
@@ -44,9 +45,11 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
-                        "You might want to reduce the length of an XPath to strengthen it, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
+                additionalDescription =  "The length of an XPath is the number of characters composing it (e.g., /div/form/input[2] has 18 characters). " +
+                        "The longer an XPath is, the more prone it is to fragility. " +
+                        "You might want to reduce the length of an XPath locator to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure.",
+                exampleDescription =  "table/tr/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "xpathLevel",
@@ -56,9 +59,11 @@ class DailyManager {
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription =
-                        "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
+                        "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags).  " +
+                        "The more levels an XPath has, the more prone it is to fragility. " +
                         "You might want to reduce the levels of an XPath to strengthen it, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
+                        "a reference to more internal elements without exposing an overly complex structure.",
+                exampleDescription =  "/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "loc2xpath",
@@ -67,8 +72,9 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "As XPath locators are known a reliable locator strategy, you might want to have " +
-                        "them implemented in the test suite, by converting non-XPath locators to XPath."
+                additionalDescription = "As XPath locators are known as a reliable locator strategy, you might want to have " +
+                        "them implemented in the test suite, by converting non-XPath locators to XPath.",
+                exampleDescription = "'Click here to proceed' (link-based locator) --> //div/a (XPath-based locator)"
             ),
             Daily(
                 "loc2id",
@@ -77,8 +83,9 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "As ID locators are known to be the most reliable locator strategy, you might want to have " +
-                        "them implemented in the test suite, by converting non-ID locators to ID."
+                additionalDescription = "As ID locators are known as the most reliable locator strategy, you might want to have " +
+                        "them implemented in the test suite, if possible, by converting non-ID locators to ID.",
+                exampleDescription = "'Click here to proceed' (link-based locator) --> proceedLink (ID-based locator)"
             ),
             Daily(
                 "runLocs20",
@@ -1973,7 +1980,8 @@ class DailyManager {
                     targetedLocators = locatorsForDaily,
                     issuesInPOs = posForDaily,
                     isAdvanced = daily.isAdvanced,
-                    additionalDescription = daily.additionalDescription
+                    additionalDescription = daily.additionalDescription,
+                    exampleDescription = daily.exampleDescription
                 )
             }
             //remove all old targeted dailies as they will be updated by new check
@@ -2076,6 +2084,12 @@ class DailyManager {
             return (ALL_RANDOM_DAILIES + ALL_TARGETED_DAILIES)
                 .find { it.name == name }
                 ?.additionalDescription!!
+        }
+
+        fun getExampleDescriptionFromName(name: String): String {
+            return (ALL_RANDOM_DAILIES + ALL_TARGETED_DAILIES)
+                .find { it.name == name }
+                ?.exampleDescription!!
         }
 
         fun updateDailyProgresses(userProfile: UserProfile, testOutcomes: List<TestOutcome>): List<Pair<Int, Daily?>> {

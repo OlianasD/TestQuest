@@ -491,10 +491,11 @@ object GUIManager {
         }
         // Add the scroll pane around the innerPanel that contains all dailies
         val scrollPane = JScrollPane(innerPanel).apply {
-            preferredSize = Dimension(500, 200)  // Set the preferred size for the scroll pane
+            preferredSize = Dimension(500, 500)  //Set the preferred size for the scroll pane
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         }
+        innerPanel.minimumSize = Dimension(500, 500)
         // Add the scroll pane to the dailiesPanel
         dailiesPanel.add(scrollPane)
         // Revalidate and repaint the panel to reflect changes
@@ -515,24 +516,15 @@ object GUIManager {
             val iconLabel = JLabel()
             iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
             dailyPanel.add(iconLabel)
-
-
-            /*val additionalDesc = dailyProgress.daily.additionalDescription?.let { "$it<br>" } ?: ""
-            val progressPerc = (dailyProgress.progress * 100 / dailyProgress.daily.target!!)
-            val dailyMessage = "<html>$additionalDesc<br>Progress: ${progressPerc}%</html>"
-            val dailyLabel = JLabel(dailyProgress.daily.description).apply {
-                this.font = font
-                foreground = JBColor.BLACK
-                toolTipText = dailyMessage
-            }
-            dailyPanel.add(dailyLabel)*/
-            val additionalDesc = dailyProgress.daily.additionalDescription?.let { "$it<br>" } ?: ""
+            val additionalDesc = dailyProgress.daily.additionalDescription.let { "$it<br>" }
+            val exampleDescription = dailyProgress.daily.exampleDescription.let { "$it<br>" }
             val progressPerc = (dailyProgress.progress * 100 / dailyProgress.daily.target!!)
             val dailyMessage = """
                     <html>
-                        <div style="width: max-content; max-width: 200px; white-space: normal;">
-                            $additionalDesc<br>
-                            <b>Reward:</b> ${dailyProgress.daily.xp} XPs<br>
+                        <div style= "text-align: justify;" "width: max-content; max-width: 200px; white-space: normal;">
+                            <b>Description:</b><br> $additionalDesc<br>
+                            <b>Example:</b><br> $exampleDescription<br>
+                            <b>Reward:</b> ${dailyProgress.daily.xp} XPs<br><br>
                             <b>Progress:</b> ${progressPerc}%
                         </div>
                     </html>
@@ -558,12 +550,14 @@ object GUIManager {
             val iconLabel = JLabel()
             iconLabel.icon = ImageIcon(icon.getScaledInstance(25, 25, Image.SCALE_SMOOTH))
             dailyPanel.add(iconLabel)
-            val additionalDesc = dailyProgress.daily.additionalDescription?.let { "$it<br>" } ?: ""
+            val additionalDesc = dailyProgress.daily.additionalDescription.let { "$it<br>" }
+            val exampleDesc = dailyProgress.daily.exampleDescription.let { "$it<br>" }
             val rewardMsg = "${dailyProgress.daily.xp} XP for each listed issue fixed"
             val dailyMessage = """
                     <html>
-                        <div style="width: max-content; max-width: 200px; white-space: normal;">
-                            $additionalDesc<br>
+                        <div style= "text-align: justify;" "width: max-content; max-width: 200px; white-space: normal;">
+                            <b>Description:</b> <br> $additionalDesc<br>
+                            <b>Example:</b> <br> $exampleDesc<br>
                             <b>Reward:</b> ${rewardMsg}<br>
                         </div>
                     </html>
@@ -900,6 +894,14 @@ object GUIManager {
 
 
 
+
+
+
+
+
+
+    /********** FUNCTIONS TO MANAGE INITIAL USER CHOICES (IF USE OLD DATA, WHICH GAMIFICATION MODE) *****************/
+
     fun showWindowStoredDataChoice(oldDataTime: String): Boolean {
         if(oldDataTime != "") {
             val panel = JPanel()
@@ -938,6 +940,8 @@ object GUIManager {
         )
         return result == 0 //returns true if the user chose Locator-based, false otherwise
     }
+
+
 
 
 
