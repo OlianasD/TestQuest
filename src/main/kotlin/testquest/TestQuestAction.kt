@@ -21,13 +21,22 @@ object PluginData {
     var userProfileId: String = ""
 }
 
+
+object WindowStateManager {
+    var isWindowOpen = false
+}
+
 class TestQuestAction : AnAction() {
 
 
-
-
-
     override fun actionPerformed(e: AnActionEvent) {
+
+        //to avoid re-opening the plugin
+        if (WindowStateManager.isWindowOpen) {
+            Messages.showMessageDialog("Test Quest is already open.", "Warning", Messages.getWarningIcon())
+            return
+        }
+        WindowStateManager.isWindowOpen = true
 
         //get Test.java and Page.java files from project
         val project = e.project ?: return
@@ -74,7 +83,7 @@ class TestQuestAction : AnAction() {
             // if not, old is set to new
             val savedDataTime = UserProgressFileHandler.getMostRecentSavedData()
             val useSavedData = GUIManager.showWindowStoredDataChoice(savedDataTime)
-            if(useSavedData) {
+            if (useSavedData) {
                 UserProgressFileHandler.loadOldData()
                 if (locatorsOld.isEmpty())
                     locatorsOld = locatorsNew
@@ -82,8 +91,7 @@ class TestQuestAction : AnAction() {
                     POsOld = POsNew
                 if (POCallsOld.isEmpty())
                     POCallsOld = POCallsNew
-            }
-            else {
+            } else {
                 UserProgressFileHandler.destroySavedData()
                 locatorsOld = locatorsNew
                 POsOld = POsNew
@@ -99,9 +107,7 @@ class TestQuestAction : AnAction() {
             //register listeners
             CodeChangeListener.registerListener(project)
             TestExecutionListener.registerListener(project)
-        }
-
-        else {
+        } else {
             Messages.showMessageDialog(
                 "Test files not found at $testFilePaths under project $project",
                 e.presentation.text,
@@ -120,8 +126,6 @@ class TestQuestAction : AnAction() {
         //this to store PO calls in tests before-after changes
         var POCallsOld: Map<String, List<PageObjectCall>> = emptyMap()
         var POCallsNew: Map<String, List<PageObjectCall>> = emptyMap()
-
-
 
     }
 }

@@ -23,6 +23,7 @@ import analyzer.locator.LocatorsAnalyzer
 import analyzer.pageobject.PageObjectsAnalyzer
 import extractor.pageobject.MethodInfo
 import extractor.pageobject.PageObject
+import testquest.WindowStateManager
 import utils.FilePathSolver
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -449,6 +450,7 @@ object GUIManager {
                 FragilityWindow?.dispose()
                 CodeChangeListener.instance.dispose()
                 TestExecutionListener.instance.dispose()
+                WindowStateManager.isWindowOpen = false //to let the Gamification Window be opened again
                 //exitProcess(0)
             }
         })

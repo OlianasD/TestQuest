@@ -53,7 +53,7 @@ class GamificationManager {
         val BAD_JS = setOf("onclick", "onload",
             "onmouseover", "onmouseout", "onchange", "onsubmit",
             "onfocus", "onkeydown")
-        const val ROBUST_THRESHOLD = 0.5
+        const val FRAGILITY_THRESHOLD = 0.5
 
         private val allTitles = mutableListOf(
             Title("Muggle", 0),

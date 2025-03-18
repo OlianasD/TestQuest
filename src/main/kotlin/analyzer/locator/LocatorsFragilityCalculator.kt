@@ -2,6 +2,7 @@ package analyzer.locator
 
 import extractor.locator.Locator
 import gamification.GamificationManager
+import kotlin.math.pow
 
 class LocatorsFragilityCalculator {
 
@@ -110,7 +111,7 @@ class LocatorsFragilityCalculator {
     //weights and factors affecting it are: absolute, num levels, num predicates, length, presence of good/bad preds
     private fun calculateXpathFragility(xpath: String): Double {
         val isAbsolute = xpath.startsWith("/html")
-        val levels = xpath.count { it == '/' }
+        val levels = xpath.count { it == '/' } + 1
         val predicates = xpath.count { it == '[' }
         val length = xpath.length
         val goodPredicatesCount = GamificationManager.GOOD_PREDS.sumOf { xpath.split(it).size - 1 }
@@ -118,9 +119,10 @@ class LocatorsFragilityCalculator {
             .sumOf { attribute -> xpath.split("@$attribute").size - 1 }
         val absoluteWeight = 1.0
         val absoluteFactor = if (isAbsolute) 5.0 else 0.1
-        val levelsWeight = 2.0
+        val levelsWeight = 3.5
         val maxLevels = GamificationManager.MAX_LEVEL
-        val levelsFactor = (levels / maxLevels.toDouble())
+        //val levelsFactor = (levels / maxLevels.toDouble())
+        val levelsFactor = ((levels.toDouble() / maxLevels).pow(2))
         val predicatesWeight = 2.5
         val maxPredicates = GamificationManager.MAX_POS_PRED
         val predicatesFactor = (predicates / maxPredicates.toDouble())

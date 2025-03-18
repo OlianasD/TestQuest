@@ -94,7 +94,9 @@ class DailyManager {
                 20,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Once implemented, you might want to exercise locators with test scripts to validate them."
+                additionalDescription = "Once implemented, locators should be tested in order to validate them and check they do not break. " +
+                        "You might want to run the test scripts with edited or newly added locators as soon as possible.",
+                exampleDescription = "-"
             ),
             Daily(
                 "robustness",
@@ -105,8 +107,10 @@ class DailyManager {
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription = "The robustness of a locator defines its ability to withstand future evolutions " +
                         "of the app without breaking, as it does not rely on fragile aspects that change over time. " +
-                        "There are specific characteristics that make a locator robust (e.g., being of type ID or relative XPath, having short length, etc)." +
-                        "You might want to improve the robustness of existing locators."
+                        "There are specific characteristics that make a locator robust. Usually, ID and relative XPath locators are the best and" +
+                        " in most cases, exposing the less is better (e.g., shorter XPaths). " +
+                        "You might want to improve the robustness of existing locators to make them less fragile to future changes.",
+                exampleDescription = "/div/form/input[2] --> //input[2] OR 'Click here to proceed' (link-based locator) --> proceedLink (ID-based locator)"
             ),
             Daily(
                 "lengthShortenMax",
@@ -115,9 +119,10 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
-                        "You might want to reduce the length of an XPath below a maximum value, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2]). "
+                additionalDescription =  "The length of an XPath is the number of characters composing it (e.g., /div/form/input[2] has 18 characters). " +
+                        "The longer an XPath is, the more prone it is to fragility. " +
+                        "You might want to reduce the length of an XPath locator below a tolerance value of ${GamificationManager.MAX_LENGTH} characters.",
+                exampleDescription = "/div/div/span/form[3]/input[@id='...'] --> //form[3]/input[@id='...'] "
             ),
             Daily(
                 "addAttrToXPath",
@@ -126,9 +131,12 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Since XPaths can refer to robust predicates (e.g., //input[@class='userData']), as they change rarely over time, " +
-                        "you might want to add to existing XPath locators the references " +
-                        "to these robust predicates, particularly @id, @name, @class, @title, @alt, and @value."
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @id, @name, @class, @title, @alt, and @value," +
+                        " are notoriously robust as they refer to conditions that change rarely over time. " +
+                        "You might want to add to existing XPath locators references " +
+                        "to these robust predicates.",
+                exampleDescription = "//div/input --> //div/input[@class='userData']"
             ),
             Daily(
                 "remAttrFromXPath",
@@ -137,8 +145,12 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Since XPaths can refer to fragile predicates (e.g., //input[@width='158']), as they expose to structural properties that change frequently over time, " +
-                        "you might want to remove from existing XPath locators the references to these fragile predicates, particularly @src, @href, @height, and @width."
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @src, @href, @height, and @width," +
+                        " are notoriously fragile as they refer to structural properties that change frequently over time. " +
+                        "You might want to remove from existing XPath locators references " +
+                        "to these fragile predicates, even by replacing them with other properties.",
+                exampleDescription = "//img[@width='358'] --> //img[@class='propic']"
             ),
             Daily(
                 "remJSFromXPath",
@@ -147,19 +159,25 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Since XPaths can refer to fragile predicates (e.g., //input[@onLoad='...']), as they expose Javascript code that changes frequently over time, " +
-                        "you might want to remove from existing XPath locators the references to these fragile predicates, particularly @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown"
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydow," +
+                        " are notoriously fragile as they expose Javascript code that may change frequently over time. " +
+                        "You might want to remove from existing XPath locators references " +
+                        "to these fragile predicates, even by replacing them with other properties.",
+                exampleDescription = "//img[@onload=\"showPropic()\"] --> //img[@class='propic']"
             ),
             Daily(
                 "levelLoweredMax",
-                "Lower the levels of $DAILY_GOAL existing locators below " + GamificationManager.MAX_LEVEL,
+                "Lower the levels of $DAILY_GOAL existing XPath locators below " + GamificationManager.MAX_LEVEL,
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription =  "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
-                        "You might want to reduce the levels of an XPath below a maximum estimation, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
+                additionalDescription =
+                        "The levels in an XPath is the number of nodes composing it (e.g., /div/form/input[2] has 3 levels).  " +
+                        "The more levels an XPath has, the more prone it is to fragility. " +
+                        "You might want to reduce the length of an XPath locator below a tolerance value of ${GamificationManager.MAX_LEVEL}.",
+                exampleDescription =  "/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "repair",
@@ -173,13 +191,14 @@ class DailyManager {
             ),
             Daily(
                 "reducePredicates",
-                "Reduce the number of predicates from $DAILY_GOAL existing locators",
+                "Remove $DAILY_GOAL positional predicates from existing XPath locators",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription ="Since the exposure of predicates, even robust ones, can be a source of locator fragility as they reveal information, " +
-                        "you might want to reduce their number where possible (e.g., //div[3]/form[@class='userData']/input[2] --> //form/input[2])."
+                additionalDescription ="Since the exposure of positional predicates in XPaths can be a source of locator fragility as they reveal structural information, " +
+                        "you might want to reduce their number from XPath locators when possible, even by replacing them with other properties.",
+                exampleDescription = "//div[3]/form[@class='userData']/input[2] --> //form[@class='userData']/input[@class='...']"
             ),
             Daily(
                 "newXPath",
@@ -189,7 +208,8 @@ class DailyManager {
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription = "As XPath locators are known as a reliable locator strategy, you might want to " +
-                        "implement new ones in the test suite, when needed."
+                        "add new XPath locators in the test suite, when needed, potentially avoiding absolute XPaths (those starting from the root element '/html').",
+                exampleDescription = "-"
             ),
             Daily(
                 "newID",
@@ -199,7 +219,8 @@ class DailyManager {
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription = "As ID locators are known as the most reliable locator strategy, you might want to " +
-                        "implement new ones in the test suite, when needed."
+                        "add new ID locators in the test suite, when needed.",
+                exampleDescription = "-"
             ),
             Daily(
                 "newLengthShorterMax",
@@ -208,9 +229,10 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
-                        "You might want to add new XPath locators with the length below a maximum value, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2]). "
+                additionalDescription =  "The length of an XPath is the number of characters composing it (e.g., /div/form/input[2] has 18 characters). " +
+                        "The longer an XPath is, the more prone it is to fragility. " +
+                        "You might want to add new XPath locators with the length below a tolerance value of ${GamificationManager.MAX_LENGTH} characters.",
+                exampleDescription = "/div/div/span/form[3]/input[@id='...'] --> //form[3]/input[@id='...'] "
             ),
             Daily(
                 "newLevelLowerMax",
@@ -219,21 +241,24 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription =  "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
-                        "You might want to add new XPath locators with the levels below a maximum estimation, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
+                additionalDescription =  "The levels of an XPath is the number of nodes composing it (e.g., /div/form/input[2] has 3 levels). " +
+                        "The more levels an XPath has, the more prone it is to fragility. " +
+                        "You might want to add new XPath locators having levels below a tolerance value of ${GamificationManager.MAX_LEVEL}.",
+                exampleDescription =  "/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "newRobust",
-                "Implement $DAILY_GOAL new robust locators",
+                "Implement $DAILY_GOAL new locators with fragility score below ${GamificationManager.FRAGILITY_THRESHOLD}",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription = "The robustness of a locator defines its ability to withstand future evolutions " +
                         "of the app without breaking, as it does not rely on fragile aspects that change over time. " +
-                        "There are specific characteristics that make a locator robust (e.g., being of type ID or relative XPath, having short length, etc)." +
-                        "You might want to add new locators that can be considered robust 'enough'"
+                        "There are specific characteristics that make a locator robust rather than fragile. Usually, ID and relative XPath locators are the best and" +
+                        " in most cases, exposing the less is better (e.g., shorter XPaths). " +
+                        "You might want to add new locators keeping their fragility score below ${GamificationManager.FRAGILITY_THRESHOLD}.",
+                exampleDescription = "-"
             ),
             Daily(
                 "newWantedAttr",
@@ -242,9 +267,12 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Since XPaths can reference predicates (e.g., //input[@class='userData']), some predicates are notoriously more " +
-                        "robust than others, as they change less frequently over time. You might want to add new XPath locators with references " +
-                        "to these robust predicates, particularly @id, @name, @class, @title, @alt, and @value."
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @id, @name, @class, @title, @alt, and @value," +
+                        " are notoriously robust as they refer to conditions that change rarely over time. " +
+                        "You might want to add new XPath locators with references " +
+                        "to these robust predicates.",
+                exampleDescription = "-"
             ),
             Daily(
                 "newUnwantedAttr",
@@ -253,9 +281,12 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Since XPaths can reference predicates (e.g., //input[@width='158']), some predicates are notoriously less " +
-                        "robust than others, as they refer to structural properties that change frequently over time. " +
-                        "You might want to add new XPath locators avoiding the references to these fragile predicates, particularly @src, @href, @height, and @width."
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @src, @href, @height, and @width," +
+                        " are notoriously fragile as they refer to structural properties that change frequently over time. " +
+                        "You might want to add new XPath locators avoiding references " +
+                        "to these fragile predicates.",
+                exampleDescription = "-"
             ),
             Daily(
                 "newJS",
@@ -264,9 +295,12 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription = "Since XPaths can reference predicates (e.g., //input[@onLoad='...']), some predicates are notoriously less " +
-                        "robust than others, as they refer to Javascript code that changes frequently over time. " +
-                        "You might want to add new XPath locators avoiding the references to these fragile predicates, particularly @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown"
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydow," +
+                        " are notoriously fragile as they expose Javascript code that may change frequently over time. " +
+                        "You might want to add new XPath locators avoiding references " +
+                        "to these fragile predicates.",
+                exampleDescription = "-"
             ),
             Daily(
                 "newLowPredicates",
@@ -275,8 +309,9 @@ class DailyManager {
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
-                additionalDescription ="Since the exposure of predicates, even robust ones, can be a source of locator fragility as they reveal information, " +
-                        "you might want to add new locators limiting the number of predicates when possible (e.g., //div[3]/form[@class='userData']/input[2] --> //form/input[2])."
+                additionalDescription ="Since the exposure of positional predicates in XPaths can be a source of locator fragility as they reveal structural information, " +
+                        "you might want to add new XPath locators with a number of predicates equal or below the threshold of ${GamificationManager.MAX_POS_PRED} predicates, when possible.",
+                exampleDescription = "-"
             ),
             /************ DAILIES ABOUT POS ************/
             Daily(
@@ -1426,10 +1461,9 @@ class DailyManager {
                     if(passedLoc.hashCode() != oldLoc.hashCode())
                         continue
                     if (oldLoc.locatorType.equals("xpath", ignoreCase = true) && passedLoc.locatorType.equals("xpath", ignoreCase = true)) {
-                        val oldPredicatesCount = oldLoc.locatorValue.split("[", "]").size / 2 - 1
-                        val newPredicatesCount = passedLoc.locatorValue.split("[", "]").size / 2 - 1
-                        if (newPredicatesCount < oldPredicatesCount)
-                            count++
+                        val oldPredicatesCount = "\\[\\d+\\]".toRegex().findAll(oldLoc.locatorValue).count()
+                        val newPredicatesCount = "\\[\\d+\\]".toRegex().findAll(passedLoc.locatorValue).count()
+                            count += oldPredicatesCount - newPredicatesCount
                     }
                     break
                 }
@@ -1447,7 +1481,7 @@ class DailyManager {
                 .toSet()
             val newPassedLocs = passedLocs.filter { passedLoc ->
                 passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
-                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
+                oldLocs.all { oldLoc -> oldLoc.hashCode() != passedLoc.hashCode() }
             }
             count += newPassedLocs.size
             return count
@@ -1464,7 +1498,7 @@ class DailyManager {
                 .toSet()
             val newPassedLocs = passedLocs.filter { passedLoc ->
                 passedLoc.locatorType.equals("id", ignoreCase = true) &&
-                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
+                oldLocs.all { oldLoc -> oldLoc.hashCode() != passedLoc.hashCode() }
             }
             count += newPassedLocs.size
             return count
@@ -1513,7 +1547,7 @@ class DailyManager {
                 .flatMap { it.locatorsOld }
                 .toSet()
             val newPassedLocs = passedLocs.filter { passedLoc ->
-                computeFragilityCoefficient(passedLoc) <= GamificationManager.ROBUST_THRESHOLD &&
+                computeFragilityCoefficient(passedLoc) <= GamificationManager.FRAGILITY_THRESHOLD &&
                 oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
             count += newPassedLocs.size
@@ -1580,7 +1614,7 @@ class DailyManager {
 
         private fun checkNewXPathWithFewPosPredicates(testOutcomes: List<TestOutcome>): Int {
             var count = 0
-            val regex = "\\[.*?]".toRegex() //to count positional predicates
+            val regex = "\\[\\d+\\]".toRegex() //to count positional predicates
             val passedLocs = testOutcomes
                 .flatMap { it.locatorsPassed }
                 .toSet()
