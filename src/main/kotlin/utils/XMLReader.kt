@@ -1,7 +1,6 @@
 package utils
 
 import gamification.*
-import extractor.locator.Locator
 import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
@@ -95,9 +94,8 @@ class XMLReader {
             val dailyIsAdvanced = DailyManager.getIsAdvancedFromName(dailyName)
             val addDescription = DailyManager.getAdditionalDescriptionFromName(dailyName)
             val exampleDescription = DailyManager.getExampleDescriptionFromName(dailyName)
-            val modifiedLocs = mutableListOf<String>()
             val dailyType = dailyNode.getAttribute("type")
-            val targetedLocators = mutableListOf<Locator>()//to manage locators associated with targeted dailies
+            /*val targetedLocators = mutableListOf<Locator>()//to manage locators associated with targeted dailies
             if (dailyType == "targeted") {
                 val locatorsNode = dailyNode.getElementsByTagName("locators")
                 if (locatorsNode.length > 0) {
@@ -117,7 +115,7 @@ class XMLReader {
                         targetedLocators.add(locator)
                     }
                 }
-            }
+            }*/
             val daily = Daily(
                 dailyName,
                 dailyDescription,
@@ -125,12 +123,11 @@ class XMLReader {
                 dailyTarget,
                 dailyIcon,
                 dailyType,
-                targetedLocators,
                 isAdvanced = dailyIsAdvanced,
                 additionalDescription = addDescription,
                 exampleDescription = exampleDescription
             )
-            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyDiscarded, modifiedLocs)
+            val dailyProgressObj = DailyProgress(daily, dailyProgress, dailyDiscarded)
             userProfile.dailyProgresses.add(dailyProgressObj)
         }
     }

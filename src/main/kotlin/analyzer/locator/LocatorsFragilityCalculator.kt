@@ -11,7 +11,9 @@ class LocatorsFragilityCalculator {
         var overallFragility = 0.0
         for (loc in locators)
             overallFragility += calculateFragility(loc)
-        return overallFragility/locators.size
+        if(locators.isNotEmpty())
+            return overallFragility/locators.size
+        return 0.0
     }
 
 

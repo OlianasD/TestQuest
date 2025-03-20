@@ -224,26 +224,26 @@ class DailyManager {
             ),
             Daily(
                 "newLengthShorterMax",
-                "Implement $DAILY_GOAL new XPath locators with length below " + GamificationManager.MAX_LENGTH,
+                "Implement $DAILY_GOAL new XPath locators with length below or equal to " + GamificationManager.MAX_LENGTH,
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription =  "The length of an XPath is the number of characters composing it (e.g., /div/form/input[2] has 18 characters). " +
                         "The longer an XPath is, the more prone it is to fragility. " +
-                        "You might want to add new XPath locators with the length below a tolerance value of ${GamificationManager.MAX_LENGTH} characters.",
+                        "You might want to add new XPath locators with the length below or equal a tolerance value of ${GamificationManager.MAX_LENGTH} characters.",
                 exampleDescription = "/div/div/span/form[3]/input[@id='...'] --> //form[3]/input[@id='...'] "
             ),
             Daily(
                 "newLevelLowerMax",
-                "Implement $DAILY_GOAL new XPath locators with levels below " + GamificationManager.MAX_LEVEL,
+                "Implement $DAILY_GOAL new XPath locators with levels below or equal to " + GamificationManager.MAX_LEVEL,
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.RANDOM.name,
                 additionalDescription =  "The levels of an XPath is the number of nodes composing it (e.g., /div/form/input[2] has 3 levels). " +
                         "The more levels an XPath has, the more prone it is to fragility. " +
-                        "You might want to add new XPath locators having levels below a tolerance value of ${GamificationManager.MAX_LEVEL}.",
+                        "You might want to add new XPath locators having levels below or equal to a tolerance value of ${GamificationManager.MAX_LEVEL}.",
                 exampleDescription =  "/div/form/input[2] --> //input[2]"
             ),
             Daily(
@@ -304,7 +304,7 @@ class DailyManager {
             ),
             Daily(
                 "newLowPredicates",
-                "Implement $DAILY_GOAL new XPath locators with " + GamificationManager.MAX_POS_PRED + " or less positional predicates",
+                "Implement $DAILY_GOAL new XPath locators with up to " + GamificationManager.MAX_POS_PRED + " positional predicates",
                 RANDOM_DAILY_XP,
                 DAILY_GOAL,
                 FilePathSolver.DAILY_PICS_PATH,
@@ -544,53 +544,62 @@ class DailyManager {
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name,
-                additionalDescription = "Absolute XPaths are characterized by the tag 'html' at the beginning (e.g., /html/body/div/form/input[2]) " +
-                        "You might want to avoid absolute XPaths and make them relative to improve flexibility and robustness, " +
-                        "ensuring they remain valid even if the document structure changes slightly (E.g., /html/body/div/form/input[2] --> //input[2])  "
+                additionalDescription = "Absolute XPath locators are characterized by the tag 'html' at the beginning (e.g., /html/body/div/form/input[2]). " +
+                        "You might want to avoid absolute XPaths, as they expose the full page structure, and make them relative to improve flexibility and robustness, " +
+                        "ensuring they remain valid if the document structure changes slightly.",
+                exampleDescription = "/html/body/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "length",
-                "Reduce the length of the following XPath locators",
+                "Reduce the length of the following XPath locators below or equal to ${GamificationManager.MAX_LENGTH}",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name,
-                additionalDescription =  "The length of XPaths is the number of characters composing them (e.g., /div/form/input[2] has 18 characters). " +
-                        "You might want to reduce the length of an XPath to strengthen it, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
+                additionalDescription =  "The length of an XPath is the number of characters composing it (e.g., /div/form/input[2] has 18 characters). " +
+                        "The longer an XPath is, the more prone it is to fragility. " +
+                        "You might want to reduce the length of an XPath locator below or equal to a tolerance value of ${GamificationManager.MAX_LENGTH} characters, to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure.",
+                exampleDescription =  "table/tr/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "level",
-                "Reduce the levels of the following XPath locators",
+                "Reduce the levels of the following XPath locators below or equal to ${GamificationManager.MAX_LEVEL}",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name,
                 additionalDescription =
-                "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags). " +
-                        "You might want to reduce the levels of an XPath to strengthen it, by finding, if possible, " +
-                        "a reference to more internal elements without exposing an overly complex structure (E.g., /div/form/input[2] --> //input[2])"
+                "The levels in XPaths are the tags composing them (e.g., /div/form/input[2] has 3 tags).  " +
+                        "The more levels an XPath has, the more prone it is to fragility. " +
+                        "You might want to reduce the levels of an XPath below or equal to a tolerance value of ${GamificationManager.MAX_LEVEL}, to strengthen it, by finding, if possible, " +
+                        "a reference to more internal elements without exposing an overly complex structure.",
+                exampleDescription =  "/div/form/input[2] --> //input[2]"
             ),
             Daily(
                 "posPredicate",
-                "Remove the positional predicates from the following XPath locators",
+                "Remove positional predicates and keep them up to ${GamificationManager.MAX_POS_PRED} from the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name,
-                additionalDescription ="Since the exposure of predicates, even robust ones, can be a source of locator fragility as they reveal information, " +
-                        "you might want to reduce their number where possible (e.g., //div[3]/form[1]/input[2] --> //form/input[2])."
+                additionalDescription ="Since the exposure of positional predicates in XPaths can be a source of locator fragility as they reveal structural information, " +
+                        "you might want to reduce their number from XPath locators when possible, even by replacing them with other properties.",
+                exampleDescription = "//div[3]/form[@class='userData']/input[2] --> //form[@class='userData']/input[@class='...']"
             ),
             Daily(
                 "badPredicate",
-                "Remove the fragile predicates from the following XPath locators",
+                "Remove all the fragile predicates from the following XPath locators",
                 TARGETED_DAILY_XP,
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name,
-                additionalDescription = "Since XPaths can refer to fragile predicates (e.g., //input[@width='158']), as they expose to structural properties or Javascript code that change frequently over time, " +
-                        "you might want to remove from existing XPath locators the references to these fragile predicates, " +
-                        "particularly @src, @href, @height, @width, @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown."
+                additionalDescription = "XPaths can refer to predicates, that are expressions enclosed in square brackets that filter" +
+                        " based on a condition (e.g., //input[@class='userData']). Some predicates, particularly @src, @href, @height, @width, @onclick, @onload, @onmouseover, @onmouseout, @onchange, @onsubmit, @onfocus, and @onkeydown," +
+                        " are notoriously fragile as they expose to structural properties or Javascript code that can change frequently over time. " +
+                        "You might want to remove from existing XPath locators references " +
+                        "to these fragile predicates, even by replacing them with other properties.",
+                exampleDescription = "//img[@width='358'] --> //img[@class='propic']"
             ),
             Daily(
                 "noIDOrXPath",
@@ -599,8 +608,9 @@ class DailyManager {
                 null,
                 FilePathSolver.DAILY_PICS_PATH,
                 GamificationManager.DailyAssignmentMode.TARGETED.name,
-                additionalDescription = "As ID and XPath locators are known as reliable locator strategies, you might want to convert " +
-                        "non-ID and non-XPath locators into them."
+                additionalDescription = "As ID and relative XPath locators are known as the most reliable locator strategies, you might want to have " +
+                        "them implemented in the test suite, if possible, by converting non-ID or non-XPath locators to ID and XPath locators.",
+                exampleDescription = "'Click here to proceed' (link-based locator) --> //a[2] (XPath-based locator)"
             ),
             Daily(
                 "broken",
@@ -872,10 +882,10 @@ class DailyManager {
                     if(passedLoc.hashCode() != oldLoc.hashCode())
                         continue
                     val hadBadPredicate = problematicAttributes.any { attr ->
-                        oldLoc.locatorValue.contains("@$attr", ignoreCase = true)
+                        oldLoc.locatorValue.contains(attr, ignoreCase = true)
                     }
                     val isResolved = problematicAttributes.none { attr ->
-                        passedLoc.locatorValue.contains("@$attr", ignoreCase = true)
+                        passedLoc.locatorValue.contains(attr, ignoreCase = true)
                     }
                     if (hadBadPredicate && isResolved)
                         count++
@@ -912,24 +922,25 @@ class DailyManager {
         private fun checkTargetedBrokenLocsRepaired(testOutcomes: List<TestOutcome>): Int {
             var count = 0
             val locsAnalizer = LocatorsAnalyzer()
+            val brokenLocs = GamificationManager.userProfile.dailyProgresses
+                .find { it.daily.name == "broken" }
+                ?.daily?.targetedLocators
             val repairedLocators = mutableListOf<Locator>()
-            //for each test, count previously broken loc that is no more present in stacktrace of the previously broken test
-            for (testOutcome in testOutcomes) {
-                val loc = testOutcome.locatorBroken
-                if (loc != null) {
-                    if(loc.methodName == testOutcome.testName && loc.className == testOutcome.className)
-                        if(testOutcome.stacktrace != null){
-                            val stackTrace = testOutcome.stacktrace.trim()
-                            val locValue = loc.locatorValue.trim()
-                            if(!stackTrace.contains(locValue)) {
-                                count++
-                                repairedLocators.add(loc) //loc repaired as the test did fail but not for that loc
-                            }
+            if(brokenLocs.isNullOrEmpty())
+                return 0
+            //for each test, count previously broken loc that is no more present in stacktrace (if any) of the test
+            for(brokenLoc in brokenLocs)
+                for (testOutcome in testOutcomes) {
+                    if (testOutcome.locatorsPassed.contains(brokenLoc)) {
+                        val stackTrace = testOutcome.stacktrace?.trim()
+                        //if there is no stacktrace or the stacktrace does not include the now repaired loc
+                        if(stackTrace == null || !stackTrace.contains(brokenLoc.locatorValue)) {
+                            count++
+                            repairedLocators.add(brokenLoc)
+                            break
                         }
-                        else
-                            repairedLocators.add(loc) //loc repaired as the test did not fail
+                    }
                 }
-            }
             locsAnalizer.updateBrokenLocs(repairedLocators)
             return count
         }
@@ -943,7 +954,7 @@ class DailyManager {
         private fun checkMethodsToEmptyPOAdded(testOutcomes: List<TestOutcome>): Int {
             val count: Int
             val passedMethods = testOutcomes
-                .flatMap { it.poMethodCallsPassed }
+                .flatMap { it.poMethodCallsExercised }
                 .map { it.methodName }
                 .toSet()
             count = TestQuestAction.POsOld
@@ -963,7 +974,7 @@ class DailyManager {
             var count = 0
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
-                .flatMap { it.poMethodCallsPassed }
+                .flatMap { it.poMethodCallsExercised }
                 .map { it }
                 .toSet()
             for (passedMethod in passedMethods) {
@@ -988,7 +999,7 @@ class DailyManager {
             var count = 0
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
-                .flatMap { it.poMethodCallsPassed }
+                .flatMap { it.poMethodCallsExercised }
                 .map { it }
                 .toSet()
             for (passedMethod in passedMethods) {
@@ -1013,7 +1024,7 @@ class DailyManager {
             var count = 0
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
-                .flatMap { it.poMethodCallsPassed }
+                .flatMap { it.poMethodCallsExercised }
                 .map { it }
                 .toSet()
             for (passedMethod in passedMethods) {
@@ -1066,7 +1077,7 @@ class DailyManager {
             val newlyCalledMethods = newCalledMethods - oldCalledMethods
             count = newlyCalledMethods.count { newMethod ->
                 testOutcomes.any { outcome ->
-                    outcome.poMethodCallsPassed.any { it.methodName == newMethod.methodName }
+                    outcome.poMethodCallsExercised.any { it.methodName == newMethod.methodName }
                 }
             }
             return count
@@ -1127,7 +1138,7 @@ class DailyManager {
                         }
                 }
             //check if any of these moved common methods is passed wrt a test
-            val passedMethods = testOutcomes.flatMap { it.poMethodCallsPassed.map { call -> call.methodName } }.toSet()
+            val passedMethods = testOutcomes.flatMap { it.poMethodCallsExercised.map { call -> call.methodName } }.toSet()
             count = passedMethods.count { it in commonMethodsMoved }
             return count
         }
@@ -1563,9 +1574,12 @@ class DailyManager {
                 .flatMap { it.locatorsOld }
                 .toSet()
             val newPassedLocs = passedLocs.filter { passedLoc ->
-                passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
-                GamificationManager.GOOD_PREDS.any { attribute -> passedLoc.locatorValue.contains("@$attribute", ignoreCase = true) } &&
-                oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
+                    passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
+                    GamificationManager.GOOD_PREDS.any { attribute ->
+                        passedLoc.locatorValue.contains(attribute, ignoreCase = true) }
+                            &&
+                    oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode()
+                }
             }
             count += newPassedLocs.size
             return count
@@ -1581,7 +1595,7 @@ class DailyManager {
                 .toSet()
             val newPassedLocs = passedLocs.filter { passedLoc ->
                 passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
-                GamificationManager.BAD_PREDS.none { attribute -> passedLoc.locatorValue.contains("@$attribute", ignoreCase = true) } &&
+                GamificationManager.BAD_PREDS.none { attribute -> passedLoc.locatorValue.contains(attribute, ignoreCase = true) } &&
                 oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
             count += newPassedLocs.size
@@ -1598,7 +1612,7 @@ class DailyManager {
                 .toSet()
             val newPassedLocs = passedLocs.filter { passedLoc ->
                 passedLoc.locatorType.equals("xpath", ignoreCase = true) &&
-                GamificationManager.BAD_JS.none { attribute -> passedLoc.locatorValue.contains("@$attribute", ignoreCase = true) } &&
+                GamificationManager.BAD_JS.none { attribute -> passedLoc.locatorValue.contains(attribute, ignoreCase = true) } &&
                 oldLocs.none { oldLoc -> oldLoc.hashCode() == passedLoc.hashCode() }
             }
             count += newPassedLocs.size
@@ -1640,7 +1654,7 @@ class DailyManager {
             val oldPONames = TestQuestAction.POsOld.map { it.name }.toSet()
             for (testOutcome in testOutcomes)
                 //check from passed PO calls any call that is related to a new PO
-                for (poCall in testOutcome.poMethodCallsPassed) {
+                for (poCall in testOutcome.poMethodCallsExercised) {
                     val poName = poCall.pageObject
                     if (poName !in oldPONames)
                         return 1
@@ -1651,7 +1665,7 @@ class DailyManager {
         private fun checkPOMethodAdded(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes)
                 //check from passed PO calls any call that is related to a new method
-                for (poCall in testOutcome.poMethodCallsPassed) {
+                for (poCall in testOutcome.poMethodCallsExercised) {
                     if (TestQuestAction.POsOld
                             .find { it.name == poCall.pageObject }
                             ?.methods
@@ -1694,7 +1708,7 @@ class DailyManager {
         private fun checkPOReturnTypeAdded(testOutcomes: List<TestOutcome>): Int {
             for (testOutcome in testOutcomes) {
                 //check passed methods that had void as old return type and PageObject as new
-                for (passedMethod in testOutcome.poMethodCallsPassed) {
+                for (passedMethod in testOutcome.poMethodCallsExercised) {
                     val oldReturnType = TestQuestAction.POsOld
                         .find { it.name == passedMethod.pageObject }
                         ?.methods?.find { it.name == passedMethod.methodName }
@@ -1714,7 +1728,7 @@ class DailyManager {
             var count = 0
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
-                .flatMap { it.poMethodCallsPassed }
+                .flatMap { it.poMethodCallsExercised }
                 .map { it }
                 .toSet()
             //count removed asserts from passed methods in PageObjects
@@ -1755,7 +1769,7 @@ class DailyManager {
             var newInteractions = 0
             //retrieve passed methods from all tests, keeping no duplicates
             val passedMethods = testOutcomes
-                .flatMap { it.poMethodCallsPassed }
+                .flatMap { it.poMethodCallsExercised }
                 .map { it }
                 .toSet()
             //check diff in interactions from all passed methods
@@ -1820,7 +1834,7 @@ class DailyManager {
             }
             //check if any of these moved common methods is passed wrt a test
             for (testOutcome in testOutcomes)
-                if (testOutcome.poMethodCallsPassed.any { it.methodName in commonMethodsMoved })
+                if (testOutcome.poMethodCallsExercised.any { it.methodName in commonMethodsMoved })
                     return 1
             return 0
         }
@@ -1834,7 +1848,7 @@ class DailyManager {
                 val newlyCalledMethods = newCalledMethods - oldCalledMethods
                 //check if new calls were passed
                 if (newlyCalledMethods.isNotEmpty() && newlyCalledMethods.any { methodName ->
-                        outcome.poMethodCallsPassed.any { it.methodName == methodName.methodName }
+                        outcome.poMethodCallsExercised.any { it.methodName == methodName.methodName }
                     })
                     return 1
             }
@@ -1853,7 +1867,7 @@ class DailyManager {
             val newlyCalledMethods = newCalledMethods - oldCalledMethods
             if (newlyCalledMethods.isNotEmpty() && newlyCalledMethods.any { newCall ->
                     testOutcomes.any { outcome ->
-                        outcome.poMethodCallsPassed.any { it.methodName == newCall.methodName }
+                        outcome.poMethodCallsExercised.any { it.methodName == newCall.methodName }
                     }
                 })
                 return 1

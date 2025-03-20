@@ -29,7 +29,7 @@ data class TestOutcome(
     // TODO: at the moment, we expect test cases to call PO methods, where PO methods should NOT call other PO methods
     val locatorBroken: Locator? = null, //the locator (if any) that brought to a test failure
     val locatorsUnexercised: List<Locator> = emptyList(), //the list of locs after a broken loc (if any) thus not executed
-    val poMethodCallsPassed: List<PageObjectCall> = emptyList(), //the list of PO method calls passed (if any)
+    val poMethodCallsExercised: List<PageObjectCall> = emptyList(), //the list of PO method calls exercised (if any)
     val poMethodCallsUnexercised: List<PageObjectCall> = emptyList() //the list of PO method calls not exercised due to error (if any)
 ) {
     override fun hashCode(): Int {
@@ -112,7 +112,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             GamificationManager.analyzeEvents(testOutcomes)
             testOutcomes.forEach { testOutcome ->
                 LocatorsAnalyzer.removePendingFixedLocators(testOutcome.locatorsPassed)
-                //PageObjectsAnalyzer.removePendingFixedPOs(testOutcome.)
+                //PageObjectsAnalyzer.removePendingFixedPOs(testOutcome.) //TODO: check this
             }
 
             //old data (locators, PO calls, POs) is updated with:
@@ -124,63 +124,123 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             val locatorsPassed = testOutcomes.flatMap { it.locatorsPassed }.distinct()
             TestQuestAction.locatorsOld = TestQuestAction.locatorsOld
                 .filter { it in TestQuestAction.locatorsNew } //keep old locators that still exist only
-                .map { oldLocator -> locatorsPassed.find { it == oldLocator } ?: oldLocator } //overwrite old locators with passed version
+                .map { oldLocator -> locatorsPassed.find { it == oldLocator } ?: oldLocator } //overwrite old locators with passed version and keep old locators for not passed ones
                 .toMutableList()
             //add newly added passed locs
             (TestQuestAction.locatorsOld as MutableList<Locator>).addAll(locatorsPassed.filterNot { it in TestQuestAction.locatorsOld })
 
             //3. PO CALLS UPDATE
-            val callsPassed = testOutcomes.flatMap { it.poMethodCallsPassed }.distinct()
-            TestQuestAction.POCallsOld = TestQuestAction.POCallsOld.mapValues { (key, oldCalls) ->
-                val updatedCalls = oldCalls.map { oldCall -> callsPassed.find { it == oldCall } ?: oldCall } //overwrite old calls with passed version
-                    .filter { it in TestQuestAction.POCallsNew[key].orEmpty() } //keep old calls that still exist only
-                //add newly added passed calls
-                (updatedCalls + callsPassed.filterNot { it in updatedCalls }).distinct()
+            val callsExercised = testOutcomes.flatMap { it.poMethodCallsExercised }.distinct()
+            TestQuestAction.POCallsOld = TestQuestAction.POCallsOld.mapValues { (test, oldCalls) ->
+                val updatedCalls = oldCalls
+                    .filter { it in TestQuestAction.POCallsNew[test].orEmpty() } //keep old calls that still exist only
+                    .map { oldCall -> callsExercised.find { it == oldCall } ?: oldCall } //overwrite old calls with exercised version and keep old calls for not exercised ones
+                //add newly added exercised calls from existing tests
+                (updatedCalls + callsExercised.filterNot { it in updatedCalls }).distinct()
             }.toMutableMap()
+            //add newly added exercised calls from new tests
+            TestQuestAction.POCallsOld = TestQuestAction.POCallsOld.toMutableMap().apply {
+                TestQuestAction.POCallsNew.forEach { (test, newCalls) ->
+                    if (!this.containsKey(test))
+                        this[test] = newCalls.filter { it in callsExercised }.distinct()
+                }
+            }
 
             //4. POs UPDATE
-            val exercisedPOs = callsPassed.map { it.pageObject }.toSet()
-            TestQuestAction.POsOld = TestQuestAction.POsOld.map { oldPO ->
-                //if PO was not exercised but still exists, keep it
-                if (oldPO.name !in exercisedPOs) {
-                    oldPO
+            val exercisedPONames = callsExercised.map { it.pageObject }.toSet()
+            val allNewPONames = TestQuestAction.POsNew.map { it.name }.toSet()
+            TestQuestAction.POsOld = TestQuestAction.POsOld.mapNotNull  { oldPO ->
+                //if oldPO still exists
+                if (oldPO.name in allNewPONames) {
+                    //if was not exercised, keep old version
+                    if (oldPO.name !in exercisedPONames)
+                        oldPO
+                    //else, update it
+                    else {
+                        //get new PO version
+                        val newPO = TestQuestAction.POsNew.find { it.name == oldPO.name }!!
+                        //update old methods
+                        val filteredUpdatedMethods = oldPO.methods
+                            //keep only methods that still exist
+                            .filter { oldMethod -> newPO.methods.any { it.name == oldMethod.name } }
+                            .map { oldMethod ->
+                                val newMethod = newPO.methods.find { it.name == oldMethod.name }!!
+                                //update method with newest version of locators that passed and old version of locators not passed but still existing
+                                val updatedLocators = (
+                                        newMethod.locators.filter { it in locatorsPassed } +
+                                                oldMethod.locators.filter { it !in locatorsPassed && it in newMethod.locators }
+                                        ).distinct()
+                                //TODO: assertions + selenium commands are now all copied but a more complex structure with error line to determine those passed to copy might be needed
+                                oldMethod.copy(locators = updatedLocators)
+                            }
+                        //update with newly added methods that had some locators passed
+                        val additionalMethods = newPO.methods
+                            .filter { newMethod -> oldPO.methods.none { it.name == newMethod.name } } //only new methods
+                            .mapNotNull { newMethod ->
+                                val updatedLocators = newMethod.locators.filter { it in locatorsPassed }.distinct()
+                                if(updatedLocators.isNotEmpty())
+                                    //TODO: assertions + selenium commands are now all copied but a more complex structure with error line to determine those passed to copy might be needed
+                                    newMethod.copy(locators = updatedLocators)
+                                else
+                                    null
+                            }
+                        val updatedMethods = (filteredUpdatedMethods + additionalMethods).distinctBy { it.name }
+
+                        //update ancestors
+                        val updatedAncestors = newPO.ancestors
+
+                        //update noncanonical locs that passed, keeping those still existing but not passed
+                        val updatedNonCanonicalLocators = oldPO.nonCanonicalLocators
+                            //keep only still existing non canonical locators
+                            .filter { locator -> locator in newPO.nonCanonicalLocators }
+                            //overwrite old passed
+                            .map { locator ->
+                            locatorsPassed.find { it == locator } ?: locator
+                        }.toMutableSet().apply {
+                            //add newly added passed non canonical
+                            addAll(
+                                newPO.nonCanonicalLocators.filter { locator ->
+                                    locator in locatorsPassed && locator !in oldPO.nonCanonicalLocators
+                                }
+                            )
+                        }.toList()
+                        //returned updated copy of PO with most components as 'passed' or not passed but still existing
+                        oldPO.copy(
+                            methods = updatedMethods,
+                            ancestors = updatedAncestors,
+                            nonCanonicalLocators = updatedNonCanonicalLocators
+                        )
+                    }
                 }
-                else {
-                    //get new PO version
-                    val newPO = TestQuestAction.POsNew.find { po -> po.name == oldPO.name }
-                    //get passed methods
-                    val passedMethodsNames = testOutcomes.flatMap { it.poMethodCallsPassed }
-                        .filter { it.pageObject == newPO!!.name }
-                        .map { it.methodName }
-                        .toSet()
-                    val passedMethods = newPO!!.methods.filter { it.name in passedMethodsNames }
-                    //update the methods with only passed ones, keeping those still existing but not passed
-                    val updatedMethods = newPO.methods.map { method ->
-                        passedMethods.find { it == method } ?: method //overwrites existing methods passed
-                    }.toMutableSet().apply {
-                        addAll(passedMethods) //adds new methods passed
-                    }.toList()
-                    //update ancestors
-                    val updatedAncestors = TestQuestAction.POsNew.find { it.name == newPO.name }!!.ancestors
-                    //update noncanonical locs that passed, keeping those still existing but not passed
-                    val updatedNonCanonicalLocators = newPO.nonCanonicalLocators.map { locator ->
-                        locatorsPassed.find { it == locator } ?: locator //overwrite old passed
-                    }.toMutableSet().apply {
-                        addAll(locatorsPassed) //add new passed
-                    }.toList()
-                    //returned updated copy of PO with most components as 'passed' or not passed but still existing
-                    oldPO.copy(
-                        methods = updatedMethods,
-                        ancestors = updatedAncestors,
+                //else, if does not exist remove it
+                else
+                    null
+            }.toMutableList()
+            //add new POs that are exercised, but only with updated methods/locators
+            val newExercisedPOs = TestQuestAction.POsNew
+                .filter { newPO ->
+                    newPO.name in exercisedPONames && TestQuestAction.POsOld.none { it.name == newPO.name }
+                }
+                .map { newPO ->
+                    //update new methods with only passed locators
+                    //TODO: assertions + selenium commands are now all copied but a more complex structure with error line to determine those passed to copy might be needed
+                    val newMethods = newPO.methods.map { method ->
+                        val updatedLocators = method.locators.filter { it in locatorsPassed }
+                        method.copy(locators = updatedLocators)
+                    }
+                    //update nonCanonicalLocators keeping only those that are passed
+                    val updatedNonCanonicalLocators = newPO.nonCanonicalLocators
+                        .filter { it in locatorsPassed }
+                        .distinct()
+                    //create new PO with updated methods and locators
+                    newPO.copy(
+                        methods = newMethods,
                         nonCanonicalLocators = updatedNonCanonicalLocators
                     )
                 }
-            }.toMutableList()
-            //add new POs that are exercised
-            val newPassedPOs = TestQuestAction.POsNew.filter { newPO ->
-                newPO.name in exercisedPOs && TestQuestAction.POsOld.none { it.name == newPO.name }
-            }
-            (TestQuestAction.POsOld as MutableList<PageObject>).addAll(newPassedPOs)
+            //add the new PageObjects to the old list
+            (TestQuestAction.POsOld as MutableList<PageObject>).addAll(newExercisedPOs)
+
 
             //5. SAVE CHANGES ON FILE
             UserProgressFileHandler.saveOldData()//to store user progress that needs to be tested next time
@@ -199,13 +259,13 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             val (oldLocatorsInTest, newLocatorsInTest) = collectLocators(test)
             // 2. FIND ERROR LINE (IF ANY), LOCATORS PASSED/BROKEN (IF ANY)/UNEXERCISED (IF ANY)
             val analysisResult = analyzeErrorInfo(test, newLocatorsInTest)
-            //3. FIND PO METHOD CALLS THAT ARE PASSED/UNEXERCISED DUE TO FAILURE
-            val (passedCalls, unexercisedCalls) = TestQuestAction.POCallsNew[test.name]?.let { calls ->
+            //3. FIND PO METHOD CALLS THAT ARE EXERCISED/UNEXERCISED DUE TO FAILURE
+            val (exercised, unexercisedCalls) = TestQuestAction.POCallsNew[test.name]?.let { calls ->
                 if (analysisResult.testErrorLineNum == -1) //if testErrorLineNum è -1, all calls are passed
                     calls to emptyList()
                 else
-                    calls.filter { it.line < analysisResult.testErrorLineNum } to
-                            calls.filter { it.line >= analysisResult.testErrorLineNum }
+                    calls.filter { it.line <= analysisResult.testErrorLineNum } to
+                            calls.filter { it.line > analysisResult.testErrorLineNum }
 
             } ?: (emptyList<PageObjectCall>() to emptyList())
             //4. TEST OUTCOME IS CREATED
@@ -220,7 +280,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
                 analysisResult.passedLocs,
                 analysisResult.brokenLoc,
                 analysisResult.unexercisedLocs,
-                passedCalls,
+                exercised,
                 unexercisedCalls
             )
             testOutcomes.add(testOutcome)

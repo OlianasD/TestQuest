@@ -59,7 +59,7 @@ class XMLWriter {
                     dailyNode.setAttribute("progress", dailyProgress.progress.toString())
                     dailyNode.setAttribute("discarded", dailyProgress.discarded.toString())
                     dailyNode.setAttribute("type", dailyProgress.daily.type)
-                    if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
+                    /*if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
                         val locatorsNode = doc.createElement("locators")
                         dailyProgress.daily.targetedLocators.forEach { locator ->
                             val locatorNode = doc.createElement("analyzer")
@@ -74,7 +74,7 @@ class XMLWriter {
                             locatorsNode.appendChild(locatorNode)
                         }
                         dailyNode.appendChild(locatorsNode)
-                    }
+                    }*/
                     dailiesNode.appendChild(dailyNode)
                 }
                 //update achievements
@@ -155,6 +155,7 @@ class XMLWriter {
             dailyNode.setAttribute("progress", dailyProgress.progress.toString())
             dailyNode.setAttribute("discarded", dailyProgress.discarded.toString())
             dailyNode.setAttribute("type", dailyProgress.daily.type)
+            /*
             //handle targeted dailies with associated locators
             if (dailyProgress.daily.type == "targeted" && dailyProgress.daily.targetedLocators.isNotEmpty()) {
                 val locatorsNode = doc.createElement("locators")
@@ -171,7 +172,7 @@ class XMLWriter {
                     locatorsNode.appendChild(locatorNode)
                 }
                 dailyNode.appendChild(locatorsNode)
-            }
+            }*/
             dailiesNode.appendChild(dailyNode)
         }
         userProfileNode.appendChild(dailiesNode)

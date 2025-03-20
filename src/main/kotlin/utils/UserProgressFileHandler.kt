@@ -39,7 +39,6 @@ object UserProgressFileHandler {
                 val locatorsOld = ois.readObject() as List<Locator>
                 val POsOld = ois.readObject() as List<PageObject>
                 val POCallsOld = ois.readObject() as Map<String, List<PageObjectCall>>
-                //TestQuestAction.locatorsOldStatic = locatorsOldStatic
                 TestQuestAction.locatorsOld = locatorsOld
                 TestQuestAction.POsOld = POsOld
                 TestQuestAction.POCallsOld = POCallsOld

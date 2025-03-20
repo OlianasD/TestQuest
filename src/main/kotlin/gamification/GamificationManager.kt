@@ -49,10 +49,10 @@ class GamificationManager {
         val GOOD_PREDS = setOf(
             "@id", "@name", "@class", "@title", "@alt", "@value") //TODO: this is just a subset. more good predicates could be considered
         val BAD_PREDS = setOf(
-            "src", "href", "height", "width")
-        val BAD_JS = setOf("onclick", "onload",
-            "onmouseover", "onmouseout", "onchange", "onsubmit",
-            "onfocus", "onkeydown")
+            "@src", "@href", "@height", "@width")
+        val BAD_JS = setOf("@onclick", "@onload",
+            "@onmouseover", "@onmouseout", "@onchange", "@sonsubmit",
+            "@onfocus", "@onkeydown")
         const val FRAGILITY_THRESHOLD = 0.5
 
         private val allTitles = mutableListOf(
@@ -98,18 +98,17 @@ class GamificationManager {
 
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
             val dailyProgresses = DailyManager.updateDailyProgresses(userProfile, testOutcomes)//check for each assigned daily
-            val achProgresses = AchievementManager.updateAchievementProgresses(userProfile, testOutcomes)
-            if (dailyProgresses.isNotEmpty() || achProgresses.isNotEmpty()){
+            //val achProgresses = AchievementManager.updateAchievementProgresses(userProfile, testOutcomes) //TODO: commented
+            if (dailyProgresses.isNotEmpty()){// || achProgresses.isNotEmpty()){ //TODO: commented
                 val totalXp = dailyProgresses.sumOf { it.first } //total xp gained
                 var msg = ""
                 if(dailyProgresses.isNotEmpty() && totalXp > 0) {
                     msg = "$totalXp XP gained from (partially) completed dailies\n"
-                    //val dailyDescriptions = dailyProgresses.mapNotNull { it.second?.description }
                 }
-                if (achProgresses.isNotEmpty()) {
+                /*if (achProgresses.isNotEmpty()) { //TODO: commented
                     val completedAchievements = achProgresses.filterNotNull().joinToString(", ") { it.name }
                     msg += "Achievements completed: $completedAchievements\n"
-                }
+                }*/
                 val xmlWriter = XMLWriter()
                 val isNewTitle = updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)

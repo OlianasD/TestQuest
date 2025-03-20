@@ -131,9 +131,9 @@ class LocatorsAnalyzer {
         val badPredicateLocators = LOCATORS.filter { locator ->
             locator.locatorType.equals("xpath", ignoreCase = true) &&
                     (GamificationManager.BAD_PREDS.any { attribute ->
-                        locator.locatorValue.contains("@$attribute", ignoreCase = true)
+                        locator.locatorValue.contains(attribute, ignoreCase = true)
                     } || GamificationManager.BAD_JS.any { jsAttribute ->
-                        locator.locatorValue.contains("@$jsAttribute", ignoreCase = true)
+                        locator.locatorValue.contains(jsAttribute, ignoreCase = true)
                     })
         }
         targetedIssuedLocators["badPredicate"] = badPredicateLocators
@@ -152,6 +152,7 @@ class LocatorsAnalyzer {
         targetedIssuedLocators["broken"] = emptyList()//initially all locators are not broken
     }
 
+
     //this value is updated once targeted dailies are present and tests are executed
     fun calculateBrokenLocators(brokenLoc: Locator) {
         val currentList = targetedIssuedLocators["broken"] ?: emptyList()
@@ -162,7 +163,7 @@ class LocatorsAnalyzer {
         }
         if (!isAlreadyPresent) {
             val updatedList = currentList + brokenLoc
-            targetedIssuedLocators["broken"] = updatedList
+            targetedIssuedLocators["broken"] = updatedList.toSet().toMutableList()
         }
     }
 
