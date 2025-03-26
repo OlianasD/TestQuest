@@ -29,7 +29,7 @@ data class Locator(
     //hashcode for uniqueness of locators
     override fun hashCode(): Int {
         if (locatorName != null)
-            return 31 * locatorPosition + locatorName.hashCode() + methodName.hashCode() + className.hashCode()
+            return 31 * locatorName.hashCode() + methodName.hashCode() + className.hashCode()
         else
            return 31 * locatorPosition + methodName.hashCode() + className.hashCode()
     }
@@ -40,8 +40,7 @@ data class Locator(
         if (locatorName != null)
             return locatorName == other.locatorName &&
                     methodName == other.methodName &&
-                    className == other.className &&
-                    locatorPosition == other.locatorPosition
+                    className == other.className
         else
             return locatorPosition == other.locatorPosition &&
                     methodName == other.methodName &&

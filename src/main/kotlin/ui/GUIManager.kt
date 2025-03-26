@@ -641,7 +641,8 @@ object GUIManager {
                             this.font = smallFont
                             foreground = JBColor.GRAY
                         }
-                        targetedIssuesPanel.add(separatorLabel)
+                        if(dailyProgress.daily.name != "broken") //broken locs will never be listed as fixed so there's no need to show this label
+                            targetedIssuesPanel.add(separatorLabel)
 
                         // show info of potentially fixed issues to verify, whether locators or POs based
                         if(!dailyProgress.daily.isAdvanced) {
