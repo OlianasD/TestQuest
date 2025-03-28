@@ -19,6 +19,7 @@ import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCallExtractor
 import testquest.TestQuestAction
 import ui.GUIManager
+import utils.ProgressFileHandler
 import utils.TestFilesExtractor
 
 
@@ -37,6 +38,10 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
     private lateinit var proj: Project
     private var isRegistered = false
     private var fileListener: VirtualFileListener? = null
+
+    private var initialSnapshot = false
+    private var locatorScores: MutableMap<Locator, Double> = mutableMapOf()
+
 
     fun registerListenerInternal(project: Project) {
         proj = project
@@ -58,8 +63,14 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
         if (virtualFile == null || !isTestRelatedFile(virtualFile.path) || locatorTooltipListeners.containsKey(testFile)) {
             return
         }
-        //compute locators score to associate with mouse tooltip for each test file
-        val locatorScores = loadLocatorScores()
+        //compute locators score to associate with mouse tooltip for each test file and create initial locators snapshot
+        if(!initialSnapshot) {
+            val (locatorScores, overallEstimation) = loadLocatorScores()
+            this.locatorScores = locatorScores
+            ProgressFileHandler.updateLocatorsCounterFromLatestSnapshot()
+            ProgressFileHandler.saveLocatorsSnapshot(locatorScores, overallEstimation)
+        }
+        initialSnapshot = true
         val listener = LocatorTooltipListener(testFile, locatorScores)
         locatorTooltipListeners[testFile] = listener
         testFile.contentComponent.addMouseMotionListener(listener)
@@ -79,7 +90,7 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                     //updates locators/POs/PO calls from classes named as _Test.java or _Page.java, and compute new fragility scores
                     val extractor = LocatorsExtractor()
                     TestQuestAction.locatorsNew = testFilePaths.flatMap { extractor.parseLocators(it) }
-                    val updatedScores = loadLocatorScores()
+                    val (updatedScores, overallEstimation) = loadLocatorScores()
                     locatorTooltipListeners.values.forEach { listener ->
                         listener.updateLocatorScores(updatedScores)
                     }
@@ -103,6 +114,12 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                     if (GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.TARGETED) {
                         GamificationManager.assignTargetDailies()
                     }
+
+                    //update counters of changed locators and create a new snapshot
+                    ProgressFileHandler.updateLocatorsCounterFromLatestSnapshot()
+                    ProgressFileHandler.saveLocatorsSnapshot(updatedScores, overallEstimation)
+
+
                 }
             }
         }
@@ -115,7 +132,7 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
         return filePath.endsWith("Test.java") || filePath.endsWith("Page.java")
     }
 
-    private fun loadLocatorScores(): Map<Locator, Double> {
+    private fun loadLocatorScores(): Pair<MutableMap<Locator, Double>, Double> {
         val locEstimator = LocatorsFragilityCalculator()
         val locatorScores = mutableMapOf<Locator, Double>()
         for (locator in TestQuestAction.locatorsNew) {
@@ -125,7 +142,7 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
         val estimation = locEstimator.calculateOverallFragility(TestQuestAction.locatorsNew)
         GUIManager.showOverallLocsFragilityScore(estimation)
         GUIManager.showLocatorScores(proj, locatorScores)
-        return locatorScores
+        return Pair(locatorScores, estimation)
     }
 
     override fun dispose() {

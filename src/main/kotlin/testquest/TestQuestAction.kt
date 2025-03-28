@@ -14,8 +14,11 @@ import extractor.test.PageObjectCall
 import extractor.test.PageObjectCallExtractor
 import listener.test.TestExecutionListener
 import ui.GUIManager
+import utils.FilePathSolver
 import utils.TestFilesExtractor
-import utils.UserProgressFileHandler
+import utils.ProgressFileHandler
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object PluginData {
     var userProfileId: String = ""
@@ -25,6 +28,10 @@ object PluginData {
 object WindowStateManager {
     var isWindowOpen = false
 }
+
+
+
+
 
 class TestQuestAction : AnAction() {
 
@@ -81,10 +88,10 @@ class TestQuestAction : AnAction() {
 
             //previous untested progress is loaded from file and considered as "old" state to compare changes with, if exists and the user wants to.
             // if not, old is set to new
-            val savedDataTime = UserProgressFileHandler.getMostRecentSavedData()
+            val savedDataTime = ProgressFileHandler.getMostRecentSavedData()
             val useSavedData = GUIManager.showWindowStoredDataChoice(savedDataTime)
             if (useSavedData) {
-                UserProgressFileHandler.loadOldData()
+                ProgressFileHandler.loadOldData()
                 if (locatorsOld.isEmpty())
                     locatorsOld = locatorsNew
                 if (POsOld.isEmpty())
@@ -92,17 +99,20 @@ class TestQuestAction : AnAction() {
                 if (POCallsOld.isEmpty())
                     POCallsOld = POCallsNew
             } else {
-                UserProgressFileHandler.destroySavedData()
+                ProgressFileHandler.destroySavedData()
                 locatorsOld = locatorsNew
                 POsOld = POsNew
                 POCallsOld = POCallsNew
             }
-            UserProgressFileHandler.saveOldData()
+            ProgressFileHandler.saveOldData()
 
             //estimate overall fragility and show it on GUI
             val locEstimator = LocatorsFragilityCalculator()
             val estimation = locEstimator.calculateOverallFragility(locatorsNew)
             GUIManager.showOverallLocsFragilityScore(estimation)
+
+            //create locators snapshot folder for logging purposes, if not exists
+            FilePathSolver.createSnapshotsFolder(PluginData.userProfileId)
 
             //register listeners
             CodeChangeListener.registerListener(project)

@@ -10,7 +10,7 @@ import analyzer.locator.LocatorsAnalyzer
 import extractor.pageobject.PageObject
 import extractor.test.PageObjectCall
 import testquest.TestQuestAction
-import utils.UserProgressFileHandler
+import utils.ProgressFileHandler
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -243,7 +243,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
 
 
             //5. SAVE CHANGES ON FILE
-            UserProgressFileHandler.saveOldData()//to store user progress that needs to be tested next time
+            ProgressFileHandler.saveOldData()//to store user progress that needs to be tested next time
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }

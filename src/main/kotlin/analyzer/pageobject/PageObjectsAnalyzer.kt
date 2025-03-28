@@ -1,11 +1,9 @@
 package analyzer.pageobject
 
 
-import analyzer.locator.LocatorsAnalyzer
-import extractor.locator.Locator
 import extractor.pageobject.MethodInfo
 import testquest.TestQuestAction
-import utils.UserProgressFileHandler
+import utils.ProgressFileHandler
 
 
 //this class is used to find problematic POs to fix with targeted dailies
@@ -42,7 +40,7 @@ class PageObjectsAnalyzer {
                 }
             }
             //fixed and pending POs are saved for future reuse
-            UserProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
+            ProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
         }
 
 
@@ -66,7 +64,7 @@ class PageObjectsAnalyzer {
         calculateDuplicatedPOMethods()
 
         //load fixedAndPending from file, if exist
-        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingPOsData()
+        val savedFixedAndPending = ProgressFileHandler.loadFixedAndPendingPOsData()
         //keep only fixed and pending related to existing POs
         var cleanedSavedFixedAndPending: Map<String, List<Any>>? = null
         if(savedFixedAndPending!=null) {
@@ -224,7 +222,7 @@ class PageObjectsAnalyzer {
             targetedFixedAndPendingPOs[key] = finalFixedAndPendingPOs.toMutableList()
 
             // Save fixed and pending POs on file for future reuse
-            UserProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
+            ProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
         }
 
     }

@@ -8,10 +8,10 @@ object FilePathSolver {
 
     private val BASE_PLUGIN_PATH = File(PathManager.getConfigPath(), "testquest")
     const val USER_PROPIC_PATH = "pics/user/default-user.png"
+    lateinit var SNAPSHOTS_FOLDER: File //locators snapshots folder to keep track of locs changes over time
     //TODO: change following paths so to manage multiple icons
     const val DAILY_PICS_PATH = "pics/daily/default-daily.png"
     const val ACHIEVEMENT_PICS_PATH = "pics/achievement/default-achievement.png"
-
 
 
     fun getUserDataFile(): File {
@@ -45,6 +45,17 @@ object FilePathSolver {
             userFolder.mkdir()
         return File(userFolder, "pendingPOs.txt")
     }
+
+
+    fun createSnapshotsFolder(user: String) {
+        val userFolder = File(BASE_PLUGIN_PATH, user)
+        if (!userFolder.exists())
+            userFolder.mkdir()
+        SNAPSHOTS_FOLDER = File(userFolder, "snapshots")
+        if (!SNAPSHOTS_FOLDER.exists())
+            SNAPSHOTS_FOLDER.mkdir()
+    }
+
 
 
 

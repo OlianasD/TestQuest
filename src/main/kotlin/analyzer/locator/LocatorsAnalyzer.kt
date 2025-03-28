@@ -3,7 +3,7 @@ package analyzer.locator
 import extractor.locator.Locator
 import gamification.GamificationManager
 import testquest.TestQuestAction
-import utils.UserProgressFileHandler
+import utils.ProgressFileHandler
 
 
 //this class is used to find problematic locators to fix with targeted dailies
@@ -41,7 +41,7 @@ class LocatorsAnalyzer {
                 }
             }
             //fixed and pending locs are saved for future reuse
-            UserProgressFileHandler.saveFixedAndPendingLocsData(targetedFixedAndPendingLocators)
+            ProgressFileHandler.saveFixedAndPendingLocsData(targetedFixedAndPendingLocators)
         }
     }
 
@@ -68,7 +68,7 @@ class LocatorsAnalyzer {
             calculateInitialBrokenLocators()
 
         //load fixedAndPending from file, if exist
-        val savedFixedAndPending = UserProgressFileHandler.loadFixedAndPendingLocsData()
+        val savedFixedAndPending = ProgressFileHandler.loadFixedAndPendingLocsData()
         //keep only fixed and pending related to existing locators
         var cleanedSavedFixedAndPending: Map<String, List<Locator>>? = null
         if(savedFixedAndPending!=null) {
@@ -232,7 +232,7 @@ class LocatorsAnalyzer {
             targetedFixedAndPendingLocators[key] = finalFixedAndPendingLocators.toMutableList()
 
             // Save fixed and pending locs on file for future reuse
-            UserProgressFileHandler.saveFixedAndPendingLocsData(targetedFixedAndPendingLocators)
+            ProgressFileHandler.saveFixedAndPendingLocsData(targetedFixedAndPendingLocators)
         }
 
     }
