@@ -57,6 +57,13 @@ object FilePathSolver {
     }
 
 
+    fun getSavedInfeasibleLocatorsFile(user: String): File {
+        val userFolder = File(BASE_PLUGIN_PATH, user)
+        if (!userFolder.exists())
+            userFolder.mkdir()
+        return File(userFolder, "infeasibleLocs.txt")
+    }
+
 
 
 

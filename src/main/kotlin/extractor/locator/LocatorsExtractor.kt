@@ -24,7 +24,8 @@ data class Locator(
     val locatorPosition: Int,
     val filePath: String,
     val isAnnotation: Boolean = false,
-    val countChanges: Int = 0 //to count how many times the locator was changed
+    val countChanges: Int = 0, //to count how many times the locator was changed
+    var feasible: Boolean = true //to determine whether locators can actually be improved
 ): Serializable
 {
     //hashcode for uniqueness of locators

@@ -230,14 +230,14 @@ object ProgressFileHandler {
         }
         TestQuestAction.locatorsNew = TestQuestAction.locatorsNew.map { newLocator ->
             //get new loc corresponding to saved one
-            val oldLocator = extractedLocators.find { it.hashCode() == newLocator.hashCode() }
-            if (oldLocator != null) {
+            val savedLocator = extractedLocators.find { it.hashCode() == newLocator.hashCode() }
+            if (savedLocator != null) {
                 //if locator type or value is changed
-                if (oldLocator.locatorType != newLocator.locatorType || oldLocator.locatorValue != newLocator.locatorValue)
+                if (savedLocator.locatorType != newLocator.locatorType || savedLocator.locatorValue != newLocator.locatorValue)
                     //update counter
-                    newLocator.copy(countChanges = oldLocator.countChanges + 1)
+                    newLocator.copy(countChanges = savedLocator.countChanges + 1)
                 else
-                    newLocator.copy(countChanges = oldLocator.countChanges)
+                    newLocator.copy(countChanges = savedLocator.countChanges)
             } else
                 newLocator
         }
@@ -247,6 +247,36 @@ object ProgressFileHandler {
 
 
 
+
+
+
+
+    fun saveInfeasibleLocators() {
+        val infeasibleLocs = TestQuestAction.locatorsNew.filter { !it.feasible }
+        try {
+            val file = FilePathSolver.getSavedInfeasibleLocatorsFile(PluginData.userProfileId)
+            ObjectOutputStream(FileOutputStream(file)).use { oos ->
+                oos.writeObject(infeasibleLocs)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun loadInfeasibleLocators(): List<Locator>? {
+        var infeasibleLocs: List<Locator>? = null
+        try {
+            val file = FilePathSolver.getSavedInfeasibleLocatorsFile(PluginData.userProfileId)
+            ObjectInputStream(FileInputStream(file)).use { ois ->
+                infeasibleLocs = ois.readObject() as? List<Locator>
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        }
+        return infeasibleLocs
+    }
 
 
 

@@ -10,6 +10,7 @@ import analyzer.locator.LocatorsAnalyzer
 import extractor.pageobject.PageObject
 import extractor.test.PageObjectCall
 import testquest.TestQuestAction
+import ui.DailyWindowManager
 import utils.ProgressFileHandler
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -95,8 +96,9 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
     override fun onTestingStarted(testsRoot: SMTestProxy.SMRootTestProxy) {
         testOutcomes.clear()
         try {
-            server = Server()
-            server.start()
+            //server = Server()
+            //server.start()
+            DailyWindowManager.closeAllWindows() //close all opened frames about targeted dailies
         }
         catch (_: RuntimeException) {}//this to handle the case of tests run even if TestQuest is not opened
     }
@@ -106,7 +108,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
     //this is called at the end of the whole testing process
     override fun onTestingFinished(testsRoot: SMTestProxy.SMRootTestProxy) {
         try {
-            server.stop()
+            //server.stop()
 
             //1. CHECK EVENTS FOR PROGRESSION
             GamificationManager.analyzeEvents(testOutcomes)

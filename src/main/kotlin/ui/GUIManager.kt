@@ -23,13 +23,16 @@ import analyzer.locator.LocatorsAnalyzer
 import analyzer.pageobject.PageObjectsAnalyzer
 import extractor.pageobject.MethodInfo
 import extractor.pageobject.PageObject
+import testquest.TestQuestAction
 import testquest.WindowStateManager
 import utils.FilePathSolver
+import utils.ProgressFileHandler
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.awt.font.TextAttribute
 import java.io.File
 import java.io.FileInputStream
 import java.math.RoundingMode
@@ -586,6 +589,14 @@ object GUIManager {
 
                         // show targeted issues for the current daily, whether locators or POs based
                         if  (!dailyProgress.daily.isAdvanced) {
+
+                            //get existing infeasible locators
+                            val infeasibleLocators = ProgressFileHandler.loadInfeasibleLocators()
+                            val validInfeasibleHashes = infeasibleLocators
+                                ?.map { it.hashCode() }
+                                ?.intersect(TestQuestAction.locatorsNew.map { it.hashCode() }.toSet())
+                                ?: emptySet()
+
                             dailyProgress.daily.targetedLocators.forEach { locator ->
                                 val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
                                 val locatorInfo = "${locator.locatorName ?: "N/A"} " +
@@ -594,7 +605,43 @@ object GUIManager {
                                     this.font = smallFont
                                     foreground = JBColor.DARK_GRAY
                                 }
-                                targetedIssuesPanel.add(locatorLabel)
+
+                                //check if current locator is infeasible for initial state
+                                val isInfeasible = validInfeasibleHashes.contains(locator.hashCode())
+                                //define a checkbox to set locators to fix as 'infeasible' if they cannot be improved any further
+                                val checkBox = JCheckBox("infeasible").apply {
+                                    this.font = smallFont.deriveFont(Font.ITALIC)
+                                    isSelected = isInfeasible //set by default remembering the locator state
+                                    if(isSelected){
+                                        locatorLabel.foreground = JBColor.RED
+                                        locatorLabel.font = locatorLabel.font.deriveFont(mapOf(TextAttribute.STRIKETHROUGH to TextAttribute.STRIKETHROUGH_ON))
+
+                                    }
+                                }
+                                //define the action over checkbox
+                                checkBox.addActionListener{
+                                    //update locator feasibility according to clicks
+                                    val target = TestQuestAction.locatorsNew.find { it.hashCode() == locator.hashCode() }
+                                    target?.feasible = !checkBox.isSelected
+                                    if (checkBox.isSelected) {
+                                        locatorLabel.foreground = JBColor.RED
+                                        locatorLabel.font = locatorLabel.font.deriveFont(mapOf(TextAttribute.STRIKETHROUGH to TextAttribute.STRIKETHROUGH_ON))
+                                    } else {
+                                        locatorLabel.foreground = JBColor.DARK_GRAY
+                                        locatorLabel.font = smallFont
+                                    }
+                                    //update infeasible locators
+                                    ProgressFileHandler.saveInfeasibleLocators()
+                                }
+                                val locatorPanel = JPanel().apply {
+                                    layout = BoxLayout(this, BoxLayout.X_AXIS)
+                                    add(locatorLabel)
+                                    add(Box.createRigidArea(Dimension(5, 0)))
+                                    add(checkBox)
+                                    alignmentX = Component.LEFT_ALIGNMENT
+                                    maximumSize = Dimension(Int.MAX_VALUE, locatorLabel.preferredSize.height)
+                                }
+                                targetedIssuesPanel.add(locatorPanel)
                             }
                         }
                         else if(dailyProgress.daily.isAdvanced) {
@@ -655,7 +702,14 @@ object GUIManager {
                                     this.font = smallFont
                                     foreground = JBColor.DARK_GRAY
                                 }
-                                targetedIssuesPanel.add(locatorLabel)
+                                val locatorPanel = JPanel().apply {
+                                    layout = BoxLayout(this, BoxLayout.X_AXIS)
+                                    add(locatorLabel)
+                                    add(Box.createRigidArea(Dimension(5, 0)))
+                                    alignmentX = Component.LEFT_ALIGNMENT
+                                    maximumSize = Dimension(Int.MAX_VALUE, locatorLabel.preferredSize.height)
+                                }
+                                targetedIssuesPanel.add(locatorPanel)
                             }
                         }
                         else if(dailyProgress.daily.isAdvanced) {
@@ -699,7 +753,7 @@ object GUIManager {
                         }
 
                         val scrollPane = JScrollPane(targetedIssuesPanel).apply {
-                            preferredSize = Dimension(300, 150)
+                            preferredSize = Dimension(400, 150)
                             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
                             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
                         }
@@ -712,15 +766,18 @@ object GUIManager {
                         addWindowListener(object : WindowAdapter() {
                             override fun windowClosing(e: WindowEvent) {
                                 toggleButton.text = "Show"
+                                DailyWindowManager.removeWindow(detailsFrame!!)
                                 detailsFrame = null
                             }
                         })
                     }
+                    DailyWindowManager.addWindow(detailsFrame!!, toggleButton)
                     toggleButton.text = "Hide"
                 } else {
                     detailsFrame?.dispose()
                     detailsFrame = null
                     toggleButton.text = "Show"
+                    DailyWindowManager.removeWindow(detailsFrame!!)
                 }
             }
             dailyPanel.add(toggleButton)

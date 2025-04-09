@@ -18,6 +18,7 @@ import analyzer.locator.LocatorsFragilityCalculator
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCallExtractor
 import testquest.TestQuestAction
+import ui.DailyWindowManager
 import ui.GUIManager
 import utils.ProgressFileHandler
 import utils.TestFilesExtractor
@@ -114,6 +115,9 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                     if (GamificationManager.assignmentMode == GamificationManager.DailyAssignmentMode.TARGETED) {
                         GamificationManager.assignTargetDailies()
                     }
+
+                    //update opened windows about targeted dailies
+                    DailyWindowManager.closeAllWindows()
 
                     //update counters of changed locators and create a new snapshot
                     ProgressFileHandler.updateLocatorsCounterFromLatestSnapshot()
