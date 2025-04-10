@@ -25,7 +25,7 @@ data class Locator(
     val filePath: String,
     val isAnnotation: Boolean = false,
     val countChanges: Int = 0, //to count how many times the locator was changed
-    var feasible: Boolean = true //to determine whether locators can actually be improved
+    var feasible: MutableMap<String, Boolean> = mutableMapOf() //to determine whether a certain task for this locator is feasible or not
 ): Serializable
 {
     //hashcode for uniqueness of locators

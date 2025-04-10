@@ -50,15 +50,23 @@ object ProgressFileHandler {
     }
 
     fun destroySavedData() {
-        var file = FilePathSolver.getSavedPendingLocsFile(PluginData.userProfileId)
-        if (file.exists())
-            file.delete()
-        file = FilePathSolver.getSavedOldDataFile(PluginData.userProfileId)
-        if (file.exists())
-            file.delete()
-        file = FilePathSolver.getSavedPendingPOsFile(PluginData.userProfileId)
-        if (file.exists())
-            file.delete()
+        val userId = PluginData.userProfileId
+        val filesToDelete = listOf(
+            FilePathSolver.getSavedPendingLocsFile(userId),
+            FilePathSolver.getSavedOldDataFile(userId),
+            FilePathSolver.getSavedPendingPOsFile(userId),
+            FilePathSolver.getSavedInfeasibleLocatorsFile(userId),
+        )
+        filesToDelete.forEach { file ->
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+        val snapshotsFolder = FilePathSolver.getSnapshotFolder(userId)
+        if (snapshotsFolder.exists() && snapshotsFolder.isDirectory) {
+            snapshotsFolder.listFiles()?.forEach { it.delete() }
+            snapshotsFolder.delete()
+        }
     }
 
 
@@ -114,9 +122,6 @@ object ProgressFileHandler {
         }
         return loadedData
     }
-
-
-
 
 
 
@@ -245,23 +250,41 @@ object ProgressFileHandler {
 
 
 
-
-
-
-
-
-
-    fun saveInfeasibleLocators() {
-        val infeasibleLocs = TestQuestAction.locatorsNew.filter { !it.feasible }
+    //this method saves infeasible locator to file (i.e., locators that cannot be improved for certain tasks)
+    fun saveInfeasibleLocators(targetLoc: Locator) {
+        //get all saved infeasible locs and keep those that still exist
+        val savedInfeasibleLocs = loadInfeasibleLocators() ?: emptyList()
+        val existingInfeasibleLocs = savedInfeasibleLocs
+            .filter { saved ->
+                TestQuestAction.locatorsNew.any { it.hashCode() == saved.hashCode() }
+            }
+            .toMutableList()
+        val existingIndex = existingInfeasibleLocs.indexOfFirst { it.hashCode() == targetLoc.hashCode() }
+        if (existingIndex >= 0) {
+            //if target locator exists, update it
+            val existing = existingInfeasibleLocs[existingIndex]
+            existing.feasible.putAll(targetLoc.feasible)
+            //if target locator is feasible in all tasks, remove it from the list
+            if (existing.feasible.values.all { it }) {
+                existingInfeasibleLocs.removeAt(existingIndex)
+            }
+        }
+        else {
+            //if target locator does not exist, add it to the list if it has at least a task as infeasible
+            if (targetLoc.feasible.values.any { !it }) {
+                existingInfeasibleLocs.add(targetLoc)
+            }
+        }
         try {
             val file = FilePathSolver.getSavedInfeasibleLocatorsFile(PluginData.userProfileId)
             ObjectOutputStream(FileOutputStream(file)).use { oos ->
-                oos.writeObject(infeasibleLocs)
+                oos.writeObject(existingInfeasibleLocs)
             }
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
+
 
     fun loadInfeasibleLocators(): List<Locator>? {
         var infeasibleLocs: List<Locator>? = null

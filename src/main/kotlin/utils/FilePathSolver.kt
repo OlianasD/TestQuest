@@ -56,6 +56,13 @@ object FilePathSolver {
             SNAPSHOTS_FOLDER.mkdir()
     }
 
+    fun getSnapshotFolder(user: String): File {
+        val userFolder = File(BASE_PLUGIN_PATH, user)
+        if (!userFolder.exists())
+            userFolder.mkdir()
+        return File(userFolder, "snapshots");
+    }
+
 
     fun getSavedInfeasibleLocatorsFile(user: String): File {
         val userFolder = File(BASE_PLUGIN_PATH, user)

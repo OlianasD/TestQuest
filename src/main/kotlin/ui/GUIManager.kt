@@ -54,7 +54,6 @@ object GUIManager {
     private var FragilityWindow: JFrame? = null // window to show locator scores
     private var currentPopup: JDialog? = null // window to show user changes (e.g., progression, daily mode change)
 
-
     //to show immediate user progressions via popup
     private fun showPopup(message: String) {
         SwingUtilities.invokeLater {
@@ -590,12 +589,12 @@ object GUIManager {
                         // show targeted issues for the current daily, whether locators or POs based
                         if  (!dailyProgress.daily.isAdvanced) {
 
-                            //get existing infeasible locators
-                            val infeasibleLocators = ProgressFileHandler.loadInfeasibleLocators()
-                            val validInfeasibleHashes = infeasibleLocators
-                                ?.map { it.hashCode() }
-                                ?.intersect(TestQuestAction.locatorsNew.map { it.hashCode() }.toSet())
-                                ?: emptySet()
+                            //get existing infeasible locators from previously saved ones
+                            val savedInfeasibleLocs = ProgressFileHandler.loadInfeasibleLocators()
+                            val existingInfeasibleLocs = savedInfeasibleLocs?.filter { saved ->
+                                TestQuestAction.locatorsNew.any { it.hashCode() == saved.hashCode() } &&
+                                        saved.feasible[dailyProgress.daily.name] == false
+                            }
 
                             dailyProgress.daily.targetedLocators.forEach { locator ->
                                 val methodPart = if (locator.methodName.isNotEmpty()) ".${locator.methodName}" else ""
@@ -606,12 +605,12 @@ object GUIManager {
                                     foreground = JBColor.DARK_GRAY
                                 }
 
-                                //check if current locator is infeasible for initial state
-                                val isInfeasible = validInfeasibleHashes.contains(locator.hashCode())
-                                //define a checkbox to set locators to fix as 'infeasible' if they cannot be improved any further
+                                //check if current locator is infeasible as initial state
+                                var targetLoc = existingInfeasibleLocs?.find { it.hashCode() == locator.hashCode() }
                                 val checkBox = JCheckBox("infeasible").apply {
                                     this.font = smallFont.deriveFont(Font.ITALIC)
-                                    isSelected = isInfeasible //set by default remembering the locator state
+                                    if (targetLoc != null)
+                                        isSelected = targetLoc!!.feasible[dailyProgress.daily.name] == false
                                     if(isSelected){
                                         locatorLabel.foreground = JBColor.RED
                                         locatorLabel.font = locatorLabel.font.deriveFont(mapOf(TextAttribute.STRIKETHROUGH to TextAttribute.STRIKETHROUGH_ON))
@@ -621,8 +620,9 @@ object GUIManager {
                                 //define the action over checkbox
                                 checkBox.addActionListener{
                                     //update locator feasibility according to clicks
-                                    val target = TestQuestAction.locatorsNew.find { it.hashCode() == locator.hashCode() }
-                                    target?.feasible = !checkBox.isSelected
+                                    if(targetLoc==null)
+                                        targetLoc = locator
+                                    targetLoc!!.feasible[dailyProgress.daily.name] = !checkBox.isSelected
                                     if (checkBox.isSelected) {
                                         locatorLabel.foreground = JBColor.RED
                                         locatorLabel.font = locatorLabel.font.deriveFont(mapOf(TextAttribute.STRIKETHROUGH to TextAttribute.STRIKETHROUGH_ON))
@@ -631,7 +631,7 @@ object GUIManager {
                                         locatorLabel.font = smallFont
                                     }
                                     //update infeasible locators
-                                    ProgressFileHandler.saveInfeasibleLocators()
+                                    ProgressFileHandler.saveInfeasibleLocators(targetLoc!!)
                                 }
                                 val locatorPanel = JPanel().apply {
                                     layout = BoxLayout(this, BoxLayout.X_AXIS)
@@ -867,6 +867,7 @@ object GUIManager {
 
 
     fun showLocatorScores(project: Project, locatorScores: Map<Locator, Double>) {
+
         FragilityWindow?.dispose()//to close any already open window
         FragilityWindow = JFrame("Locator Details Panel").apply {
             defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE //avoid to close this window
