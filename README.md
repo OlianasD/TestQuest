@@ -41,7 +41,6 @@ The TestQuest main class is implemented as an IntelliJ custom action, enabling t
 
 Extracted data are used both to assess test suite quality (based on specific metrics) and to drive gamification. TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
 
----
 
 ## Modules
 TestQuest is composed by the following main modules:  
@@ -54,11 +53,13 @@ TestQuest is composed by the following main modules:
 ---
 
 ## Usage
-To install and use TestQuest into your IntelliJ test project:
+To use TestQuest into your IntelliJ test project:
 
-- Import **TestQuest Library** _zip_: 
-    - `File` > `Settings` > `Plugin` > click the engine symbol > `Import from File system` 
-    - From the panel, add _testquest.zip_ provided in this repository (or create your own zip by ...)
+- Import **TestQuest Plugin**: 
+    - Open the test project in Intellij
+    - Select `File` > `Settings` > `Plugin` > click the engine symbol > `Import from File system` 
+    - From the panel, select _testquest.zip_ provided in this repository under the _dist_ folder 
+    - You can create your own zip copy of TestQuest by running `./gradlew buildPlugin` from TestQuest project terminal. The zip copy can be found under `build/distributions`
 - Be sure that: 
     - All test artifacts in the test project (test cases, Page Objects) are stored under a _test_ folder
     - Test cases are named as _testCaseName_\_Test
