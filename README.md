@@ -13,11 +13,11 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 | ID  | Description                                                                 |
 |-----|-----------------------------------------------------------------------------|
 | L1  | Prioritize `ID` and `XPath` locators                                        |
-| L2  | Prioritize `XPath` locators with predicates about `id`, `name`, `class`, `title`, `alt`, and `value` properties|
+| L2  | Prioritize `XPath` locators with predicates about `id`, `name`, `class`, `title`, `alt`, and `value` properties |
 | L3  | Keep number of positional predicates and levels in XPath locators as few as possible |
 | L4  | Keep locator values readable and short                                      |
 | L5  | Avoid using absolute `XPath` locators                                       |
-| L6  | Avoid `XPath` locators with predicates about internal app structure (e.g., `href`) or Javascript (e.g., `onClick`) |
+| L6  | Avoid `XPath` locators with predicates about internal app structure (e.g., `href`) or Javascript (e.g., `onClick`)  |
 
 ### Page Object Guidelines
 
@@ -40,22 +40,19 @@ The process describing how TestQuest works is sketched in the following Figure.
 </p>
 
 The TestQuest main class is implemented as an IntelliJ custom action, enabling the plugin in the target test project. TestQuest scans test-related files to extract information on locators and Page Objects using dedicated extractors. Locators follow the Selenium WebDriver model and are represented as Kotlin data classes containing _type_, _value_, and _code location_. Page Objects are structured with _names_, _ancestors_, and _method lists_, where methods include metadata like _parameters_, _return types_ and _associated locators_.
-At plugin startup and after each change, TestQuest updates two GUI windows: the _Gamification window_, showing info about the user profile, assigned dailies, ongoing achievements, and more,
- and _the Fragility window_, listing locators ranked by fragility score (0–1) inspired by **SIDEREAL** approach [3] and based on the best practices listed above.
-In terms of usage, the user completes assigned tasks (e.g., replacing absolute XPaths), validate them through test execution, and earn rewards. 
-Progress is saved in XML files, and only passing tests count toward progression. 
-Two listeners are registered to capture static and dynamic perspectives of the test suite, respectively, managing the changes affecting the code and the outcomes of test
-executions, eventually reactivating the whole process sketched in the Figure above. 
+At plugin startup and after each change, TestQuest updates two GUI windows: the _Gamification window_, showing info about the user profile, assigned dailies, ongoing achievements, and more, and _the Fragility window_, listing locators ranked by fragility score (0–1) inspired by **SIDEREAL** approach [3] and based on the best practices listed above.
+In terms of usage, the user completes assigned tasks (e.g., replacing absolute XPaths), validate them through test execution, and earn rewards. Progress is saved in XML files, and only passing tests count toward progression. 
+Two listeners are registered to capture static and dynamic perspectives of the test suite, respectively, managing the changes affecting the code and the outcomes of test executions, eventually reactivating the whole process sketched in the Figure above. 
 
 The tool currently support two daily assignment modes:
-- **RANDOM**: dailies are randomly assigned and expire after 24h
-- **TARGETED**: dailies are based on actual detected issues in the test suite
+- _RANDOM_: dailies are randomly assigned and expire after 24h
+- _TARGETED_: dailies are based on actual detected issues in the test suite
 
 TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
 
 
 ## Modules
-TestQuest is composed by the following main modules:  
+TestQuest is composed of the following main modules:  
 - [analyzer](./src/main/kotlin/analyzer/): this module is responsible for evaluating locators and Page Objects according to quality metrics. The evaluation is used to rate locators fragility and activate dailies targeted to fix found issues 
 - [extractor](./src/main/kotlin/extractor/): this module is responsible for extracting locator and Page object data from test artifacts for the evaluation
 - [gamification](./src/main/kotlin/gamification/): this module is responsible for defining and assigning tasks to users and keeping track of user progressions 
@@ -67,7 +64,7 @@ TestQuest is composed by the following main modules:
 
 ## Usage
 To use TestQuest into your IntelliJ test project:
-- Import TestQuest Plugin: 
+- Import TestQuest plugin: 
     - Open the test project in Intellij
     - Select `File` > `Settings` > `Plugin` > click the engine symbol > `Import from File system` 
     - From the panel, select _testquest.zip_ provided in this repository under the _dist_ folder 
