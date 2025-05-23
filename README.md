@@ -1,6 +1,6 @@
 # TestQuest
 
-TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustness through an embedded gamification framework, based on Selenium WebDriver APIs, with a focus towards locators and PageObjects. 
+TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustness through an embedded gamification framework, based on **Selenium WebDriver** APIs [1], with a focus towards locators and **PageObjects** [2]. 
 
 
 ## Guidelines
@@ -41,7 +41,20 @@ The process describing how TestQuest works is sketched in the following Figure.
 
 The TestQuest main class is implemented as an IntelliJ custom action, enabling the plugin in the target test project. TestQuest scans test-related files to extract information on locators and Page Objects using dedicated extractors. Locators follow the Selenium WebDriver model and are represented as Kotlin data classes containing _type_, _value_, and _code location_. Page Objects are structured with _names_, _ancestors_, and _method lists_, where methods include metadata like _parameters_, _return types_ and _associated locators_.
 
-Extracted data are used both to assess test suite quality (based on specific metrics) and to drive gamification. TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
+At plugin startup and after each change, TestQuest updates two GUI windows: the _Gamification window_, showing info about the user profile, assigned dailies, ongoing achievements, and more,
+ and _the Fragility window_, listing locators ranked by fragility score (0–1) inspired by **SIDEREAL** approach [3] and based on the best practices listed above.
+
+The tool currently support two daily assignment modes:
+- RANDOM: dailies are randomly assigned and expire after 24h
+- TARGETED: dailies are based on actual detected issues in the test suite
+
+In terms of usage, the user completes assigned tasks (e.g., replacing absolute XPaths), validate them through test execution, and earn rewards. 
+Progress is saved in XML files, and only passing tests count toward progression. 
+
+Two listeners are registered to capture static and dynamic perspectives of the test suite, respectively, managing the changes affecting the code and the outcomes of test
+executions, eventually reactivating the whole process sketched in the Figure above. 
+
+TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
 
 
 ## Modules
@@ -54,7 +67,6 @@ TestQuest is composed by the following main modules:
 - [ui](./src/main/kotlin/ui/): this module is responsible for the plugin interface, including the Gamification and Fragility windows, displaying user data, progressions, and all related notifications
 - [utils](./src/main/kotlin/utils/): this modules is responsible for utility functions, including the management of the user progression through I/O operations
 
----
 
 ## Usage
 To use TestQuest into your IntelliJ test project:
@@ -73,3 +85,10 @@ To use TestQuest into your IntelliJ test project:
     - All changes on test cases and Page Objects are positively validated by test execution (e.g., changing a locator that breaks will not provide any progress)
 
 TestQuest plugin is written in Kotlin and built targeting Java 17 (JVM) and IntelliJ IDEA 2023.2.x (build 232.*) or later versions.
+
+
+## References
+[1]: Selenium WebDriver Documentation. Available: https://www.selenium.dev/documentation/webdriver/
+[2]: M. Fowler. (2013) Page Object. Available: https://martinfowler.com/bliki/PageObject.html
+[3]: M. Leotta, F. Ricca, and P. Tonella, “SIDEREAL: Statistical adaptive generation of robust locators for Web testing,” Journal of Software:
+Testing, Verification and Reliability (STVR), vol. 31, 2021. Available: https://doi.org/10.1002/stvr.1767
