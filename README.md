@@ -57,18 +57,20 @@ TestQuest is composed by the following main modules:
 ## Usage
 To use TestQuest into your IntelliJ test project:
 
-- Import **TestQuest Plugin**: 
+- Import and Use **TestQuest Plugin**: 
     - Open the test project in Intellij
     - Select `File` > `Settings` > `Plugin` > click the engine symbol > `Import from File system` 
     - From the panel, select _testquest.zip_ provided in this repository under the _dist_ folder 
-    - You can create your own zip copy of TestQuest by running `./gradlew buildPlugin` from TestQuest project terminal. The zip copy can be found under `build/distributions`
+      - You can create your own zip copy of TestQuest by running `./gradlew buildPlugin` from TestQuest project terminal. The zip copy can be found under `build/distributions`
+    - Select `Gamify` > `TestQuest` to start the plugin 
+    - You can now create and modify test artifacts with TestQuest active. Progressions are saved under the IntelliJ IntelliJ config and data folder of your system (e.g., `C:\Users\User\AppData\Roaming\JetBrains\IdeaIC2023.2\testquest` path in Windows). 
 - Be sure that: 
     - All test artifacts in the test project (test cases, Page Objects) are stored under a _test_ folder
     - Test cases are named as _testCaseName_\_Test
     - Page Objects are named as _pageObjectName_\_Page 
     - All locators are declared in their full form (i.e., `WebElement locatorName = driver.findElement(By.locatorStrategy(...))`)
+    - All changes on test cases and Page Objects are positively validated by test execution (e.g., changing a locator that breaks will not provide any progress)
 
-_TestQuest plugin was built with Java 17 and targets IntelliJ IDEA version 2023.2.x (build 232.*) or later.
-_
+TestQuest plugin was built with Java 17 and targets IntelliJ IDEA version 2023.2.x (build 232.*) or later.
 
 
