@@ -3,7 +3,34 @@
 
 
 ## Approach
-TestQuest is a Kotlin plugin for IntelliJ IDEA to support Web test maintenance based on Selenium WebDriver APIs, with a focus towards locators and PageObjects robustness. 
+TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustness through an embedded gamification framework, based on Selenium WebDriver APIs, with a focus towards locators and PageObjects. 
+
+
+
+### Locator Guidelines
+
+| ID  | Description                                                                 |
+|-----|-----------------------------------------------------------------------------|
+| L1  | Prioritize `ID` and `XPath` locators                                       |
+| L2  | Prioritize `XPath` locators with predicates about `id`, `name`, `class`, `title`, `alt`, and `value` properties |
+| L3  | Keep number of positional predicates and levels in XPath locators as few as possible |
+| L4  | Keep locator values readable and short                                     |
+| L5  | Avoid using absolute `XPath` locators                                      |
+| L6  | Avoid `XPath` locators with predicates about internal app structure (e.g., `href`) or Javascript code (e.g., `onClick`) |
+
+### Page Object Guidelines
+
+| ID  | Description                                                                 |
+|-----|-----------------------------------------------------------------------------|
+| P1  | Avoid exposing locator details outside Page Objects                        |
+| P2  | Avoid implementing unused locators within Page Objects                     |
+| P3  | Avoid methods implementing test logic in Page Objects (e.g., assertions, conditional statements) |
+| P4  | Implement multiple Page Object methods to model multiple expected outcomes (e.g., `loginOK` and `loginKO`) |
+| P5  | Introduce Page Object ancestors to share common functionalities            |
+| P6  | Add Page Objects as return types to methods to model the user's exploration |
+
+
+
 
 The process describing how TestQuest works is sketched in the following Figure.
 
