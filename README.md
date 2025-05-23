@@ -9,6 +9,7 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 
 ### Locator Guidelines
 
+
 | ID  | Description                                                                 |
 |-----|-----------------------------------------------------------------------------|
 | L1  | Prioritize `ID` and `XPath` locators                                        |
@@ -28,6 +29,45 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 | P4  | Implement multiple Page Object methods to model multiple expected outcomes (e.g., `loginOK` and `loginKO`)               |
 | P5  | Introduce Page Object ancestors to share common functionalities             |
 | P6  | Add Page Objects as return types to methods to model the user's exploration  |
+
+
+
+<h3>Locator Guidelines</h3>
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse;" border="1">
+  <thead>
+    <tr>
+      <th style="width: 10%; text-align: left; padding: 4px;">ID</th>
+      <th style="width: 90%; text-align: left; padding: 4px;">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="padding: 4px;">L1</td><td style="padding: 4px;">Prioritize <code>ID</code> and <code>XPath</code> locators</td></tr>
+    <tr><td style="padding: 4px;">L2</td><td style="padding: 4px;">Prioritize <code>XPath</code> locators with predicates about <code>id</code>, <code>name</code>, <code>class</code>, <code>title</code>, <code>alt</code>, and <code>value</code> properties</td></tr>
+    <tr><td style="padding: 4px;">L3</td><td style="padding: 4px;">Keep number of positional predicates and levels in XPath locators as few as possible</td></tr>
+    <tr><td style="padding: 4px;">L4</td><td style="padding: 4px;">Keep locator values readable and short</td></tr>
+    <tr><td style="padding: 4px;">L5</td><td style="padding: 4px;">Avoid using absolute <code>XPath</code> locators</td></tr>
+    <tr><td style="padding: 4px;">L6</td><td style="padding: 4px;">Avoid <code>XPath</code> locators with predicates about internal app structure (e.g., <code>href</code>) or Javascript code (e.g., <code>onClick</code>)</td></tr>
+  </tbody>
+</table>
+
+<h3>Page Object Guidelines</h3>
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 1em;" border="1">
+  <thead>
+    <tr>
+      <th style="width: 10%; text-align: left; padding: 4px;">ID</th>
+      <th style="width: 90%; text-align: left; padding: 4px;">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="padding: 4px;">P1</td><td style="padding: 4px;">Avoid exposing locator details outside Page Objects</td></tr>
+    <tr><td style="padding: 4px;">P2</td><td style="padding: 4px;">Avoid implementing unused locators within Page Objects</td></tr>
+    <tr><td style="padding: 4px;">P3</td><td style="padding: 4px;">Avoid methods implementing test logic in Page Objects (e.g., assertions, conditional statements)</td></tr>
+    <tr><td style="padding: 4px;">P4</td><td style="padding: 4px;">Implement multiple Page Object methods to model multiple expected outcomes (e.g., <code>loginOK</code> and <code>loginKO</code>)</td></tr>
+    <tr><td style="padding: 4px;">P5</td><td style="padding: 4px;">Introduce Page Object ancestors to share common functionalities</td></tr>
+    <tr><td style="padding: 4px;">P6</td><td style="padding: 4px;">Add Page Objects as return types to methods to model the user's exploration</td></tr>
+  </tbody>
+</table>
+
 
 
 ## Approach
