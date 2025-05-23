@@ -26,7 +26,7 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 | P1  | Avoid exposing locator details outside Page Objects                         |
 | P2  | Avoid implementing unused locators within Page Objects                      |
 | P3  | Avoid methods implementing test logic in Page Objects (e.g., assertions, conditional statements) |
-| P4  | Implement multiple Page Object methods to model multiple expected outcomes (e.g., `loginOK` and `loginKO`) |
+| P4  | Implement multiple Page Object methods to model multiple expected outcomes (e.g., `loginOK` and `loginKO`)|
 | P5  | Introduce Page Object ancestors to share common functionalities             |
 | P6  | Add Page Objects as return types to methods to model the user's exploration  |
 
@@ -40,19 +40,16 @@ The process describing how TestQuest works is sketched in the following Figure.
 </p>
 
 The TestQuest main class is implemented as an IntelliJ custom action, enabling the plugin in the target test project. TestQuest scans test-related files to extract information on locators and Page Objects using dedicated extractors. Locators follow the Selenium WebDriver model and are represented as Kotlin data classes containing _type_, _value_, and _code location_. Page Objects are structured with _names_, _ancestors_, and _method lists_, where methods include metadata like _parameters_, _return types_ and _associated locators_.
-
 At plugin startup and after each change, TestQuest updates two GUI windows: the _Gamification window_, showing info about the user profile, assigned dailies, ongoing achievements, and more,
  and _the Fragility window_, listing locators ranked by fragility score (0–1) inspired by **SIDEREAL** approach [3] and based on the best practices listed above.
-
-The tool currently support two daily assignment modes:
-- RANDOM: dailies are randomly assigned and expire after 24h
-- TARGETED: dailies are based on actual detected issues in the test suite
-
 In terms of usage, the user completes assigned tasks (e.g., replacing absolute XPaths), validate them through test execution, and earn rewards. 
 Progress is saved in XML files, and only passing tests count toward progression. 
-
 Two listeners are registered to capture static and dynamic perspectives of the test suite, respectively, managing the changes affecting the code and the outcomes of test
 executions, eventually reactivating the whole process sketched in the Figure above. 
+
+The tool currently support two daily assignment modes:
+- **RANDOM**: dailies are randomly assigned and expire after 24h
+- **TARGETED**: dailies are based on actual detected issues in the test suite
 
 TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
 
@@ -88,7 +85,7 @@ TestQuest plugin is written in Kotlin and built targeting Java 17 (JVM) and Inte
 
 
 ## References
-[1]: Selenium WebDriver Documentation. Available: https://www.selenium.dev/documentation/webdriver/
-[2]: M. Fowler. (2013) Page Object. Available: https://martinfowler.com/bliki/PageObject.html
-[3]: M. Leotta, F. Ricca, and P. Tonella, “SIDEREAL: Statistical adaptive generation of robust locators for Web testing,” Journal of Software:
+- [1]: Selenium WebDriver Documentation. Available: https://www.selenium.dev/documentation/webdriver/
+- [2]: M. Fowler. (2013) Page Object. Available: https://martinfowler.com/bliki/PageObject.html
+- [3]: M. Leotta, F. Ricca, and P. Tonella, “SIDEREAL: Statistical adaptive generation of robust locators for Web testing,” Journal of Software:
 Testing, Verification and Reliability (STVR), vol. 31, 2021. Available: https://doi.org/10.1002/stvr.1767
