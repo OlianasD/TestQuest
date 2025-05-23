@@ -11,23 +11,23 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 
 | ID  | Description                                                                 |
 |-----|-----------------------------------------------------------------------------|
-| L1  | Prioritize `ID` and `XPath` locators                                       |
+| L1  | Prioritize `ID` and `XPath` locators                                        |
 | L2  | Prioritize `XPath` locators with predicates about `id`, `name`, `class`, `title`, `alt`, and `value` properties |
 | L3  | Keep number of positional predicates and levels in XPath locators as few as possible |
-| L4  | Keep locator values readable and short                                     |
-| L5  | Avoid using absolute `XPath` locators                                      |
+| L4  | Keep locator values readable and short                                      |
+| L5  | Avoid using absolute `XPath` locators                                       |
 | L6  | Avoid `XPath` locators with predicates about internal app structure (e.g., `href`) or Javascript code (e.g., `onClick`) |
 
 ### Page Object Guidelines
 
 | ID  | Description                                                                 |
 |-----|-----------------------------------------------------------------------------|
-| P1  | Avoid exposing locator details outside Page Objects                        |
-| P2  | Avoid implementing unused locators within Page Objects                     |
+| P1  | Avoid exposing locator details outside Page Objects                         |
+| P2  | Avoid implementing unused locators within Page Objects                      |
 | P3  | Avoid methods implementing test logic in Page Objects (e.g., assertions, conditional statements) |
-| P4  | Implement multiple Page Object methods to model multiple expected outcomes (e.g., `loginOK` and `loginKO`)              |
-| P5  | Introduce Page Object ancestors to share common functionalities            |
-| P6  | Add Page Objects as return types to methods to model the user's exploration |
+| P4  | Implement multiple Page Object methods to model multiple expected outcomes (e.g., `loginOK` and `loginKO`)               |
+| P5  | Introduce Page Object ancestors to share common functionalities             |
+| P6  | Add Page Objects as return types to methods to model the user's exploration  |
 
 
 ## Approach
@@ -49,7 +49,7 @@ TestQuest is composed by the following main modules:
 - [extractor](./src/main/kotlin/extractor/): this module is responsible for extracting locator and Page object data from test artifacts for the evaluation
 - [gamification](./src/main/kotlin/gamification/): this module is responsible for defining and assigning tasks to users and keeping track of user progressions 
 - [listener](./src/main/kotlin/listener/): this module is responsible for capturing static and dynamic changes affecting test artifacts and test executions, eventually activating the gamification procress
-- [testQuest](./src/main/kotlin/testQuest/): this module is responsible for initializing the plugin and the whole gamification process
+- [testquest](./src/main/kotlin/testquest/): this module is responsible for initializing the plugin and the whole gamification process
 - [ui](./src/main/kotlin/ui/): this module is responsible for the plugin interface, including the Gamification and Fragility windows, displaying user data, progressions, and all related notifications
 - [utils](./src/main/kotlin/utils/): this modules is responsible for utility functions, including the management of the user progression through I/O operations
 
