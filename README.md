@@ -36,7 +36,7 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 The process describing how TestQuest works is sketched in the following Figure.
 
 <p align="center">
-  <img src="docs/testquest.png" alt="TestQuest Approach" width="75%" />
+  <img src="docs/testquest.png" alt="TestQuest Approach" width="50%" />
 </p>
 
 The TestQuest main class is implemented as an IntelliJ custom action, enabling the plugin in the target test project. TestQuest scans test-related files to extract information on locators and Page Objects using dedicated extractors. Locators follow the Selenium WebDriver model and are represented as Kotlin data classes containing _type_, _value_, and _code location_. Page Objects are structured with _names_, _ancestors_, and _method lists_, where methods include metadata like _parameters_, _return types_ and _associated locators_.
