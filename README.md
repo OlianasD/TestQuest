@@ -5,6 +5,7 @@
 ## Approach
 TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustness through an embedded gamification framework, based on Selenium WebDriver APIs, with a focus towards locators and PageObjects. 
 
+TestQuest relies on a task-driver approach, where tasks to complete are based on test robustness best practices identified in the literature, synthesized in the following Tables.
 
 
 ### Locator Guidelines
@@ -30,13 +31,13 @@ TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustne
 | P6  | Add Page Objects as return types to methods to model the user's exploration |
 
 
-
-
 The process describing how TestQuest works is sketched in the following Figure.
 
 <img src="./testquest.png" alt="TestQuest Approach" width="50%" />
 
-...
+The TestQuest main class is implemented as an IntelliJ custom action, enabling the plugin in the target test project. TestQuest scans test-related files to extract information on locators and Page Objects using dedicated extractors. Locators follow the Selenium WebDriver model and are represented as Kotlin data classes containing _type_, _value_, and _code location_. Page Objects are structured with _names_, _ancestors_, and _method lists_, where methods include metadata like _parameters_, _return types_ and _associated locators_.
+
+Extracted data are used both to assess test suite quality (based on specific metrics) and to drive gamification. TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
 
 
 
