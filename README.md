@@ -13,11 +13,11 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 | ID  | Description                                                                 |
 |-----|-----------------------------------------------------------------------------|
 | L1  | Prioritize `ID` and `XPath` locators                                        |
-| L2  | Prioritize `XPath` locators with predicates on `id`, `name`, `class`, `title`, `alt`, and `value` properties|
+| L2  | Prioritize `XPath` locators with predicates about `id`, `name`, `class`, `title`, `alt`, and `value` properties|
 | L3  | Keep number of positional predicates and levels in XPath locators as few as possible |
 | L4  | Keep locator values readable and short                                      |
 | L5  | Avoid using absolute `XPath` locators                                       |
-| L6  | Avoid `XPath` locators with predicates about internal app structure or Javascript (e.g., `href`, `onClick`) |
+| L6  | Avoid `XPath` locators with predicates about internal app structure (e.g., `href`) or Javascript (e.g., `onClick`) |
 
 ### Page Object Guidelines
 
