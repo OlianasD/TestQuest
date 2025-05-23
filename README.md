@@ -6,7 +6,7 @@ TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustne
 
 ## Guidelines
 
-TestQuest relies on a task-driver approach, where tasks to complete are based on test robustness best practices identified in the literature, synthesized in the following Tables.
+TestQuest relies on a task-driver approach, where tasks to complete are based on test robustness best practices identified in the literature, synthesized as follows.
 
 ### Locator Guidelines
 
@@ -46,23 +46,25 @@ Extracted data are used both to assess test suite quality (based on specific met
 
 ## Modules
 TestQuest is composed by the following main modules:  
-- [Gamification](./src/main/kotlin/gamification/): ...
-- [Listener](./src/main/kotlin/listener/): ... 
-- [Locator](./src/main/kotlin/analyzer/): ...
-- [UI](./src/main/kotlin/ui/): ...
-- [Utils](./src/main/kotlin/utils/): ...
+- [Analyzer](./src/main/kotlin/gamification/): this module is responsible for evaluating locators and Page Objects according to quality metrics. The evaluation is used to rate locators fragility and activate dailies targeted to fix found issues 
+- [Extractor](./src/main/kotlin/gamification/): this module is responsible for extracting locator and Page object data from test artifacts for the evaluation
+- [Gamification](./src/main/kotlin/gamification/): this module is responsible for defining and assigning tasks to users and keeping track of user progressions 
+- [Listener](./src/main/kotlin/listener/): this module is responsible for capturing static and dynamic changes affecting test artifacts and test executions, eventually activating the gamification procress
+- [TestQuest](./src/main/kotlin/analyzer/): this module is responsible for initializing the plugin and the whole gamification process
+- [UI](./src/main/kotlin/ui/): this module is responsible for the plugin interface, including the Gamification and Fragility windows, displaying user data, progressions, and all related notifications
+- [Utils](./src/main/kotlin/utils/): this modules is responsible for utility functions, including the management of the user progression through I/O operations
 
 ---
 
 ## Usage
 To use TestQuest into your IntelliJ test project:
-- Import **TestQuest Plugin**: 
+- Import TestQuest Plugin: 
     - Open the test project in Intellij
     - Select `File` > `Settings` > `Plugin` > click the engine symbol > `Import from File system` 
     - From the panel, select _testquest.zip_ provided in this repository under the _dist_ folder 
       - You can create your own zip copy of TestQuest by running `./gradlew buildPlugin` from TestQuest project terminal. The zip copy can be found under `build/distributions`
     - Select `Gamify` > `TestQuest` to start the plugin 
-- You can now create and modify test artifacts with TestQuest active. Progressions are saved under the IntelliJ config and data folder of your machine (e.g., `C:\Users\User\AppData\Roaming\JetBrains\IdeaIC2023.2\testquest` in Windows). 
+- You can now create and modify test artifacts with TestQuest active. Progressions are saved under the IntelliJ data folder of your machine (e.g., `\AppData\Roaming\JetBrains\IdeaIC2023.2\testquest` in Windows). 
 - Be sure that: 
     - All test artifacts in the test project (test cases, Page Objects) are stored under a _test_ folder
     - Test cases are named as _testCaseName_\_Test
