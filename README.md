@@ -66,5 +66,7 @@ To use TestQuest into your IntelliJ test project:
     - Page Objects are named as _pageObjectName_\_Page 
     - All locators are declared in their full form (i.e., `WebElement locatorName = driver.findElement(By.locatorStrategy(...))`)
 
+_TestQuest plugin was built with Java 17 and targets IntelliJ IDEA version 2023.2.x (build 232.*) or later.
+_
 
 
