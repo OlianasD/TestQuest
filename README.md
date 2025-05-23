@@ -1,12 +1,12 @@
 # TestQuest
 
 
-
-## Approach
 TestQuest is a Kotlin plugin for IntelliJ IDEA designed to enhance test robustness through an embedded gamification framework, based on Selenium WebDriver APIs, with a focus towards locators and PageObjects. 
 
-TestQuest relies on a task-driver approach, where tasks to complete are based on test robustness best practices identified in the literature, synthesized in the following Tables.
 
+## Guidelines
+
+TestQuest relies on a task-driver approach, where tasks to complete are based on test robustness best practices identified in the literature, synthesized in the following Tables.
 
 ### Locator Guidelines
 
@@ -31,6 +31,8 @@ TestQuest relies on a task-driver approach, where tasks to complete are based on
 | P6  | Add Page Objects as return types to methods to model the user's exploration |
 
 
+## Approach
+
 The process describing how TestQuest works is sketched in the following Figure.
 
 <img src="./testquest.png" alt="TestQuest Approach" width="50%" />
@@ -39,7 +41,7 @@ The TestQuest main class is implemented as an IntelliJ custom action, enabling t
 
 Extracted data are used both to assess test suite quality (based on specific metrics) and to drive gamification. TestQuest currently offers **50** daily tasks (**30** on locators, **20** on Page Objects) and **29** achievements to encourage user engagement and good practices.
 
-
+---
 
 ## Modules
 TestQuest is composed by the following main modules:  
@@ -49,21 +51,16 @@ TestQuest is composed by the following main modules:
 - [UI](./src/main/kotlin/ui/): ...
 - [Utils](./src/main/kotlin/utils/): ...
 
-
-
+---
 
 ## Usage
 To install and use TestQuest into your IntelliJ test project:
 
-- Import **Gamification Library** _jar_ used to intercept test events: 
-    - `Project Structure` > `Project Settings` > `Libraries`
-    - From the `Modules` panel to the right, under the `Dependencies` section, add _gamification-library.jar_ via `+` button, then confirm
-    - In this repository we provided a _jar_ file that supports Java 20, see more at [Gamification Library project](https://github.com/Paolobd/gamification-library))
 - Import **TestQuest Library** _zip_: 
     - `File` > `Settings` > `Plugin` > click the engine symbol > `Import from File system` 
     - From the panel, add _testquest.zip_ provided in this repository (or create your own zip by ...)
 - Be sure that: 
-    - All test artifacts (test cases, Page Objects) are stored under a _test_ folder
+    - All test artifacts in the test project (test cases, Page Objects) are stored under a _test_ folder
     - Test cases are named as _testCaseName_\_Test
     - Page Objects are named as _pageObjectName_\_Page 
     - All locators are declared in their full form (i.e., `WebElement locatorName = driver.findElement(By.locatorStrategy(...))`)
