@@ -8,6 +8,7 @@ import gamification.GamificationManager
 import extractor.locator.Locator
 import extractor.locator.LocatorsExtractor
 import analyzer.locator.LocatorsFragilityCalculator
+import extractor.pageobject.MethodInfo
 import extractor.pageobject.PageObject
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCall
@@ -133,6 +134,8 @@ class TestQuestAction : AnAction() {
         //this to store PO info before-after changes
         var POsOld: List<PageObject> = listOf()
         var POsNew: List<PageObject> = listOf()
+        var emptyPOs : ArrayList<PageObject> = arrayListOf()
+        var emptyReturnType : MutableSet<MethodInfo> = mutableSetOf()
         //this to store PO calls in tests before-after changes
         var POCallsOld: Map<String, List<PageObjectCall>> = emptyMap()
         var POCallsNew: Map<String, List<PageObjectCall>> = emptyMap()

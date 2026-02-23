@@ -1,7 +1,9 @@
 package analyzer.pageobject
 
 
+import extractor.locator.LocatorKey
 import extractor.pageobject.MethodInfo
+import extractor.pageobject.MethodInfoKey
 import testquest.TestQuestAction
 import utils.ProgressFileHandler
 
@@ -42,7 +44,60 @@ class PageObjectsAnalyzer {
             //fixed and pending POs are saved for future reuse
             ProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
         }
+        fun intersectMethodInfoLists(
+            list1: List<MethodInfo>,
+            list2: List<MethodInfo>
+        ): List<MethodInfo> {
 
+            val comparisonSet = list2.map { method ->
+                MethodInfoKey(
+                    name = method.name,
+                    returnType = method.returnType,
+                    paramTypes = method.paramTypes,
+                    locators = method.locators.map { locator ->
+                        LocatorKey(locator.locatorType, locator.locatorValue)
+                    },
+                    assertionLines = method.assertionLines,
+                    seleniumCommands = method.seleniumCommands
+                )
+            }.toSet()
+
+            return list1.filter { method ->
+                MethodInfoKey(
+                    name = method.name,
+                    returnType = method.returnType,
+                    paramTypes = method.paramTypes,
+                    locators = method.locators.map { locator ->
+                        LocatorKey(locator.locatorType, locator.locatorValue)
+                    },
+                    assertionLines = method.assertionLines,
+                    seleniumCommands = method.seleniumCommands
+                ) in comparisonSet
+            }
+        }
+
+        fun containsMethod(
+            list: List<MethodInfo>,
+            target: MethodInfo
+        ): Boolean {
+
+            return list.any { candidate ->
+
+                // Confronto campi principali
+                candidate.name == target.name &&
+                        candidate.returnType == target.returnType &&
+                        candidate.paramTypes == target.paramTypes &&
+                        candidate.assertionLines == target.assertionLines &&
+                        candidate.seleniumCommands == target.seleniumCommands &&
+
+                        // Confronto locators (solo locatorType e locatorValue)
+                        candidate.locators.size == target.locators.size &&
+                        candidate.locators.zip(target.locators).all { (loc1, loc2) ->
+                            loc1.locatorType == loc2.locatorType &&
+                                    loc1.locatorValue == loc2.locatorValue
+                        }
+            }
+        }
 
     }
 
@@ -75,7 +130,7 @@ class PageObjectsAnalyzer {
             }.filterValues { it.isNotEmpty() }
         }
         //if some new issue have been observed in the session, retrieve new fixed and pending from analysis and add saved ones
-        if(previousTargetedIssuedPOs.isNotEmpty())
+        /*if(previousTargetedIssuedPOs.isNotEmpty())
             calculateFixedAndPendingPOs(cleanedSavedFixedAndPending)
         //else, populate fixed and pending only with saved data
         else {
@@ -86,7 +141,7 @@ class PageObjectsAnalyzer {
                     targetedFixedAndPendingPOs[key] = mutableListOf()
                 }
             }
-        }
+        }*/
         return targetedIssuedPOs
     }
 
@@ -98,6 +153,8 @@ class PageObjectsAnalyzer {
         val emptyPOs = POs.filter { it.methods.isEmpty() }
         if (emptyPOs.isNotEmpty())
             targetedIssuedPOs["emptyPageObjects"] = emptyPOs
+        else
+            targetedIssuedPOs["emptyPageObjects"] = emptyList()
     }
 
     private fun calculateMissingCommandsMethods() {
@@ -106,6 +163,8 @@ class PageObjectsAnalyzer {
         }
         if (missingCommandsMethods.isNotEmpty())
             targetedIssuedPOs["missingCommandMethods"] = missingCommandsMethods
+        else
+            targetedIssuedPOs["missingCommandMethods"] = emptyList()
     }
 
     private fun calculateMissingReturnedPOMethods() {
@@ -114,6 +173,9 @@ class PageObjectsAnalyzer {
         }
         if (voidReturnMethods.isNotEmpty())
             targetedIssuedPOs["missingRetPOMethods"] = voidReturnMethods
+        else
+           targetedIssuedPOs["missingRetPOMethods"] = emptyList()
+
     }
 
     private fun calculateAssertionsInPOs() {
@@ -121,13 +183,17 @@ class PageObjectsAnalyzer {
             po.methods.flatMap { it.assertionLines }
         }
         if (assertionsInPOs.isNotEmpty())
-            targetedIssuedPOs["assertInPOs"] = assertionsInPOs
+            targetedIssuedPOs["assertInPOMethods"] = assertionsInPOs
+        else
+            targetedIssuedPOs["assertInPOMethods"] = emptyList()
     }
 
     private fun calculateNonCanonicalLocators() {
         val nonCanonicalLocators = POs.flatMap { it.nonCanonicalLocators }
         if (nonCanonicalLocators.isNotEmpty())
             targetedIssuedPOs["nonCanonicalLocs"] = nonCanonicalLocators
+        else
+            targetedIssuedPOs["nonCanonicalLocs"] = emptyList()
     }
 
     private fun calculateUnusedPOMethods() {
@@ -135,17 +201,36 @@ class PageObjectsAnalyzer {
             .flatten()
             .map { it.pageObject to it.methodName }
             .toSet()
-        val unusedMethods = POs.flatMap { po ->
+        var unusedMethods : ArrayList<MethodInfo> = POs.flatMap { po ->
             po.methods.filter { method -> (po.name to method.name) !in usedMethods }
-        }
-        if (unusedMethods.isNotEmpty())
+        } as ArrayList<MethodInfo>
+        if (unusedMethods.isNotEmpty()) {
+            //check for superclass methods invoked from subclass
+           var copyOfUnusedMethods = ArrayList(unusedMethods)
+            for(unusedMethod in copyOfUnusedMethods) {
+                var currClass = TestQuestAction.POsNew.find { it.name == unusedMethod.pageObject }
+                var descendants = TestQuestAction.POsNew.filter { currClass?.name in it.ancestors }
+                for(descendant in descendants) {
+                   var useInSubclass = Pair(descendant.name, unusedMethod.name)
+                    if(useInSubclass in usedMethods) {
+                        unusedMethods.remove(unusedMethod)
+                        break
+                    }
+                }
+            }
             targetedIssuedPOs["unusedPOMethods"] = unusedMethods
+        }
+        else
+            targetedIssuedPOs["unusedPOMethods"] = emptyList()
     }
 
     private fun calculateLocsOutPOs() {
         val invalidClassLocators = TestQuestAction.locatorsNew.filter { !it.className.endsWith("_Page") }
         if (invalidClassLocators.isNotEmpty())
             targetedIssuedPOs["outPOLocs"] = invalidClassLocators
+        else {
+            targetedIssuedPOs["outPOLocs"] = emptyList()
+        }
     }
 
     //compute duplicated methods that should be moved to common ancestor
@@ -154,12 +239,16 @@ class PageObjectsAnalyzer {
         for (po1 in POs)
             for (po2 in POs)
                 if (po1 != po2) {
-                    val commonMethods = po1.methods.intersect(po2.methods.toSet())
+                    //val commonMethods = po1.methods.toSet().intersect(po2.methods.toSet())
+                    val commonMethods = intersectMethodInfoLists(po1.methods, po2.methods)
                     clonedMethods.addAll(commonMethods)
                 }
         if (clonedMethods.isNotEmpty())
-            targetedIssuedPOs["clonedPOMethods"] = clonedMethods.toList()
+            targetedIssuedPOs["duplicatedMethods"] = clonedMethods.toList()
+        else
+            targetedIssuedPOs["duplicatedMethods"] = emptyList()
     }
+
 
 
 
@@ -222,42 +311,9 @@ class PageObjectsAnalyzer {
             targetedFixedAndPendingPOs[key] = finalFixedAndPendingPOs.toMutableList()
 
             // Save fixed and pending POs on file for future reuse
-            ProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
+           ProgressFileHandler.saveFixedAndPendingPOsData(targetedFixedAndPendingPOs)
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

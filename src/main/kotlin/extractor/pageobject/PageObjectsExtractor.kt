@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.stmt.Statement
 import com.github.javaparser.ast.stmt.TryStmt
 import extractor.locator.Locator
+import extractor.locator.LocatorKey
 import java.io.Serializable
 import java.nio.file.Path
 
@@ -26,6 +27,15 @@ data class PageObject(
         return name.hashCode()
     }
 }
+
+data class MethodInfoKey(
+    val name: String,
+    val returnType: String,
+    val paramTypes: List<String>,
+    val locators: List<LocatorKey>,
+    val assertionLines: List<String>,
+    val seleniumCommands: List<String>
+)
 
 //method info for the methods within each PO
 data class MethodInfo(
@@ -59,7 +69,9 @@ data class MethodInfo(
         result = 31 * result + seleniumCommands.hashCode()
         return result
     }
+
 }
+
 
 
 

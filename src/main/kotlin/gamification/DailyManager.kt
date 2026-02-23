@@ -624,7 +624,7 @@ class DailyManager {
             ),
             /************ DAILIES ABOUT POs ************/
             Daily(
-                "emptyPOs",
+                "emptyPageObjects",
                 "Add methods to the following empty Page Objects",
                 TARGETED_DAILY_XP,
                 null,
@@ -767,7 +767,7 @@ class DailyManager {
             "noIDOrXPath" to { testOutcomes -> checkTargetedNoIDNoXpathChanged(testOutcomes) },
             "broken" to { testOutcomes -> checkTargetedBrokenLocsRepaired(testOutcomes) },
             /************ DAILIES ABOUT POs ************/
-            "emptyPOs" to { testOutcomes -> checkMethodsToEmptyPOAdded(testOutcomes) },
+            "emptyPageObjects" to { testOutcomes -> checkMethodsToEmptyPOAdded(testOutcomes) },
             "missingCommandMethods" to { testOutcomes -> checkCommandsAdded(testOutcomes) },
             "missingRetPOMethods" to { testOutcomes -> checkPOTypeReturned(testOutcomes) },
             "assertInPOMethods" to { testOutcomes -> checkAssertsRemoved(testOutcomes) },
@@ -952,7 +952,7 @@ class DailyManager {
 
         //it counts the number of empty PO that have now one or more methods executed correctly
         private fun checkMethodsToEmptyPOAdded(testOutcomes: List<TestOutcome>): Int {
-            val count: Int
+            var count: Int
             val passedMethods = testOutcomes
                 .flatMap { it.poMethodCallsExercised }
                 .map { it.methodName }
@@ -965,6 +965,15 @@ class DailyManager {
                         ?.methods
                         ?.any { it.name in passedMethods } == true
                 }
+            var newPOsNoMoreEmpty = TestQuestAction.emptyPOs.filter {
+                oldPO ->
+                TestQuestAction.POsNew
+                    .find { it.name == oldPO.name }
+                    ?.methods
+                    ?.any { it.name in passedMethods } == true
+            }
+            TestQuestAction.emptyPOs.removeAll(newPOsNoMoreEmpty)
+            count += newPOsNoMoreEmpty.size
             return count
         }
 
@@ -1012,8 +1021,19 @@ class DailyManager {
                 //count methods that once had void as return type but that now have a PO
                 val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
                 val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
-                if (wasVoid && isNowPageObject)
+                if (wasVoid && isNowPageObject) {
                     count++
+                    TestQuestAction.emptyReturnType.removeIf { it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject }
+                }
+                else {
+                    if(isNowPageObject) {
+                        val wasVoidForReal = TestQuestAction.emptyReturnType.find{ it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject}
+                        if(wasVoidForReal != null) {
+                            count++
+                            TestQuestAction.emptyReturnType.remove(wasVoidForReal)
+                        }
+                    }
+                }
             }
             return count
         }
@@ -1065,7 +1085,7 @@ class DailyManager {
         //it counts the number of PO methods called by tests (POCallsNew) and executed correctly (i.e., call line before any error line)
         //that were not used before in any test
         private fun checkUnusedMethodsNowUsed(testOutcomes: List<TestOutcome>): Int {
-            val count: Int
+            var count: Int
             val oldCalledMethods = mutableSetOf<PageObjectCall>()
             val newCalledMethods = mutableSetOf<PageObjectCall>()
             //collect old and new PO calls from all tests
@@ -1080,6 +1100,24 @@ class DailyManager {
                     outcome.poMethodCallsExercised.any { it.methodName == newMethod.methodName }
                 }
             }
+            //check if some method from superclasses has been called. NON DECOMMENTARE, questo codice assegna punti per la daily ogni volta che si usa (ed esegue) un metodo ereditato
+            /*for(newCalledMethod in newCalledMethods) {
+                var currClass = TestQuestAction.POsNew.find {it.name == newCalledMethod.pageObject}
+                var currAncestors = currClass?.ancestors
+                if(currAncestors != null) {
+                    for(ancestor in currAncestors) {
+                        var ancestorClass = TestQuestAction.POsNew.find {it.name == ancestor}
+                        var commonMethod = ancestorClass?.methods?.find {it.name == newCalledMethod.methodName}
+                        if(commonMethod != null) {
+                            var subclassDoesNotHaveMethod = currClass?.methods?.any { it.name == commonMethod.name }
+                            if (subclassDoesNotHaveMethod != null && ! subclassDoesNotHaveMethod) {
+                                count++
+                            }
+                        }
+
+                    }
+                }
+            }*/
             return count
         }
 
@@ -1091,11 +1129,15 @@ class DailyManager {
             val passedLocs = testOutcomes
                 .flatMap { it.locatorsPassed }
                 .toSet()
+            val executedTestClasses = testOutcomes
+                .map { it.className }
+                .toSet()
+            val locsFromExecutedTestClasses = TestQuestAction.locatorsOld.filter { it.className in executedTestClasses}
             //check from passed locs all those that are moved from tests to PO
             for (passedLoc in passedLocs) {
                 //we compare new loc that changed class with previous version
                 //as some key attributes changed, basic equal cannot be used
-                val matchingOldLocator = TestQuestAction.locatorsOld.find { oldLocator ->
+                val matchingOldLocator = locsFromExecutedTestClasses.find { oldLocator ->
                     passedLoc.compareThisLocInPOWithOldInTest(oldLocator)
                 }
                 if (matchingOldLocator != null)
@@ -1117,24 +1159,41 @@ class DailyManager {
                     val commonAncestorsOldNames = poOld1.ancestors.intersect(poOld2.ancestors.toSet())
                     val commonAncestorsOld = TestQuestAction.POsOld.filter { it.name in commonAncestorsOldNames }
                     //find common methods OLD
-                    val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
-                    for (method in commonMethods)
+                    //val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
+                    val commonMethods = PageObjectsAnalyzer.intersectMethodInfoLists(poOld1.methods, poOld2.methods)
+                    for (method in commonMethods) {
+                        //find new versions of the compared POs
+                        val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
+                        val poNew2 = TestQuestAction.POsNew.find { it.name == poOld2.name }
                         //check no common ancestors OLD had that method before changes
-                        if (commonAncestorsOld.none { it.methods.contains(method) }) {
-                            //find new versions of the compared POs
-                            val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
-                            val poNew2 = TestQuestAction.POsNew.find { it.name == poOld2.name }
-                            if (poNew1 != null && poNew2 != null)
-                                //check that method is no more present in POs
-                                if (!poNew1.methods.contains(method) && !poNew2.methods.contains(method)) {
-                                    //find common ancestors NEW
-                                    val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
-                                    val commonAncestorsNew = TestQuestAction.POsNew.filter { it.name in commonAncestorsNewNames }
-                                    //check a common ancestor that now has that method
-                                    if (commonAncestorsNew.any { it.methods.contains(method) })
-                                        commonMethodsMoved.add(method.name)
+                        if (poNew1 != null && poNew2 != null) {
+                            //the method was not present in the old version of the ancestor PO and check that method is no more present in POs
+                            if (commonAncestorsOld.none { it.methods.contains(method) } && (!poNew1.methods.contains(method) && !poNew2.methods.contains(method))) {
+                                //find common ancestors NEW
+                                val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
+                                val commonAncestorsNew = TestQuestAction.POsNew.filter { it.name in commonAncestorsNewNames }
+                                //check a common ancestor that now has that method
+                                //if (commonAncestorsNew.any { it.methods.contains(method) })
+                                if (commonAncestorsNew.any {
+                                    PageObjectsAnalyzer.containsMethod(
+                                        it.methods,
+                                        method
+                                    )
+                                }) commonMethodsMoved.add(method.name)
+                            //poNew2 is an ancestor of poNew1
+                            } else if (poNew1.ancestors.contains(poNew2.name)) {
+                                //the method is no more present in PO1 but it was present in an older version of PO1 and is now present in the current version of PO2
+                                if(!PageObjectsAnalyzer.containsMethod(poNew1.methods, method) && PageObjectsAnalyzer.containsMethod(poOld1.methods, method) && PageObjectsAnalyzer.containsMethod(poNew2.methods, method)) {
+                                    commonMethodsMoved.add(method.name)
                                 }
-
+                            //poNew1 is an ancestor of poNew2
+                            } else if(poNew2.ancestors.contains(poNew1.name)) {
+                                //the method is no more present in PO2, but it was present in an older version of PO2 and is now present in the current version of PO1
+                                if(!PageObjectsAnalyzer.containsMethod(poNew2.methods, method) && PageObjectsAnalyzer.containsMethod(poOld2.methods, method) && PageObjectsAnalyzer.containsMethod(poNew1.methods, method)) {
+                                    commonMethodsMoved.add(method.name)
+                                }
+                        }
+                    }
                         }
                 }
             //check if any of these moved common methods is passed wrt a test
@@ -1809,7 +1868,8 @@ class DailyManager {
                     val commonAncestorsOldNames = poOld1.ancestors.intersect(poOld2.ancestors.toSet())
                     val commonAncestorsOld = TestQuestAction.POsOld.filter { it.name in commonAncestorsOldNames }
                     //find common methods
-                    val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
+                    //val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
+                    val commonMethods = PageObjectsAnalyzer.intersectMethodInfoLists(poOld1.methods, poOld2.methods)
                     for (method in commonMethods) {
                         //check no common ancestors had that method before changes
                         if (commonAncestorsOld.none { it.methods.contains(method) }) {
@@ -1876,13 +1936,6 @@ class DailyManager {
 
 
 
-
-
-
-
-
-
-
         /******* RANDOM DAILY CHECKS ABOUT TESTS *******/
 
         private fun checkRunTC(testOutcomes: List<TestOutcome>): Int {
@@ -1944,30 +1997,6 @@ class DailyManager {
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /**AUXILIARY FUNCTIONS**/
         private fun computeFragilityCoefficient(loc: Locator): Double{
             val calc = LocatorsFragilityCalculator()
@@ -1985,13 +2014,6 @@ class DailyManager {
         private fun countJavaScriptReferences(locatorValue: String): Int {
             return GamificationManager.BAD_JS.sumOf { attribute -> Regex(attribute).findAll(locatorValue).count() }
         }
-
-
-
-
-
-
-
 
         //dailies are assigned to new user at the start. initially, the usage mode is RANDOM so random dailies are assigned for setup
         //further, dailies are assigned randomly from not advanced ones (i.e., only those based on locators) if that is the chosen gamification mode
@@ -2091,20 +2113,6 @@ class DailyManager {
             }
             GamificationManager.updateUserProfile(userProfile)
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         fun getIconFromName(name: String): String {
             return DAILY_NAME_TO_ICON[name] ?: ""

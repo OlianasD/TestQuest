@@ -71,11 +71,12 @@ data class Locator(
                 || (this.methodName != "" && old.methodName == ""))
     }
 
-
-
 }
 
-
+data class LocatorKey(
+    val locatorType: String,
+    val locatorValue: String
+)
 
 
 

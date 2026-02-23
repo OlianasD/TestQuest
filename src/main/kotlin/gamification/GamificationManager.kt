@@ -105,7 +105,7 @@ class GamificationManager {
                 if(dailyProgresses.isNotEmpty() && totalXp > 0) {
                     msg = "$totalXp XP gained from (partially) completed dailies\n"
                 }
-                /*if (achProgresses.isNotEmpty()) { //TODO: commented
+               /* if (achProgresses.isNotEmpty()) { //TODO: commented
                     val completedAchievements = achProgresses.filterNotNull().joinToString(", ") { it.name }
                     msg += "Achievements completed: $completedAchievements\n"
                 }*/

@@ -5,6 +5,7 @@ import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.body.VariableDeclarator
+import testquest.TestQuestAction
 import java.io.File
 import java.io.Serializable
 
@@ -12,7 +13,8 @@ data class PageObjectCall(
     val pageObject: String,
     val methodName: String,
     val line: Int,
-    val parameters: List<String> = emptyList()
+    val parameters: List<String> = emptyList(),
+    val ancestors: List<String>? = emptyList()
 ): Serializable
 {
     override fun equals(other: Any?): Boolean {
@@ -64,9 +66,10 @@ class PageObjectCallExtractor {
                         val varName = scope.asNameExpr().nameAsString
                         val methodName = methodCall.nameAsString
                         val parameters = inferParameterTypes(methodCall.arguments.map { it.toString() })
+                        val ancestors = TestQuestAction.POsNew.find {pageObjectVars[varName] == it.name}?.ancestors
                         if (varName in pageObjectVars) {
                             results[currentTestMethod]?.add(
-                                PageObjectCall(pageObjectVars[varName]!!, methodName, methodCall.range.get().begin.line, parameters)
+                                PageObjectCall(pageObjectVars[varName]!!, methodName, methodCall.range.get().begin.line, parameters, ancestors)
                             )
                         }
                     }

@@ -7,6 +7,7 @@ import com.intellij.util.messages.MessageBusConnection
 import gamification.GamificationManager
 import extractor.locator.Locator
 import analyzer.locator.LocatorsAnalyzer
+import analyzer.pageobject.PageObjectsAnalyzer
 import extractor.pageobject.PageObject
 import extractor.test.PageObjectCall
 import testquest.TestQuestAction
@@ -114,7 +115,7 @@ class TestExecutionListener private constructor() : SMTRunnerEventsListener {
             GamificationManager.analyzeEvents(testOutcomes)
             testOutcomes.forEach { testOutcome ->
                 LocatorsAnalyzer.removePendingFixedLocators(testOutcome.locatorsPassed)
-                //PageObjectsAnalyzer.removePendingFixedPOs(testOutcome.) //TODO: check this
+                PageObjectsAnalyzer.removePendingFixedPOs(testOutcome.poMethodCallsExercised) //TODO: check this
             }
 
             //old data (locators, PO calls, POs) is updated with:

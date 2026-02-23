@@ -645,6 +645,10 @@ object GUIManager {
                             }
                         }
                         else if(dailyProgress.daily.isAdvanced) {
+                            if(dailyProgress.daily.name == "outPOLocs") {
+                                (dailyProgress.daily.issuesInPOs as? MutableList<Locator>)
+                                    ?.sortBy { it.className }
+                            }
                             dailyProgress.daily.issuesInPOs!!.forEach { issue ->
                                 when (issue) {
                                     is String -> { //e.g., a PO issue about an assertion line

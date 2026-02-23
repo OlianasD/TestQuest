@@ -102,6 +102,17 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                         .filter { it.fileName.toString().endsWith("Page.java") }
                         .map { po -> poExtractor.parsePageObject(po, TestQuestAction.locatorsNew) }
 
+                    //needed for the daily emptyPOs
+                    var newEmptyPOs = TestQuestAction.POsNew.filter {newPO ->
+                        newPO.methods.isEmpty() && !(TestQuestAction.emptyPOs.any {it.name == newPO.name}) && !(TestQuestAction.POsOld.any{it.name == newPO.name})}
+                    TestQuestAction.emptyPOs.addAll(newEmptyPOs)
+
+                    //needed for the daily missingRetPOMethods
+                    var voidReturnMethods = TestQuestAction.POsNew.flatMap { po ->
+                        po.methods.filter { it.returnType.equals("void", ignoreCase = true) }.map { it }
+                    }
+                    TestQuestAction.emptyReturnType.addAll(voidReturnMethods)
+
                     //extract PageObject calls from Tests (if any, from classes named as _Test.java)
                     val poCallsExtractor = PageObjectCallExtractor()
                     TestQuestAction.POCallsNew = testFilePaths
