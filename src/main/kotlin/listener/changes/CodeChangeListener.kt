@@ -15,6 +15,7 @@ import gamification.GamificationManager
 import extractor.locator.Locator
 import extractor.locator.LocatorsExtractor
 import analyzer.locator.LocatorsFragilityCalculator
+import analyzer.pageobject.PageObjectsAnalyzer
 import extractor.pageobject.PageObjectExtractor
 import extractor.test.PageObjectCallExtractor
 import testquest.TestQuestAction
@@ -112,6 +113,15 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                         po.methods.filter { it.returnType.equals("void", ignoreCase = true) }.map { it }
                     }
                     TestQuestAction.emptyReturnType.addAll(voidReturnMethods)
+
+                    //needed for the daily duplicatedMethods
+                    for(po1 in TestQuestAction.POsNew)
+                        for(po2 in TestQuestAction.POsNew)
+                            if(po1 != po2) {
+                                val commonMethods =
+                                    PageObjectsAnalyzer.intersectMethodInfoLists(po1.methods, po2.methods)
+                                TestQuestAction.duplicatedMethods.addAll(commonMethods)
+                            }
 
                     //extract PageObject calls from Tests (if any, from classes named as _Test.java)
                     val poCallsExtractor = PageObjectCallExtractor()

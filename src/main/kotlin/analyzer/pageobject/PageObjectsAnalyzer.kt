@@ -4,6 +4,7 @@ package analyzer.pageobject
 import extractor.locator.LocatorKey
 import extractor.pageobject.MethodInfo
 import extractor.pageobject.MethodInfoKey
+import gamification.GamificationManager
 import testquest.TestQuestAction
 import utils.ProgressFileHandler
 
@@ -129,19 +130,22 @@ class PageObjectsAnalyzer {
                 }
             }.filterValues { it.isNotEmpty() }
         }
-        //if some new issue have been observed in the session, retrieve new fixed and pending from analysis and add saved ones
-        /*if(previousTargetedIssuedPOs.isNotEmpty())
-            calculateFixedAndPendingPOs(cleanedSavedFixedAndPending)
-        //else, populate fixed and pending only with saved data
-        else {
-            targetedFixedAndPendingPOs =
-                cleanedSavedFixedAndPending?.mapValues { it.value.toMutableList() }?.toMutableMap() ?: mutableMapOf()
-            targetedIssuedPOs.keys.forEach { key ->
-                if (!targetedFixedAndPendingPOs.containsKey(key)) {
-                    targetedFixedAndPendingPOs[key] = mutableListOf()
+        if(GamificationManager.gamificationMode != GamificationManager.GamificationMode.ADVANCED) {
+            //if some new issue have been observed in the session, retrieve new fixed and pending from analysis and add saved ones
+            if (previousTargetedIssuedPOs.isNotEmpty())
+                calculateFixedAndPendingPOs(cleanedSavedFixedAndPending)
+            //else, populate fixed and pending only with saved data
+            else {
+                targetedFixedAndPendingPOs =
+                    cleanedSavedFixedAndPending?.mapValues { it.value.toMutableList() }?.toMutableMap()
+                        ?: mutableMapOf()
+                targetedIssuedPOs.keys.forEach { key ->
+                    if (!targetedFixedAndPendingPOs.containsKey(key)) {
+                        targetedFixedAndPendingPOs[key] = mutableListOf()
+                    }
                 }
             }
-        }*/
+        }
         return targetedIssuedPOs
     }
 

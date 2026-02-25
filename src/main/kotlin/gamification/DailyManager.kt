@@ -6,6 +6,7 @@ import extractor.test.PageObjectCall
 import analyzer.locator.LocatorsAnalyzer
 import analyzer.locator.LocatorsFragilityCalculator
 import analyzer.pageobject.PageObjectsAnalyzer
+import extractor.pageobject.MethodInfo
 import testquest.TestQuestAction
 import ui.GUIManager
 import utils.FilePathSolver
@@ -1147,58 +1148,23 @@ class DailyManager {
         }
 
         private fun checkClonedMethodsMoved(testOutcomes: List<TestOutcome>): Int {
-            val count: Int
-            //used a set to count the number of movement actions to move common methods to an ancestor
-            // (e.g., if 3 methods have same name and into this set, we will count them as 1 movement)
-            val commonMethodsMoved = mutableSetOf<String>()
-            for (i in 0 until TestQuestAction.POsOld.size)
-                for (j in i + 1 until TestQuestAction.POsOld.size) {
-                    val poOld1 = TestQuestAction.POsOld[i]
-                    val poOld2 = TestQuestAction.POsOld[j]
-                    //find common ancestors OLD
-                    val commonAncestorsOldNames = poOld1.ancestors.intersect(poOld2.ancestors.toSet())
-                    val commonAncestorsOld = TestQuestAction.POsOld.filter { it.name in commonAncestorsOldNames }
-                    //find common methods OLD
-                    //val commonMethods = poOld1.methods.intersect(poOld2.methods.toSet())
-                    val commonMethods = PageObjectsAnalyzer.intersectMethodInfoLists(poOld1.methods, poOld2.methods)
-                    for (method in commonMethods) {
-                        //find new versions of the compared POs
-                        val poNew1 = TestQuestAction.POsNew.find { it.name == poOld1.name }
-                        val poNew2 = TestQuestAction.POsNew.find { it.name == poOld2.name }
-                        //check no common ancestors OLD had that method before changes
-                        if (poNew1 != null && poNew2 != null) {
-                            //the method was not present in the old version of the ancestor PO and check that method is no more present in POs
-                            if (commonAncestorsOld.none { it.methods.contains(method) } && (!poNew1.methods.contains(method) && !poNew2.methods.contains(method))) {
-                                //find common ancestors NEW
-                                val commonAncestorsNewNames = poNew1.ancestors.intersect(poNew2.ancestors.toSet())
-                                val commonAncestorsNew = TestQuestAction.POsNew.filter { it.name in commonAncestorsNewNames }
-                                //check a common ancestor that now has that method
-                                //if (commonAncestorsNew.any { it.methods.contains(method) })
-                                if (commonAncestorsNew.any {
-                                    PageObjectsAnalyzer.containsMethod(
-                                        it.methods,
-                                        method
-                                    )
-                                }) commonMethodsMoved.add(method.name)
-                            //poNew2 is an ancestor of poNew1
-                            } else if (poNew1.ancestors.contains(poNew2.name)) {
-                                //the method is no more present in PO1 but it was present in an older version of PO1 and is now present in the current version of PO2
-                                if(!PageObjectsAnalyzer.containsMethod(poNew1.methods, method) && PageObjectsAnalyzer.containsMethod(poOld1.methods, method) && PageObjectsAnalyzer.containsMethod(poNew2.methods, method)) {
-                                    commonMethodsMoved.add(method.name)
-                                }
-                            //poNew1 is an ancestor of poNew2
-                            } else if(poNew2.ancestors.contains(poNew1.name)) {
-                                //the method is no more present in PO2, but it was present in an older version of PO2 and is now present in the current version of PO1
-                                if(!PageObjectsAnalyzer.containsMethod(poNew2.methods, method) && PageObjectsAnalyzer.containsMethod(poOld2.methods, method) && PageObjectsAnalyzer.containsMethod(poNew1.methods, method)) {
-                                    commonMethodsMoved.add(method.name)
-                                }
-                        }
+            var count = 0
+            val passedMethods = testOutcomes.flatMap { it.poMethodCallsExercised }.toSet()
+            var currentlyDuplicatedMethods : MutableSet<MethodInfo> = mutableSetOf()
+            for(po1 in TestQuestAction.POsNew)
+                for(po2 in TestQuestAction.POsNew)
+                    if(po1 != po2) {
+                        val commonMethods =
+                            PageObjectsAnalyzer.intersectMethodInfoLists(po1.methods, po2.methods)
+                        currentlyDuplicatedMethods.addAll(commonMethods)
                     }
-                        }
+            for(passedMethod in passedMethods) {
+                if(TestQuestAction.duplicatedMethods.any {it.name == passedMethod.methodName}
+                    && !currentlyDuplicatedMethods.any {it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject}) {
+                    count++
+                    TestQuestAction.duplicatedMethods.removeIf { it.name == passedMethod.methodName }
                 }
-            //check if any of these moved common methods is passed wrt a test
-            val passedMethods = testOutcomes.flatMap { it.poMethodCallsExercised.map { call -> call.methodName } }.toSet()
-            count = passedMethods.count { it in commonMethodsMoved }
+            }
             return count
         }
 

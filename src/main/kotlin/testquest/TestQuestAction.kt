@@ -136,6 +136,7 @@ class TestQuestAction : AnAction() {
         var POsNew: List<PageObject> = listOf()
         var emptyPOs : ArrayList<PageObject> = arrayListOf()
         var emptyReturnType : MutableSet<MethodInfo> = mutableSetOf()
+        var duplicatedMethods : MutableSet<MethodInfo> = mutableSetOf()
         //this to store PO calls in tests before-after changes
         var POCallsOld: Map<String, List<PageObjectCall>> = emptyMap()
         var POCallsNew: Map<String, List<PageObjectCall>> = emptyMap()
