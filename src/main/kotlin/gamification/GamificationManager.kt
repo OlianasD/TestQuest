@@ -98,17 +98,17 @@ class GamificationManager {
 
         private fun updateProgresses(testOutcomes: List<TestOutcome>, userProfile: UserProfile) {
             val dailyProgresses = DailyManager.updateDailyProgresses(userProfile, testOutcomes)//check for each assigned daily
-            //val achProgresses = AchievementManager.updateAchievementProgresses(userProfile, testOutcomes) //TODO: commented
+            val achProgresses = AchievementManager.updateAchievementProgresses(userProfile, testOutcomes) //TODO: commented
             if (dailyProgresses.isNotEmpty()){// || achProgresses.isNotEmpty()){ //TODO: commented
                 val totalXp = dailyProgresses.sumOf { it.first } //total xp gained
                 var msg = ""
                 if(dailyProgresses.isNotEmpty() && totalXp > 0) {
                     msg = "$totalXp XP gained from (partially) completed dailies\n"
                 }
-               /* if (achProgresses.isNotEmpty()) { //TODO: commented
+                if (achProgresses.isNotEmpty()) { //TODO: commented
                     val completedAchievements = achProgresses.filterNotNull().joinToString(", ") { it.name }
                     msg += "Achievements completed: $completedAchievements\n"
-                }*/
+                }
                 val xmlWriter = XMLWriter()
                 val isNewTitle = updateTitleAndLvl(userProfile)
                 xmlWriter.saveUserProfileToXML(usersDataFile, userProfile)
@@ -128,6 +128,7 @@ class GamificationManager {
                 .maxByOrNull {
                     if (it.xp + getXpForTitle(userProfile.title) <= userProfile.currentXP + getXpForTitle(userProfile.title)) it.xp
                 else Int.MIN_VALUE }
+
             if (newTitle != null && userProfile.title != newTitle.name) {//if a new title is found
                 userProfile.title = newTitle.name
                 val currentIndex = allTitles.indexOfFirst { it.name == userProfile.title }
@@ -137,13 +138,13 @@ class GamificationManager {
                 }
                 else {
                     userProfile.nextXP = allTitles[currentIndex + 1].xp
-                    userProfile.currentXP -= allTitles[currentIndex].xp //xp is restarted considering exceeding XP from lvl reached
+                    //userProfile.currentXP -= allTitles[currentIndex].xp //xp is restarted considering exceeding XP from lvl reached
                 }
                 userProfile.level = currentIndex + 1
                 return true
             }
-            else if (newTitle == null)
-                userProfile.nextXP = allTitles[allTitles.size -1].xp
+            /*else if (newTitle == null)
+                userProfile.nextXP = allTitles[allTitles.size -1].xp*/
             return false
         }
 

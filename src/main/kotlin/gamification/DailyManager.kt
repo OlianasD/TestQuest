@@ -1013,26 +1013,17 @@ class DailyManager {
                 .map { it }
                 .toSet()
             for (passedMethod in passedMethods) {
-                //get old/new associated PO
-                val oldPO = TestQuestAction.POsOld.find { po -> po.name == passedMethod.pageObject }
+
                 val newPO = TestQuestAction.POsNew.find { po -> po.name == passedMethod.pageObject }
                 //get old/new method version
-                val oldMethod = oldPO?.methods?.find { it.name == passedMethod.methodName }
                 val newMethod = newPO?.methods?.find { it.name == passedMethod.methodName }
                 //count methods that once had void as return type but that now have a PO
-                val wasVoid = oldMethod?.returnType?.equals("void", ignoreCase = true) == true
                 val isNowPageObject = newMethod?.returnType?.endsWith("Page", ignoreCase = true) == true
-                if (wasVoid && isNowPageObject) {
-                    count++
-                    TestQuestAction.emptyReturnType.removeIf { it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject }
-                }
-                else {
-                    if(isNowPageObject) {
-                        val wasVoidForReal = TestQuestAction.emptyReturnType.find{ it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject}
-                        if(wasVoidForReal != null) {
-                            count++
-                            TestQuestAction.emptyReturnType.remove(wasVoidForReal)
-                        }
+                if(isNowPageObject) {
+                    val wasVoidForReal = TestQuestAction.emptyReturnType.find{ it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject}
+                    if(wasVoidForReal != null) {
+                        count++
+                        TestQuestAction.emptyReturnType.remove(wasVoidForReal)
                     }
                 }
             }
@@ -1049,16 +1040,14 @@ class DailyManager {
                 .map { it }
                 .toSet()
             for (passedMethod in passedMethods) {
-                val oldAssertions = TestQuestAction.POsOld
-                    .find { it.name == passedMethod.pageObject }
-                    ?.methods?.find { it.name == passedMethod.methodName }
-                    ?.assertionLines?.size ?: 0
-                val newAssertions = TestQuestAction.POsNew
-                    .find { it.name == passedMethod.pageObject }
-                    ?.methods?.find { it.name == passedMethod.methodName }
-                    ?.assertionLines?.size ?: 0
-                if (oldAssertions > newAssertions)
-                    count += (oldAssertions - newAssertions)
+                val oldMethodWithAssertions = TestQuestAction.assertsInPOs.find {it.name == passedMethod.methodName && it.pageObject == passedMethod.pageObject}
+                if(oldMethodWithAssertions != null) {
+                    val currMethod = TestQuestAction.POsNew.find {it.name == passedMethod.pageObject}?.methods?.find{ it.name == passedMethod.methodName}
+                    if(currMethod!!.assertionLines.isEmpty()) {
+                        count++;
+                        TestQuestAction.assertsInPOs.removeIf { it.name == oldMethodWithAssertions.name && it.pageObject == oldMethodWithAssertions.pageObject}
+                    }
+                }
             }
             return count
         }
@@ -1101,24 +1090,6 @@ class DailyManager {
                     outcome.poMethodCallsExercised.any { it.methodName == newMethod.methodName }
                 }
             }
-            //check if some method from superclasses has been called. NON DECOMMENTARE, questo codice assegna punti per la daily ogni volta che si usa (ed esegue) un metodo ereditato
-            /*for(newCalledMethod in newCalledMethods) {
-                var currClass = TestQuestAction.POsNew.find {it.name == newCalledMethod.pageObject}
-                var currAncestors = currClass?.ancestors
-                if(currAncestors != null) {
-                    for(ancestor in currAncestors) {
-                        var ancestorClass = TestQuestAction.POsNew.find {it.name == ancestor}
-                        var commonMethod = ancestorClass?.methods?.find {it.name == newCalledMethod.methodName}
-                        if(commonMethod != null) {
-                            var subclassDoesNotHaveMethod = currClass?.methods?.any { it.name == commonMethod.name }
-                            if (subclassDoesNotHaveMethod != null && ! subclassDoesNotHaveMethod) {
-                                count++
-                            }
-                        }
-
-                    }
-                }
-            }*/
             return count
         }
 
@@ -1173,21 +1144,6 @@ class DailyManager {
 
 
         /******* TARGETED DAILY CHECKS ABOUT TESTS *******/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         /******* RANDOM DAILY CHECKS ABOUT LOCATORS *******/

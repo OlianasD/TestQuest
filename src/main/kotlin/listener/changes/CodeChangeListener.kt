@@ -123,6 +123,12 @@ class CodeChangeListener private constructor() : EditorFactoryListener, Disposab
                                 TestQuestAction.duplicatedMethods.addAll(commonMethods)
                             }
 
+                    //needed for the dailies assertionsInPOMethods
+                    for(po in TestQuestAction.POsNew) {
+                        val assertsInPO = po.methods.filter { it.assertionLines.isNotEmpty()}
+                        TestQuestAction.assertsInPOs.addAll(assertsInPO)
+                    }
+
                     //extract PageObject calls from Tests (if any, from classes named as _Test.java)
                     val poCallsExtractor = PageObjectCallExtractor()
                     TestQuestAction.POCallsNew = testFilePaths
